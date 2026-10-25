@@ -66,6 +66,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL21C;
@@ -1253,6 +1254,11 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 		compositeRenderer.renderAll();
 		finalPassRenderer.renderFinalPass();
+
+		// vanilla leaves the scene depth in the main target, mods and upscalers that run after the world read it there
+		RenderTarget main = Minecraft.getInstance().getRenderTarget();
+		IrisRenderSystem.blitFramebuffer(renderTargets.getDepthSourceFb().getId(), main.frameBufferId, 0, 0, main.width, main.height,
+			0, 0, main.width, main.height, GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
 
 		isRenderingFullScreenPass = false;
 	}
