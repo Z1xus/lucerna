@@ -15,9 +15,9 @@ import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.AbstractTexture;
+import net.minecraft.client.render.texture.SimpleTexture;
 import net.minecraft.client.render.texture.Texture;
 import net.minecraft.client.render.texture.TextureManager;
-import net.minecraft.client.render.texture.TextureUtil;
 import net.minecraft.resource.Identifier;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL12C;
@@ -110,7 +110,13 @@ public class CustomTextureManager {
 			return () -> {
 				Texture texture = textureManager.get(textureLocation);
 
-				return texture != null ? texture.getGlId() : TextureUtil.MISSING_TEXTURE.getGlId();
+				// vanilla loads a texture when it first binds it, which never happens if the pack turned that renderer off
+				if (texture == null) {
+					texture = new SimpleTexture(textureLocation);
+					textureManager.register(textureLocation, texture);
+				}
+
+				return texture.getGlId();
 			};
 		} else {
 			throw new IllegalArgumentException("Unable to handle custom texture data " + textureData);
