@@ -37,7 +37,6 @@ class InstancedEntityTransformer {
 		String out = modern ? "out" : "varying";
 
 		replaceAttribute(t, tree, root, "mc_Entity", "vec4(-1.0, -1.0, 0.0, 1.0)");
-		replaceAttribute(t, tree, root, "mc_midTexCoord", "vec4(0.0, 0.0, 0.0, 1.0)");
 		replaceAttribute(t, tree, root, "at_tangent", "vec4(1.0, 0.0, 0.0, 1.0)");
 		replaceAttribute(t, tree, root, "at_midBlock", "vec4(0.0)");
 		removeUniform(t, root, "entityColor");
@@ -87,6 +86,12 @@ class InstancedEntityTransformer {
 			"vec2 lucerna_effectCoord(vec2 uv) { return uGlintPass >= 0 ? lucerna_glint(uv, 0.0) : uItemGlintPass >= 0 ? (uItemGlintMatrix * vec4(uv, 0.0, 1.0)).xy"
 				+ " : uChargePass == 1 ? uv + vec2(aEffectTime * 0.01) : uChargePass == 2 ? uv + vec2(cos(aEffectTime * 0.02) * 3.0, aEffectTime * 0.01)"
 				+ " : (gl_TextureMatrix[0] * vec4(uv, 0.0, 1.0)).xy; }");
+
+		// a mid texcoord equal to the vertex texcoord turns the atlas tile math of parallax into a plain lookup
+		int midTexCoord = removeAttribute(t, root, "mc_midTexCoord");
+		if (midTexCoord >= 0) {
+			root.replaceReferenceExpressions(t, "mc_midTexCoord", "vec4(lucerna_texture(), 0.0, 1.0)" + SWIZZLES[midTexCoord]);
+		}
 
 		root.rename("ftransform", "lucerna_ftransform");
 		root.replaceReferenceExpressions(t, "gl_Vertex", "lucerna_vertex()");
@@ -160,14 +165,24 @@ class InstancedEntityTransformer {
 	}
 
 	private static void replaceAttribute(ASTParser t, TranslationUnit tree, Root root, String name, String value) {
+		int type = removeAttribute(t, root, name);
+
+		if (type >= 0) {
+			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "const " + TYPES[type] + " " + name + " = " + value + SWIZZLES[type] + ";");
+		}
+	}
+
+	// returns the index of the declared type in TYPES, or -1 when the attribute is not declared
+	private static int removeAttribute(ASTParser t, Root root, String name) {
 		for (int i = 0; i < TYPES.length; i++) {
 			boolean found = root.processMatches(t, new AutoHintedMatcher<ExternalDeclaration>("attribute " + TYPES[i] + " " + name + ";", Matcher.externalDeclarationPattern), ASTNode::detachAndDelete);
 			found |= root.processMatches(t, new AutoHintedMatcher<ExternalDeclaration>("in " + TYPES[i] + " " + name + ";", Matcher.externalDeclarationPattern), ASTNode::detachAndDelete);
 
 			if (found) {
-				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "const " + TYPES[i] + " " + name + " = " + value + SWIZZLES[i] + ";");
-				return;
+				return i;
 			}
 		}
+
+		return -1;
 	}
 }
