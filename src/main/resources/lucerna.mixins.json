@@ -19,6 +19,8 @@
     "MixinVertexBuffer",
     "MixinWorldRenderer",
     "entity_render_context.MixinBlockEntityRenderDispatcher",
-    "entity_render_context.MixinEntityRenderDispatcher"
+    "entity_render_context.MixinEntityRenderDispatcher",
+    "gui.MixinCeleritasVideoOptionsController",
+    "gui.MixinGameGui"
   ]
 }
