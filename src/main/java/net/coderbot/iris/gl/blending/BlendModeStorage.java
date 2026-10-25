@@ -7,6 +7,8 @@ public class BlendModeStorage {
 	private static boolean originalBlendEnable;
 	private static BlendMode originalBlend;
 	private static boolean blendLocked;
+	// draw buffers with their own blend state, which the global blend calls do not reset
+	private static int overriddenBuffers;
 
 	public static boolean isBlendLocked() {
 		return blendLocked;
@@ -42,6 +44,8 @@ public class BlendModeStorage {
 			originalBlend = new BlendMode(blendState.sfactorRGB, blendState.dfactorRGB, blendState.sfactorAlpha, blendState.dfactorAlpha);
 		}
 
+		overriddenBuffers |= 1 << index;
+
 		if (override == null) {
 			IrisRenderSystem.disableBufferBlend(index);
 		} else {
@@ -75,5 +79,19 @@ public class BlendModeStorage {
 
 		GlStateManager.blendFuncSeparate(originalBlend.getSrcRgb(), originalBlend.getDstRgb(),
 				originalBlend.getSrcAlpha(), originalBlend.getDstAlpha());
+
+		for (int index = 0; overriddenBuffers != 0; index++, overriddenBuffers >>>= 1) {
+			if ((overriddenBuffers & 1) == 0) {
+				continue;
+			}
+
+			if (originalBlendEnable) {
+				IrisRenderSystem.enableBufferBlend(index);
+			} else {
+				IrisRenderSystem.disableBufferBlend(index);
+			}
+
+			IrisRenderSystem.blendFuncSeparatei(index, originalBlend.getSrcRgb(), originalBlend.getDstRgb(), originalBlend.getSrcAlpha(), originalBlend.getDstAlpha());
+		}
 	}
 }
