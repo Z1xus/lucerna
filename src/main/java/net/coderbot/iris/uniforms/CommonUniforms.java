@@ -202,7 +202,7 @@ public final class CommonUniforms {
 			if (nightVision != null) {
 				int duration = nightVision.getDuration();
 				float tickDelta = CapturedRenderingState.INSTANCE.getTickDelta();
-				return duration > 200 ? 1.0F : 0.7F + MathHelper.sin((duration - tickDelta) * (float) java.lang.Math.PI * 0.2F) * 0.3F;
+				return duration > 200 ? 1.0F : 0.7F + MathHelper.sin((duration - tickDelta) * (float) Math.PI * 0.2F) * 0.3F;
 			}
 		}
 

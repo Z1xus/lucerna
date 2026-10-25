@@ -1,8 +1,5 @@
 package net.coderbot.iris.compat.celeritas;
 
-import org.embeddedt.embeddium.impl.render.chunk.RenderPassConfiguration;
-import org.embeddedt.embeddium.impl.render.chunk.terrain.TerrainRenderPass;
-
 public enum IrisTerrainPass {
 	SHADOW("shadow"),
 	SHADOW_CUTOUT("shadow"),
@@ -22,13 +19,5 @@ public enum IrisTerrainPass {
 
 	public boolean isShadow() {
 		return this == SHADOW || this == SHADOW_CUTOUT;
-	}
-
-	public TerrainRenderPass toTerrainPass(RenderPassConfiguration<?> configuration) {
-		return switch (this) {
-			case SHADOW, GBUFFER_SOLID -> configuration.defaultSolidMaterial().pass;
-			case SHADOW_CUTOUT, GBUFFER_CUTOUT -> configuration.defaultCutoutMippedMaterial().pass;
-			case GBUFFER_TRANSLUCENT -> configuration.defaultTranslucentMaterial().pass;
-		};
 	}
 }

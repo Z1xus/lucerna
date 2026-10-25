@@ -19,14 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Adds the shader video settings page and a "Shader Packs..." tab, which opens the shader pack screen instead of
- * selecting a page, to the Celeritas video settings that Argentum shows.
- */
 @Mixin(value = CeleritasVideoOptionsController.class, remap = false)
 public class MixinCeleritasVideoOptionsController {
 	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
-	private static List<OptionPage> iris$addOptionPage(List<OptionPage> pages) {
+	private static List<OptionPage> lucerna$addOptionPage(List<OptionPage> pages) {
 		List<OptionPage> withShaders = new ArrayList<>(pages);
 		withShaders.add(IrisOptionPage.create());
 
@@ -34,7 +30,7 @@ public class MixinCeleritasVideoOptionsController {
 	}
 
 	@Inject(method = "createExtraTabs", at = @At("HEAD"))
-	private void iris$addShaderPackTab(Map<String, List<Tab<?>>> tabs, CallbackInfo ci) {
+	private void lucerna$addShaderPackTab(Map<String, List<Tab<?>>> tabs, CallbackInfo ci) {
 		tabs.computeIfAbsent(Iris.MODID, id -> new ArrayList<>()).add(Tab.createBuilder()
 				.setId(OptionIdentifier.create(Iris.MODID, "shader_packs"))
 				.setTitle(TextComponent.translatable("options.iris.shaderPackSelection"))
@@ -42,6 +38,7 @@ public class MixinCeleritasVideoOptionsController {
 					Minecraft minecraft = Minecraft.getInstance();
 					minecraft.openScreen(new ShaderPackScreen(minecraft.screen));
 
+					// open the screen instead of selecting a page
 					return false;
 				})
 				.build());

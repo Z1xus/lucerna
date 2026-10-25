@@ -12,22 +12,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Initializes Iris right before options are loaded, so that its key bindings are loaded from options.txt too, and
- * applies the cloud mode of the shader pack.
- */
 @Mixin(GameOptions.class)
 public class MixinGameOptions {
 	@Shadow
 	public KeyBinding[] keyBindings;
 
+	// initialize before the options load, so the key bindings are read from options.txt too
 	@Inject(method = "<init>(Lnet/minecraft/client/Minecraft;Ljava/io/File;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/options/GameOptions;load()V"))
-	private void iris$beforeLoadOptions(CallbackInfo ci) {
+	private void lucerna$beforeLoadOptions(CallbackInfo ci) {
 		keyBindings = ArrayUtils.addAll(keyBindings, Iris.onEarlyInitialize());
 	}
 
 	@Inject(method = "getCloudRenderMode", at = @At("RETURN"), cancellable = true)
-	private void iris$overrideCloudMode(CallbackInfoReturnable<Integer> cir) {
+	private void lucerna$overrideCloudMode(CallbackInfoReturnable<Integer> cir) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline == null) {

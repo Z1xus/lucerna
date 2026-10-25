@@ -1,6 +1,5 @@
 package net.coderbot.iris.rendertarget;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import com.google.common.collect.ImmutableSet;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
@@ -8,6 +7,7 @@ import net.coderbot.iris.gl.texture.DepthBufferFormat;
 import net.coderbot.iris.gl.texture.DepthCopyStrategy;
 import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.GL20C;
 

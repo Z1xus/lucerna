@@ -13,7 +13,7 @@ public class CapturedRenderingState {
 
 	private final Matrix4f gbufferModelView = new Matrix4f();
 	private final Matrix4f gbufferProjection = new Matrix4f();
-	private Vector3d fogColor;
+	private final Vector3d fogColor = new Vector3d();
 	private float tickDelta;
 	private int currentRenderedBlockEntity;
 	private Runnable blockEntityIdListener = null;
@@ -57,7 +57,7 @@ public class CapturedRenderingState {
 	}
 
 	public Vector3d getFogColor() {
-		if (Minecraft.getInstance().world == null || fogColor == null) {
+		if (Minecraft.getInstance().world == null) {
 			return ZERO_VECTOR_3d;
 		}
 
@@ -65,7 +65,7 @@ public class CapturedRenderingState {
 	}
 
 	public void setFogColor(float red, float green, float blue) {
-		fogColor = new Vector3d(red, green, blue);
+		fogColor.set(red, green, blue);
 	}
 
 	public void setTickDelta(float tickDelta) {

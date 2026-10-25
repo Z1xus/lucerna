@@ -1,9 +1,9 @@
 package net.coderbot.iris.shaderpack;
 
-import net.coderbot.iris.gui.option.IrisVideoSettings;
 import com.google.common.collect.ImmutableList;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
+import net.coderbot.iris.gui.option.IrisVideoSettings;
 import org.joml.Vector4f;
 
 import java.util.Optional;

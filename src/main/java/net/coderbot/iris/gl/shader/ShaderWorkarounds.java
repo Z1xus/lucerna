@@ -16,6 +16,7 @@ package net.coderbot.iris.gl.shader;
 
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL20C;
+import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
@@ -45,7 +46,7 @@ public class ShaderWorkarounds {
 			pointers.put(sourceBuffer);
 
 			GL20C.nglShaderSource(glId, 1, pointers.address0(), 0);
-			org.lwjgl.system.APIUtil.apiArrayFree(pointers.address0(), 1);
+			APIUtil.apiArrayFree(pointers.address0(), 1);
 		} finally {
 			stack.setPointer(stackPointer);
 		}

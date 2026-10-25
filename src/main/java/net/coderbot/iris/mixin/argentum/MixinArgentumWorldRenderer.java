@@ -8,13 +8,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/**
- * Builds chunk meshes in the extended vertex format while a shader pack is loaded.
- */
 @Mixin(value = ArgentumWorldRenderer.class, remap = false)
 public class MixinArgentumWorldRenderer {
 	@ModifyVariable(method = "createRenderSectionManager", at = @At("STORE"))
-	private ChunkVertexType iris$useExtendedVertexFormat(ChunkVertexType vertexType) {
+	private ChunkVertexType lucerna$useExtendedVertexFormat(ChunkVertexType vertexType) {
 		return Iris.getCurrentPack().isPresent() ? XHFPModelVertexType.INSTANCE : vertexType;
 	}
 }

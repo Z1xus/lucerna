@@ -15,13 +15,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Tells the extended terrain vertex encoder which block is being meshed.
- */
 @Mixin(ChunkBuilderMeshingTask.class)
 public class MixinChunkBuilderMeshingTask {
 	@Inject(method = "execute", remap = false, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;hasBlockEntity()Z", remap = true))
-	private void iris$beginBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
+	private void lucerna$beginBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
 								 @Local(name = "blockState") BlockState blockState, @Local(name = "blockPos") BlockPos.Mutable blockPos) {
 		if (Iris.getCurrentPack().isPresent()) {
 			TerrainBlockContext.get().set(TerrainBlockContext.packId(blockState), blockPos.getX(), blockPos.getY(), blockPos.getZ());
@@ -29,11 +26,11 @@ public class MixinChunkBuilderMeshingTask {
 	}
 
 	@Inject(method = "execute", remap = false, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/BlockRenderDispatcher;render(Lnet/minecraft/block/state/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/WorldView;Lnet/minecraft/client/render/vertex/BufferBuilder;)Z", remap = true))
-	private void iris$beginVanillaBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
+	private void lucerna$beginVanillaBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
 										@Local(name = "blockState") BlockState blockState, @Local(name = "blockPos") BlockPos.Mutable blockPos,
 										@Local(name = "pass") BlockLayer pass) {
 		if (Iris.getCurrentPack().isPresent()) {
-			((TerrainContextRanges) context).iris$recordBlock(pass, TerrainBlockContext.packId(blockState), blockPos);
+			((TerrainContextRanges) context).lucerna$recordBlock(pass, TerrainBlockContext.packId(blockState), blockPos);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package net.coderbot.iris.gl.program;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -10,6 +9,7 @@ import net.coderbot.iris.gl.sampler.SamplerHolder;
 import net.coderbot.iris.gl.sampler.SamplerLimits;
 import net.coderbot.iris.gl.state.ValueUpdateNotifier;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL20C;
 
 import java.util.ArrayList;
@@ -113,9 +113,6 @@ public class ProgramSamplers {
 			while (reservedTextureUnits.contains(nextUnit)) {
 				nextUnit += 1;
 			}
-
-			//System.out.println("Begin building samplers. Reserved texture units are " + reservedTextureUnits +
-			//		", next texture unit is " + nextUnit + ", there are " + remainingUnits + " units remaining.");
 		}
 
 		@Override
@@ -134,7 +131,6 @@ public class ProgramSamplers {
 				}
 
 				// Set up this sampler uniform to use this particular texture unit.
-				//System.out.println("Binding external sampler " + name + " to texture unit " + textureUnit);
 				calls.add(new GlUniform1iCall(location, textureUnit));
 			}
 		}
@@ -187,8 +183,6 @@ public class ProgramSamplers {
 					throw new IllegalStateException("No more available texture units while activating sampler " + name);
 				}
 
-				//System.out.println("Binding dynamic sampler " + name + " to texture unit " + nextUnit);
-
 				// Set up this sampler uniform to use this particular texture unit.
 				calls.add(new GlUniform1iCall(location, nextUnit));
 
@@ -208,8 +202,6 @@ public class ProgramSamplers {
 			while (remainingUnits > 0 && reservedTextureUnits.contains(nextUnit)) {
 				nextUnit += 1;
 			}
-
-			//System.out.println("The next unit is " + nextUnit + ", there are " + remainingUnits + " units remaining.");
 
 			return true;
 		}

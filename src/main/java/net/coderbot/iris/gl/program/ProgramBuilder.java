@@ -7,8 +7,8 @@ import net.coderbot.iris.gl.sampler.SamplerHolder;
 import net.coderbot.iris.gl.shader.GlShader;
 import net.coderbot.iris.gl.shader.ProgramCreator;
 import net.coderbot.iris.gl.shader.ShaderType;
-import net.coderbot.iris.gl.texture.InternalTextureFormat;
 import net.coderbot.iris.gl.state.ValueUpdateNotifier;
+import net.coderbot.iris.gl.texture.InternalTextureFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;

@@ -8,9 +8,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-/**
- * Gives Argentum's section manager the Celeritas shadow pass when a shader pack is loaded.
- */
 @Mixin(value = ArgentumRenderSectionManager.class, remap = false)
 public abstract class MixinArgentumRenderSectionManager extends RenderSectionManager {
 	private MixinArgentumRenderSectionManager() {
@@ -18,7 +15,7 @@ public abstract class MixinArgentumRenderSectionManager extends RenderSectionMan
 	}
 
 	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/RenderSectionManager;<init>(Lorg/embeddedt/embeddium/impl/render/chunk/RenderPassConfiguration;Ljava/util/function/Supplier;Ljava/util/function/BiFunction;ILorg/embeddedt/embeddium/impl/gl/device/CommandList;IIIZ)V"), index = 8)
-	private static boolean iris$enableShadowPass(boolean hasShadowPass) {
+	private static boolean lucerna$enableShadowPass(boolean hasShadowPass) {
 		return hasShadowPass || Iris.getCurrentPack().isPresent();
 	}
 

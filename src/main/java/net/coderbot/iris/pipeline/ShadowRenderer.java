@@ -6,7 +6,7 @@ import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gui.option.IrisVideoSettings;
-import net.coderbot.iris.mixin.ArgentumWorldRendererAccessor;
+import net.coderbot.iris.mixin.argentum.ArgentumWorldRendererAccessor;
 import net.coderbot.iris.shaderpack.OptionalBoolean;
 import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.shaderpack.PackShadowDirectives;
@@ -38,6 +38,7 @@ import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBTextureSwizzle;
@@ -50,8 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShadowRenderer {
-	public static Matrix4f MODELVIEW;
-	public static Matrix4f PROJECTION;
 	public static boolean ACTIVE = false;
 	private final float halfPlaneLength;
 	private final float renderDistanceMultiplier;
@@ -203,7 +202,7 @@ public class ShadowRenderer {
 
 			if (packCullingState == OptionalBoolean.FALSE) {
 				reason = "(set by shader pack)";
-			} else /*if (packHasVoxelization)*/ {
+			} else {
 				reason = "(voxelization detected)";
 			}
 
@@ -248,8 +247,8 @@ public class ShadowRenderer {
 
 			Vector4f shadowLightPosition = new CelestialUniforms(sunPathRotation).getShadowLightPositionInWorldSpace();
 
-			org.joml.Vector3f shadowLightVectorFromOrigin =
-				new org.joml.Vector3f(shadowLightPosition.x(), shadowLightPosition.y(), shadowLightPosition.z());
+			Vector3f shadowLightVectorFromOrigin =
+				new Vector3f(shadowLightPosition.x(), shadowLightPosition.y(), shadowLightPosition.z());
 
 			shadowLightVectorFromOrigin.normalize();
 
@@ -287,7 +286,7 @@ public class ShadowRenderer {
 
 		GlStateManager.viewport(0, 0, resolution, resolution);
 
-		MODELVIEW = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
+		Matrix4f modelView = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
 
 		profiler.push("terrain_setup");
 
@@ -323,17 +322,15 @@ public class ShadowRenderer {
 		profiler.swap("terrain");
 
 		// Set up our orthographic projection matrix and load it into the legacy matrix stack
-		float[] projection = this.fov != null
+		Matrix4f projection = new Matrix4f().set(this.fov != null
 			? ShadowMatrices.createPerspectiveMatrix(this.fov)
-			: ShadowMatrices.createOrthoMatrix(halfPlaneLength);
+			: ShadowMatrices.createOrthoMatrix(halfPlaneLength));
 
-		PROJECTION = new Matrix4f().set(projection);
+		loadMatrix(GL11.GL_PROJECTION, projection);
+		loadMatrix(GL11.GL_MODELVIEW, modelView);
 
-		loadMatrix(GL11.GL_PROJECTION, PROJECTION);
-		loadMatrix(GL11.GL_MODELVIEW, MODELVIEW);
-
-		ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).getMatrices();
-		((ArgentumWorldRendererAccessor) renderer).setMatrices(new ChunkRenderMatrices(PROJECTION, MODELVIEW));
+		ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).lucerna$getMatrices();
+		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(new ChunkRenderMatrices(projection, modelView));
 
 		// Disable backface culling
 		// This partially works around an issue where if the front face of a mountain isn't visible, it casts no
@@ -412,7 +409,7 @@ public class ShadowRenderer {
 
 		profiler.swap("restore gl state");
 
-		((ArgentumWorldRendererAccessor) renderer).setMatrices(playerMatrices);
+		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(playerMatrices);
 
 		GlStateManager.enableCull();
 
@@ -481,7 +478,6 @@ public class ShadowRenderer {
 			+ (shouldRenderTerrain ? "" : " (no terrain) ") + (shouldRenderTranslucent ? "" : "(no translucent)"));
 		messages.add("[" + Iris.MODNAME + "] Shadow Entities: " + getEntitiesDebugString());
 		messages.add("[" + Iris.MODNAME + "] Shadow Block Entities: " + getBlockEntitiesDebugString());
-
 	}
 
 	private String getEntitiesDebugString() {

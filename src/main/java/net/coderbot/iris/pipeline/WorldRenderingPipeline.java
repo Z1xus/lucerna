@@ -3,11 +3,11 @@ package net.coderbot.iris.pipeline;
 import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 import net.coderbot.iris.gbuffer_overrides.matching.SpecialCondition;
 import net.coderbot.iris.gbuffer_overrides.state.RenderTargetStateListener;
-import net.minecraft.client.render.world.WorldRenderer;
 import net.coderbot.iris.shaderpack.CloudSetting;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
-import net.minecraft.entity.Entity;
 import net.minecraft.client.render.Culler;
+import net.minecraft.client.render.world.WorldRenderer;
+import net.minecraft.entity.Entity;
 
 import java.util.List;
 import java.util.OptionalInt;

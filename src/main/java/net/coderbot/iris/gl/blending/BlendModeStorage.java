@@ -1,7 +1,7 @@
 package net.coderbot.iris.gl.blending;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
 
 public class BlendModeStorage {
 	private static boolean originalBlendEnable;

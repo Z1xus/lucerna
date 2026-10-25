@@ -7,15 +7,14 @@ import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
 import net.coderbot.iris.gl.program.ProgramImages;
 import net.coderbot.iris.gl.program.ProgramSamplers;
 import net.coderbot.iris.gl.program.ProgramUniforms;
+import net.coderbot.iris.mixin.GameRendererAccessor;
 import net.coderbot.iris.pipeline.SodiumTerrainPipeline;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
+import net.coderbot.iris.samplers.IrisSamplers;
 import net.coderbot.iris.shadows.ShadowRenderingState;
 import net.minecraft.client.Minecraft;
-import net.coderbot.iris.mixin.GameRendererAccessor;
-import net.coderbot.iris.samplers.IrisSamplers;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.TextureAtlas;
-import org.lwjgl.opengl.GL13;
 import org.embeddedt.embeddium.impl.gl.shader.ShaderBindingContext;
 import org.embeddedt.embeddium.impl.gl.shader.uniform.GlUniformFloat;
 import org.embeddedt.embeddium.impl.gl.shader.uniform.GlUniformFloat3v;
@@ -29,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.lwjgl.opengl.GL13;
 
 import java.util.List;
 
@@ -93,14 +93,14 @@ public class IrisChunkShaderInterface implements ChunkShaderInterface {
 		}
 
 		if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
-			// No back face culling during the shadow pass
+			// no back face culling during the shadow pass
 			GlStateManager.disableCull();
 		}
 
-		// See IrisSamplers#addLevelSamplers
+		// see IrisSamplers#addLevelSamplers
 		Minecraft minecraft = Minecraft.getInstance();
 		GlStateManager.activeTexture(GL13.GL_TEXTURE0 + IrisSamplers.LIGHTMAP_TEXTURE_UNIT);
-		GlStateManager.bindTexture(((GameRendererAccessor) minecraft.gameRenderer).getLightMapTexture().getGlId());
+		GlStateManager.bindTexture(((GameRendererAccessor) minecraft.gameRenderer).lucerna$getLightmapTexture().getGlId());
 		GlStateManager.activeTexture(GL13.GL_TEXTURE0 + IrisSamplers.ALBEDO_TEXTURE_UNIT);
 		GlStateManager.bindTexture(minecraft.getTextureManager().get(TextureAtlas.BLOCKS_LOCATION).getGlId());
 
@@ -178,7 +178,7 @@ public class IrisChunkShaderInterface implements ChunkShaderInterface {
 
 	@Override
 	public void setTextureSlot(ChunkShaderTextureSlot slot, int val) {
-		// Not used, the pack samplers bind the albedo and lightmap units themselves
+		// unused, the pack samplers bind the albedo and lightmap units themselves
 	}
 
 	private static SodiumTerrainPipeline getSodiumTerrainPipeline() {

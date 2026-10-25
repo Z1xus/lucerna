@@ -133,10 +133,6 @@ public class IrisFunctions {
 				// remainder
 				IrisFunctions.<II2IFunction>addVectorizable("remainder", (a, b) -> a % b);
 				IrisFunctions.<FF2FFunction>add("remainder", (a, b) -> a % b);
-
-				// IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC2, Vector2f::??);
-				// IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC3, Vector3f::??);
-				// IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC4, Vector4f::??);
 			}
 		}
 		{
@@ -211,7 +207,6 @@ public class IrisFunctions {
 				IrisFunctions.<F2FFunction>add("log2", (a) -> (float) (Math.log(a) / Math.log(2)));
 
 				IrisFunctions.<F2FFunction>add("sqrt", (a) -> (float) Math.sqrt(a));
-				// IrisFunctions.<F2FFunction>addVectorizable("inversesqrt", (a) -> (float) Math.(a));
 
 				// optifine
 				IrisFunctions.<F2FFunction>add("log10", (a) -> (float) Math.log10(a));
@@ -236,15 +231,9 @@ public class IrisFunctions {
 
 
 				IrisFunctions.<F2FFunction>add("sign", Math::signum);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC2, Vector2f::??);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC3, Vector3f::??);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC4, Vector4f::??);
 
 				// optifine
 				IrisFunctions.<F2FFunction>add("signum", Math::signum);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC2, Vector2f::??);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC3, Vector3f::??);
-				// IrisFunctions.addUnaryOpJOML("abs", VectorType.VEC4, Vector4f::??);
 
 				// because my type checker can handle (float) -> float and (float) -> int,
 				// floor doesn't require a cast to int, but does not cause issues if the float is too big and
@@ -265,17 +254,6 @@ public class IrisFunctions {
 				IrisFunctions.addUnaryOpJOML("ceil", VectorType.VEC4, Vector4f::ceil);
 
 				IrisFunctions.<F2FFunction>add("frac", (a) -> (float) (a - Math.floor(a)));
-
-				// IrisFunctions.addUnaryOpJOML("frac", VectorType.VEC2, Vector2f::??);
-				// IrisFunctions.addUnaryOpJOML("frac", VectorType.VEC3, Vector3f::??);
-				// IrisFunctions.addUnaryOpJOML("frac", VectorType.VEC4, Vector4f::??);
-
-				// optifine
-				// TODO: why does Math.round give an int?
-				// IrisFunctions.<F2FFunction>addVectorizable("round", (a) -> (float) Math.round(a));
-				// TODO maybe add round with a specifyable precission?
-				// IrisFunctions.<F2IFunction>addVectorizable("round", (a) -> (int) Math.round(a));
-
 
 				// mod is also already an operator
 
@@ -1209,10 +1187,6 @@ public class IrisFunctions {
 
 	static void addExplicitCast(final Type from, final Type to, final Consumer<FunctionReturn> function) {
 		addCast("to" + to.getClass().getSimpleName(), from, to, function);
-	}
-
-	public static void main(String[] args) {
-		functions.logAllFunctions();
 	}
 
 	interface ObjectObject2BooleanFunction<T, U> {

@@ -1,9 +1,8 @@
 package net.coderbot.iris.gbuffer_overrides.state;
 
+import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 import net.coderbot.iris.samplers.IrisSamplers;
 import net.minecraft.client.render.platform.GlStateManager;
-
-import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 
 public class StateTracker {
 	public static final StateTracker INSTANCE = new StateTracker();

@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Builds and caches the shader pack terrain programs that replace Celeritas' chunk programs.
- */
 public class IrisChunkProgramOverrides {
 	private static final Map<PatchShaderType, ShaderType> SHADER_TYPES = Map.of(
 		PatchShaderType.VERTEX, ShaderType.VERTEX,
@@ -29,7 +26,7 @@ public class IrisChunkProgramOverrides {
 	);
 
 	private final EnumMap<IrisTerrainPass, GlProgram<IrisChunkShaderInterface>> programs = new EnumMap<>(IrisTerrainPass.class);
-	private boolean shadersCreated = false;
+	private boolean shadersCreated;
 	private int versionCounterForSodiumShaderReload = -1;
 
 	@Nullable
@@ -67,14 +64,12 @@ public class IrisChunkProgramOverrides {
 	}
 
 	private void createShaders(SodiumTerrainPipeline pipeline) {
-		if (pipeline != null) {
-			for (IrisTerrainPass pass : IrisTerrainPass.values()) {
-				if (pass.isShadow() && !pipeline.hasShadowPass()) {
-					continue;
-				}
-
-				programs.put(pass, createProgram(pass, pipeline));
+		for (IrisTerrainPass pass : IrisTerrainPass.values()) {
+			if (pass.isShadow() && !pipeline.hasShadowPass()) {
+				continue;
 			}
+
+			programs.put(pass, createProgram(pass, pipeline));
 		}
 
 		shadersCreated = true;

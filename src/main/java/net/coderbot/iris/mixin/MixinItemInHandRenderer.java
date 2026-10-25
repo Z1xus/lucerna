@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(ItemInHandRenderer.class)
 public class MixinItemInHandRenderer {
 	@WrapWithCondition(method = "renderScreenEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/ItemInHandRenderer;renderInWaterEffect(F)V"))
-	private boolean iris$renderUnderwaterOverlay(ItemInHandRenderer renderer, float tickDelta) {
+	private boolean lucerna$renderUnderwaterOverlay(ItemInHandRenderer renderer, float tickDelta) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		return pipeline == null || pipeline.shouldRenderUnderwaterOverlay();

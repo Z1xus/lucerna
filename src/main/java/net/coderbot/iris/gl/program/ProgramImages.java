@@ -1,13 +1,12 @@
 package net.coderbot.iris.gl.program;
 
-import org.lwjgl.opengl.GL20;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.image.ImageBinding;
 import net.coderbot.iris.gl.image.ImageHolder;
 import net.coderbot.iris.gl.image.ImageLimits;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
+import org.lwjgl.opengl.GL20;
 
 import java.util.ArrayList;
 import java.util.List;

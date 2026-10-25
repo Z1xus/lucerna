@@ -1,7 +1,6 @@
 package net.coderbot.iris.postprocess;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
 import net.coderbot.iris.gl.program.Program;
@@ -12,9 +11,9 @@ import net.coderbot.iris.gl.texture.DepthCopyStrategy;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
 import net.coderbot.iris.gl.texture.PixelType;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
-import net.coderbot.iris.rendertarget.RenderTargets;
 import net.coderbot.iris.uniforms.SystemTimeUniforms;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL21C;

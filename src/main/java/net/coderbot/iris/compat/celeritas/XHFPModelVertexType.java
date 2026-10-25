@@ -5,10 +5,7 @@ import org.embeddedt.embeddium.impl.gl.attribute.GlVertexFormat;
 import org.embeddedt.embeddium.impl.render.chunk.vertex.format.ChunkVertexEncoder;
 import org.embeddedt.embeddium.impl.render.chunk.vertex.format.ChunkVertexType;
 
-/**
- * A Celeritas chunk vertex format with the attributes that shader packs read. Every attribute is a float attribute,
- * so the patched programs keep working on the GLSL 1.20 that most 1.8.9 shader packs target.
- */
+// every attribute is a float attribute, so the patched programs work on the glsl 1.20 that most 1.8.9 packs target
 public class XHFPModelVertexType implements ChunkVertexType {
 	public static final XHFPModelVertexType INSTANCE = new XHFPModelVertexType();
 

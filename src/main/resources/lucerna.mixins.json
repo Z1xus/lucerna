@@ -7,12 +7,10 @@
     "defaultRequire": 1
   },
   "client": [
-    "ArgentumWorldRendererAccessor",
     "GameRendererAccessor",
     "MixinBufferUploader",
     "MixinEntityRenderer",
     "MixinGLX",
-    "MixinGameGui",
     "MixinGameOptions",
     "MixinGameRenderer",
     "MixinItemRenderer",
@@ -28,6 +26,7 @@
     "MixinTitleScreen",
     "MixinVertexBuffer",
     "MixinWorldRenderer",
+    "argentum.ArgentumWorldRendererAccessor",
     "argentum.MixinArgentumChunkBuildContext",
     "argentum.MixinArgentumRenderSectionManager",
     "argentum.MixinArgentumWorldRenderer",

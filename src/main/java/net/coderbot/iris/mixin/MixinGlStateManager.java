@@ -23,46 +23,46 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GlStateManager.class)
 public class MixinGlStateManager {
 	@Unique
-	private static final int iris$TEXTURE_UNITS = 32;
+	private static final int LUCERNA_TEXTURE_UNITS = 32;
 
 	@Shadow
 	private static int texture;
 
 	@Unique
-	private static Runnable fogToggleListener;
+	private static Runnable lucerna$fogToggleListener;
 	@Unique
-	private static Runnable fogModeListener;
+	private static Runnable lucerna$fogModeListener;
 	@Unique
-	private static Runnable fogStartListener;
+	private static Runnable lucerna$fogStartListener;
 	@Unique
-	private static Runnable fogEndListener;
+	private static Runnable lucerna$fogEndListener;
 	@Unique
-	private static Runnable fogDensityListener;
+	private static Runnable lucerna$fogDensityListener;
 	@Unique
-	private static Runnable blendFuncListener;
+	private static Runnable lucerna$blendFuncListener;
 
 	static {
-		StateUpdateNotifiers.fogToggleNotifier = listener -> fogToggleListener = listener;
-		StateUpdateNotifiers.fogModeNotifier = listener -> fogModeListener = listener;
-		StateUpdateNotifiers.fogStartNotifier = listener -> fogStartListener = listener;
-		StateUpdateNotifiers.fogEndNotifier = listener -> fogEndListener = listener;
-		StateUpdateNotifiers.fogDensityNotifier = listener -> fogDensityListener = listener;
-		StateUpdateNotifiers.blendFuncNotifier = listener -> blendFuncListener = listener;
+		StateUpdateNotifiers.fogToggleNotifier = listener -> lucerna$fogToggleListener = listener;
+		StateUpdateNotifiers.fogModeNotifier = listener -> lucerna$fogModeListener = listener;
+		StateUpdateNotifiers.fogStartNotifier = listener -> lucerna$fogStartListener = listener;
+		StateUpdateNotifiers.fogEndNotifier = listener -> lucerna$fogEndListener = listener;
+		StateUpdateNotifiers.fogDensityNotifier = listener -> lucerna$fogDensityListener = listener;
+		StateUpdateNotifiers.blendFuncNotifier = listener -> lucerna$blendFuncListener = listener;
 	}
 
 	// vanilla only tracks 8 texture units, shader packs bind far more than that
 	@ModifyConstant(method = "<clinit>", constant = @Constant(intValue = 8, ordinal = 1))
-	private static int iris$increaseTextureArray(int units) {
-		return iris$TEXTURE_UNITS;
+	private static int lucerna$increaseTextureArray(int units) {
+		return LUCERNA_TEXTURE_UNITS;
 	}
 
 	@ModifyConstant(method = "<clinit>", constant = @Constant(intValue = 8, ordinal = 3))
-	private static int iris$increaseTextureLoop(int units) {
-		return iris$TEXTURE_UNITS;
+	private static int lucerna$increaseTextureLoop(int units) {
+		return LUCERNA_TEXTURE_UNITS;
 	}
 
 	@Unique
-	private static void iris$updateInputs() {
+	private static void lucerna$updateInputs() {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -71,7 +71,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "enableTexture", at = @At("HEAD"))
-	private static void iris$onEnableTexture(CallbackInfo ci) {
+	private static void lucerna$onEnableTexture(CallbackInfo ci) {
 		if (texture == IrisSamplers.ALBEDO_TEXTURE_UNIT) {
 			StateTracker.INSTANCE.albedoSampler = true;
 		} else if (texture == IrisSamplers.LIGHTMAP_TEXTURE_UNIT) {
@@ -80,11 +80,11 @@ public class MixinGlStateManager {
 			return;
 		}
 
-		iris$updateInputs();
+		lucerna$updateInputs();
 	}
 
 	@Inject(method = "disableTexture", at = @At("HEAD"))
-	private static void iris$onDisableTexture(CallbackInfo ci) {
+	private static void lucerna$onDisableTexture(CallbackInfo ci) {
 		if (texture == IrisSamplers.ALBEDO_TEXTURE_UNIT) {
 			StateTracker.INSTANCE.albedoSampler = false;
 		} else if (texture == IrisSamplers.LIGHTMAP_TEXTURE_UNIT) {
@@ -93,11 +93,11 @@ public class MixinGlStateManager {
 			return;
 		}
 
-		iris$updateInputs();
+		lucerna$updateInputs();
 	}
 
 	@Inject(method = "callList", at = @At("HEAD"))
-	private static void iris$beforeCallList(int list, CallbackInfo ci) {
+	private static void lucerna$beforeCallList(int list, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -106,53 +106,53 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "bindTexture", at = @At("RETURN"))
-	private static void iris$onBindTexture(int id, CallbackInfo ci) {
+	private static void lucerna$onBindTexture(int id, CallbackInfo ci) {
 		TextureTracker.INSTANCE.onBindTexture(id);
 	}
 
 	@Inject(method = "deleteTextures", at = @At("RETURN"))
-	private static void iris$onDeleteTexture(int id, CallbackInfo ci) {
+	private static void lucerna$onDeleteTexture(int id, CallbackInfo ci) {
 		TextureTracker.INSTANCE.onDeleteTexture(id);
 		TextureInfoCache.INSTANCE.onDeleteTexture(id);
 	}
 
 	@Inject(method = { "enableFog", "disableFog" }, at = @At("RETURN"))
-	private static void iris$onFogToggle(CallbackInfo ci) {
-		if (fogToggleListener != null) {
-			fogToggleListener.run();
+	private static void lucerna$onFogToggle(CallbackInfo ci) {
+		if (lucerna$fogToggleListener != null) {
+			lucerna$fogToggleListener.run();
 		}
 	}
 
 	@Inject(method = "fogMode", at = @At("RETURN"))
-	private static void iris$onFogMode(int mode, CallbackInfo ci) {
-		if (fogModeListener != null) {
-			fogModeListener.run();
+	private static void lucerna$onFogMode(int mode, CallbackInfo ci) {
+		if (lucerna$fogModeListener != null) {
+			lucerna$fogModeListener.run();
 		}
 	}
 
 	@Inject(method = "fogDensity", at = @At("RETURN"))
-	private static void iris$onFogDensity(float density, CallbackInfo ci) {
-		if (fogDensityListener != null) {
-			fogDensityListener.run();
+	private static void lucerna$onFogDensity(float density, CallbackInfo ci) {
+		if (lucerna$fogDensityListener != null) {
+			lucerna$fogDensityListener.run();
 		}
 	}
 
 	@Inject(method = "fogStart", at = @At("RETURN"))
-	private static void iris$onFogStart(float start, CallbackInfo ci) {
-		if (fogStartListener != null) {
-			fogStartListener.run();
+	private static void lucerna$onFogStart(float start, CallbackInfo ci) {
+		if (lucerna$fogStartListener != null) {
+			lucerna$fogStartListener.run();
 		}
 	}
 
 	@Inject(method = "fogEnd", at = @At("RETURN"))
-	private static void iris$onFogEnd(float end, CallbackInfo ci) {
-		if (fogEndListener != null) {
-			fogEndListener.run();
+	private static void lucerna$onFogEnd(float end, CallbackInfo ci) {
+		if (lucerna$fogEndListener != null) {
+			lucerna$fogEndListener.run();
 		}
 	}
 
 	@Inject(method = "disableBlend", at = @At("HEAD"), cancellable = true)
-	private static void iris$blendDisableLock(CallbackInfo ci) {
+	private static void lucerna$blendDisableLock(CallbackInfo ci) {
 		if (BlendModeStorage.isBlendLocked()) {
 			BlendModeStorage.deferBlendModeToggle(false);
 			ci.cancel();
@@ -160,7 +160,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "enableBlend", at = @At("HEAD"), cancellable = true)
-	private static void iris$blendEnableLock(CallbackInfo ci) {
+	private static void lucerna$blendEnableLock(CallbackInfo ci) {
 		if (BlendModeStorage.isBlendLocked()) {
 			BlendModeStorage.deferBlendModeToggle(true);
 			ci.cancel();
@@ -168,7 +168,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "blendFunc", at = @At("HEAD"), cancellable = true)
-	private static void iris$blendFuncLock(int srcFactor, int dstFactor, CallbackInfo ci) {
+	private static void lucerna$blendFuncLock(int srcFactor, int dstFactor, CallbackInfo ci) {
 		if (BlendModeStorage.isBlendLocked()) {
 			BlendModeStorage.deferBlendFunc(srcFactor, dstFactor, srcFactor, dstFactor);
 			ci.cancel();
@@ -176,7 +176,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "blendFuncSeparate", at = @At("HEAD"), cancellable = true)
-	private static void iris$blendFuncSeparateLock(int srcRgb, int dstRgb, int srcAlpha, int dstAlpha, CallbackInfo ci) {
+	private static void lucerna$blendFuncSeparateLock(int srcRgb, int dstRgb, int srcAlpha, int dstAlpha, CallbackInfo ci) {
 		if (BlendModeStorage.isBlendLocked()) {
 			BlendModeStorage.deferBlendFunc(srcRgb, dstRgb, srcAlpha, dstAlpha);
 			ci.cancel();
@@ -184,14 +184,14 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = { "blendFunc", "blendFuncSeparate" }, at = @At("RETURN"))
-	private static void iris$onBlendFunc(CallbackInfo ci) {
-		if (blendFuncListener != null) {
-			blendFuncListener.run();
+	private static void lucerna$onBlendFunc(CallbackInfo ci) {
+		if (lucerna$blendFuncListener != null) {
+			lucerna$blendFuncListener.run();
 		}
 	}
 
 	@Inject(method = "disableAlphaTest", at = @At("HEAD"), cancellable = true)
-	private static void iris$alphaTestDisableLock(CallbackInfo ci) {
+	private static void lucerna$alphaTestDisableLock(CallbackInfo ci) {
 		if (AlphaTestStorage.isAlphaTestLocked()) {
 			AlphaTestStorage.deferAlphaTestToggle(false);
 			ci.cancel();
@@ -199,7 +199,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "enableAlphaTest", at = @At("HEAD"), cancellable = true)
-	private static void iris$alphaTestEnableLock(CallbackInfo ci) {
+	private static void lucerna$alphaTestEnableLock(CallbackInfo ci) {
 		if (AlphaTestStorage.isAlphaTestLocked()) {
 			AlphaTestStorage.deferAlphaTestToggle(true);
 			ci.cancel();
@@ -207,7 +207,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "alphaFunc", at = @At("HEAD"), cancellable = true)
-	private static void iris$alphaFuncLock(int function, float reference, CallbackInfo ci) {
+	private static void lucerna$alphaFuncLock(int function, float reference, CallbackInfo ci) {
 		if (AlphaTestStorage.isAlphaTestLocked()) {
 			AlphaTestStorage.deferAlphaFunc(function, reference);
 			ci.cancel();
@@ -215,7 +215,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "depthMask", at = @At("HEAD"), cancellable = true)
-	private static void iris$depthMaskLock(boolean enable, CallbackInfo ci) {
+	private static void lucerna$depthMaskLock(boolean enable, CallbackInfo ci) {
 		if (DepthColorStorage.isDepthColorLocked()) {
 			DepthColorStorage.deferDepthEnable(enable);
 			ci.cancel();
@@ -223,7 +223,7 @@ public class MixinGlStateManager {
 	}
 
 	@Inject(method = "colorMask", at = @At("HEAD"), cancellable = true)
-	private static void iris$colorMaskLock(boolean red, boolean green, boolean blue, boolean alpha, CallbackInfo ci) {
+	private static void lucerna$colorMaskLock(boolean red, boolean green, boolean blue, boolean alpha, CallbackInfo ci) {
 		if (DepthColorStorage.isDepthColorLocked()) {
 			DepthColorStorage.deferColorMask(red, green, blue, alpha);
 			ci.cancel();

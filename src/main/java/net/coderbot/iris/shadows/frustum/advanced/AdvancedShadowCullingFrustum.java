@@ -5,9 +5,13 @@ import net.minecraft.client.render.Culler;
 import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
+import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.embeddedt.embeddium.impl.render.viewport.frustum.ShadowSearchFrustum;
-import org.joml.*;
 import org.joml.Math;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 /**
  * A Frustum implementation that derives a tightly-fitted shadow pass frustum based on the player's camera frustum and
@@ -29,7 +33,7 @@ import org.joml.Math;
  * are not sensitive to the specific internal ordering of planes and corners, in order to avoid potential bugs at the
  * cost of slightly more computations.</p>
  */
-public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum, ShadowSearchFrustum {
+public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, Frustum, ShadowSearchFrustum {
 	private static final int MAX_CLIPPING_PLANES = 13;
 
 	protected final BoxCuller boxCuller;
@@ -240,26 +244,6 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, o
 
 			plane = extend(edgePlaneNormal, w);
 		}
-
-		// Check and make sure our point is actually on all 3 planes.
-		// This can be removed in production but it's good to check for now while we're still testing.
-		/*{
-			float dp0 = plane.dotProduct(extend(point, 1.0F));
-			float dp1 = frontPlane4.dotProduct(extend(point, 1.0F));
-			float dp2 = backPlane4.dotProduct(extend(point, 1.0F));
-
-			if (Math.abs(dp0) > 0.0005) {
-				throw new IllegalStateException("dp0 should be zero, but was " + dp0);
-			}
-
-			if (Math.abs(dp1) > 0.0005) {
-				throw new IllegalStateException("dp1 should be zero, but was " + dp1);
-			}
-
-			if (Math.abs(dp2) > 0.0005) {
-				throw new IllegalStateException("dp2 should be zero, but was " + dp2);
-			}
-		}*/
 
 		addPlane(plane);
 	}

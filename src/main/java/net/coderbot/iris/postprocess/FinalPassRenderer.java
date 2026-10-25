@@ -1,9 +1,7 @@
 package net.coderbot.iris.postprocess;
 
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import net.coderbot.iris.gl.IrisRenderSystem;
@@ -29,16 +27,16 @@ import net.coderbot.iris.shaderpack.ProgramSet;
 import net.coderbot.iris.shaderpack.ProgramSource;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
 import net.coderbot.iris.uniforms.CommonUniforms;
-import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
-import org.joml.Vector3i;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
-import org.lwjgl.opengl.GL43C;
 
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +98,7 @@ public class FinalPassRenderer {
 		this.baseline = renderTargets.createGbufferFramebuffer(flippedBuffers, new int[] {0});
 		this.colorHolder = new GlFramebuffer();
 		this.lastColorTextureId = Minecraft.getInstance().getRenderTarget().colorTextureId;
-		this.lastColorTextureVersion = ((Blaze3dRenderTargetExt) Minecraft.getInstance().getRenderTarget()).iris$getColorBufferVersion();
+		this.lastColorTextureVersion = ((Blaze3dRenderTargetExt) Minecraft.getInstance().getRenderTarget()).lucerna$getColorBufferVersion();
 		this.colorHolder.addColorAttachment(0, lastColorTextureId);
 
 		// TODO: We don't actually fully swap the content, we merely copy it from alt to main
@@ -121,8 +119,6 @@ public class FinalPassRenderer {
 			swap.width = target1.getWidth();
 			swap.height = target1.getHeight();
 			swap.from = renderTargets.createColorFramebuffer(ImmutableSet.of(), new int[] {target});
-			// NB: This is handled in RenderTargets now.
-			//swap.from.readBuffer(target);
 			swap.targetTexture = renderTargets.get(target).getMainTexture();
 
 			swapPasses.add(swap);
@@ -157,7 +153,7 @@ public class FinalPassRenderer {
 		GlStateManager.disableAlphaTest();
 		GlStateManager.depthMask(false);
 
-		final net.minecraft.client.render.pipeline.RenderTarget main = Minecraft.getInstance().getRenderTarget();
+		final var main = Minecraft.getInstance().getRenderTarget();
 		final int baseWidth = renderTargets.getCurrentWidth();
 		final int baseHeight = renderTargets.getCurrentHeight();
 
@@ -174,8 +170,8 @@ public class FinalPassRenderer {
 		//
 		// This is not a concern for depthtex1 / depthtex2 since the copy call extracts the depth values, and the
 		// shader pack only ever uses them to read the depth values.
-		if (((Blaze3dRenderTargetExt) main).iris$getColorBufferVersion() != lastColorTextureVersion || main.colorTextureId != lastColorTextureId) {
-			lastColorTextureVersion = ((Blaze3dRenderTargetExt) main).iris$getColorBufferVersion();
+		if (((Blaze3dRenderTargetExt) main).lucerna$getColorBufferVersion() != lastColorTextureVersion || main.colorTextureId != lastColorTextureId) {
+			lastColorTextureVersion = ((Blaze3dRenderTargetExt) main).lucerna$getColorBufferVersion();
 			this.lastColorTextureId = main.colorTextureId;
 			colorHolder.addColorAttachment(0, lastColorTextureId);
 		}

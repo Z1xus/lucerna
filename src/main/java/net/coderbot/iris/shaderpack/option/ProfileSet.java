@@ -1,7 +1,6 @@
 package net.coderbot.iris.shaderpack.option;
 
 import net.coderbot.iris.Iris;
-import net.coderbot.iris.IrisLogging;
 import net.coderbot.iris.shaderpack.option.values.OptionValues;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +26,6 @@ public class ProfileSet {
 		// few constraints, needed for accurate matching when one profile contains an additional constraint
 		// to another profile but is otherwise the same;
 		sorted.sort(highToLow);
-
-		if (IrisLogging.ENABLE_SPAM) {
-			sorted.forEach(p -> System.out.println(p.name + ":" + p.precedence));
-		}
 
 		this.sortedProfiles = sorted;
 		this.orderedProfiles = orderedProfiles;

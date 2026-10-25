@@ -6,9 +6,9 @@ import net.minecraft.client.render.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
 
-import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class NativeImageBackedCustomTexture extends DynamicTexture {
 	public NativeImageBackedCustomTexture(CustomTextureData.PngData textureData) throws IOException {

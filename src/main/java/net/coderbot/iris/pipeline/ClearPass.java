@@ -1,9 +1,8 @@
 package net.coderbot.iris.pipeline;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.joml.Vector4f;
-import net.minecraft.client.Minecraft;
 
 import java.util.Objects;
 import java.util.function.IntSupplier;

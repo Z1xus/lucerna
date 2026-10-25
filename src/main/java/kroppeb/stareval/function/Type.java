@@ -2,8 +2,8 @@ package kroppeb.stareval.function;
 
 import kroppeb.stareval.expression.ConstantExpression;
 import kroppeb.stareval.function.TypedFunction.Parameter;
-import net.coderbot.iris.parsing.MatrixType;
 import net.coderbot.iris.gl.uniform.UniformType;
+import net.coderbot.iris.parsing.MatrixType;
 import net.coderbot.iris.parsing.VectorType;
 
 public abstract class Type {

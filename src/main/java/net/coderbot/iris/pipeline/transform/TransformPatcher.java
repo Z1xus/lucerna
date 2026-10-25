@@ -1,16 +1,5 @@
 package net.coderbot.iris.pipeline.transform;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.github.douira.glsl_transformer.ast.node.Identifier;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.Version;
@@ -24,6 +13,14 @@ import io.github.douira.glsl_transformer.cst.token_filter.TokenFilter;
 import io.github.douira.glsl_transformer.util.LRUCache;
 import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 import net.coderbot.iris.pipeline.PatchedShaderPrinter;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
+
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The transform patcher (triforce 2) uses glsl-transformer's ASTTransformer to
@@ -34,7 +31,7 @@ import net.coderbot.iris.pipeline.PatchedShaderPrinter;
  * an equals method and they must never be changed after having been used for
  * patching. Since the cache also contains the source string, it doesn't need to
  * be disabled when developing shaderpacks. However, when changes are made to
- * the patcher, the cache should be disabled with {@link #useCache}.
+ * the patcher, the cache should be disabled with {@link #USE_CACHE}.
  *
  * NOTE: This patcher expects (and ensures) that the string doesn't contain any
  * (!) preprocessor directives. The only allowed ones are #extension and #pragma
@@ -42,9 +39,8 @@ import net.coderbot.iris.pipeline.PatchedShaderPrinter;
  * the string, it will throw.
  */
 public class TransformPatcher {
-	static Logger LOGGER = LogManager.getLogger(TransformPatcher.class);
 	private static EnumASTTransformer<Parameters, PatchShaderType> transformer;
-	private static final boolean useCache = true;
+	private static final boolean USE_CACHE = true;
 	private static final Map<CacheKey, Map<PatchShaderType, String>> cache =  new LRUCache<>(400);
 
 	private static class CacheKey {
@@ -124,7 +120,7 @@ public class TransformPatcher {
 			public TranslationUnit parseTranslationUnit(String input) throws RecognitionException {
 				// parse #version directive using an efficient regex before parsing so that the
 				// parser can be set to the correct version
-				Matcher matcher = versionPattern.matcher(input);
+				Matcher matcher = VERSION_PATTERN.matcher(input);
 				if (!matcher.find()) {
 					throw new IllegalArgumentException("No #version directive found in source code! See debugging.md for more information.");
 				}
@@ -178,7 +174,7 @@ public class TransformPatcher {
 		transformer.setParseTokenFilter(parseTokenFilter);
 	}
 
-	private static final Pattern versionPattern = Pattern.compile("^.*#version\\s+(\\d+)", Pattern.DOTALL);
+	private static final Pattern VERSION_PATTERN = Pattern.compile("^.*#version\\s+(\\d+)", Pattern.DOTALL);
 
 	private static Map<PatchShaderType, String> transform(String vertex, String geometry, String fragment, Parameters parameters) {
 		// stop if all are null
@@ -189,7 +185,7 @@ public class TransformPatcher {
 		// check if this has been cached
 		CacheKey key;
 		Map<PatchShaderType, String> result = null;
-		if (useCache) {
+		if (USE_CACHE) {
 			key = new CacheKey(parameters, vertex, geometry, fragment);
 			if (cache.containsKey(key)) {
 				result = cache.get(key);
@@ -198,13 +194,13 @@ public class TransformPatcher {
 
 		// if there is no cache result, transform the shaders
 		if (result == null) {
-			transformer.setPrintType(PatchedShaderPrinter.prettyPrintShaders ? PrintType.INDENTED : PrintType.SIMPLE);
+			transformer.setPrintType(PatchedShaderPrinter.PRETTY_PRINT_SHADERS ? PrintType.INDENTED : PrintType.SIMPLE);
 			EnumMap<PatchShaderType, String> inputs = new EnumMap<>(PatchShaderType.class);
 			inputs.put(PatchShaderType.VERTEX, vertex);
 			inputs.put(PatchShaderType.GEOMETRY, geometry);
 			inputs.put(PatchShaderType.FRAGMENT, fragment);
 			result = transformer.transform(inputs, parameters);
-			if (useCache) {
+			if (USE_CACHE) {
 				cache.put(key, result);
 			}
 		}

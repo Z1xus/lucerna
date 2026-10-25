@@ -8,10 +8,7 @@ import net.minecraft.client.render.vertex.Tesselator;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
-/**
- * Renders vanilla fancy clouds from a display list that is only rebuilt when the cloud cell, color or visible faces
- * change, instead of tessellating every cloud quad each frame.
- */
+// fancy clouds from a display list that is rebuilt only when the cell, color or visible faces change
 public final class CloudRenderer {
 	public static final CloudRenderer INSTANCE = new CloudRenderer();
 

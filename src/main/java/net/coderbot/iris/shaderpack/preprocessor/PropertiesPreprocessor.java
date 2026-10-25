@@ -40,7 +40,7 @@ public class PropertiesPreprocessor {
 				try {
 					pp.addMacro(name, value);
 				} catch (LexerException e) {
-					e.printStackTrace();
+					Iris.logger.error("Failed to define the macro " + name, e);
 				}
 			});
 
@@ -64,7 +64,7 @@ public class PropertiesPreprocessor {
 				preprocessor.addMacro(envDefine.getKey(), envDefine.getValue());
 			}
 		} catch (LexerException e) {
-			e.printStackTrace();
+			Iris.logger.error("Failed to define the environment macros", e);
 		}
 
 		return process(preprocessor, source);

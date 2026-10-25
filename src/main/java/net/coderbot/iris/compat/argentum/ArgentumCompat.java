@@ -3,10 +3,7 @@ package net.coderbot.iris.compat.argentum;
 import dev.rdh.argentum.impl.Argentum;
 import dev.rdh.argentum.impl.config.ArgentumConfig;
 
-/**
- * Turns off the Argentum renderers that draw world geometry with their own programs while a shader pack is loaded,
- * so that the geometry goes through the shader pack's gbuffer programs instead.
- */
+// these argentum renderers draw with their own programs, so they are off while a shader pack is loaded
 public final class ArgentumCompat {
 	private static boolean applied;
 	private static boolean entityInstancing;
@@ -26,11 +23,6 @@ public final class ArgentumCompat {
 		}
 
 		if (active) {
-			entityInstancing = config.entityInstancing;
-			nameTagBatching = config.nameTagBatching;
-			fasterClouds = config.fasterClouds;
-			fasterWeather = config.fasterWeather;
-			fasterEndPortals = config.fasterEndPortals;
 			disable(config);
 		} else {
 			restore(config);
@@ -47,17 +39,16 @@ public final class ArgentumCompat {
 
 	public static void afterSave() {
 		if (applied) {
-			ArgentumConfig config = Argentum.CONFIG;
-			entityInstancing = config.entityInstancing;
-			nameTagBatching = config.nameTagBatching;
-			fasterClouds = config.fasterClouds;
-			fasterWeather = config.fasterWeather;
-			fasterEndPortals = config.fasterEndPortals;
-			disable(config);
+			disable(Argentum.CONFIG);
 		}
 	}
 
 	private static void disable(ArgentumConfig config) {
+		entityInstancing = config.entityInstancing;
+		nameTagBatching = config.nameTagBatching;
+		fasterClouds = config.fasterClouds;
+		fasterWeather = config.fasterWeather;
+		fasterEndPortals = config.fasterEndPortals;
 		config.entityInstancing = false;
 		config.nameTagBatching = false;
 		config.fasterClouds = false;

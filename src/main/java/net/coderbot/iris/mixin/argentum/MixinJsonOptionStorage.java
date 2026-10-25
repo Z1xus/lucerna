@@ -7,18 +7,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Keeps the overrides of {@link ArgentumCompat} out of Argentum's config file.
- */
+// keeps the ArgentumCompat overrides out of the argentum config file
 @Mixin(value = JsonOptionStorage.class, remap = false)
 public class MixinJsonOptionStorage {
 	@Inject(method = "save", at = @At("HEAD"))
-	private void iris$beforeSave(CallbackInfo ci) {
+	private void lucerna$beforeSave(CallbackInfo ci) {
 		ArgentumCompat.beforeSave();
 	}
 
 	@Inject(method = "save", at = @At("RETURN"))
-	private void iris$afterSave(CallbackInfo ci) {
+	private void lucerna$afterSave(CallbackInfo ci) {
 		ArgentumCompat.afterSave();
 	}
 }

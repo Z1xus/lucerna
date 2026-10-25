@@ -19,17 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BlockEntityRenderDispatcher.class)
 public class MixinBlockEntityRenderDispatcher {
 	@Unique
-	private WorldRenderingPhase iris$previousPhase;
+	private WorldRenderingPhase lucerna$previousPhase;
 
 	@Inject(method = "render(Lnet/minecraft/block/entity/BlockEntity;DDDFI)V", at = @At("HEAD"))
-	private void iris$beginBlockEntityRender(BlockEntity blockEntity, double dx, double dy, double dz, float tickDelta, int blockMiningProgress, CallbackInfo ci) {
+	private void lucerna$beginBlockEntityRender(BlockEntity blockEntity, double dx, double dy, double dz, float tickDelta, int blockMiningProgress, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline == null) {
 			return;
 		}
 
-		iris$previousPhase = pipeline.getPhase();
+		lucerna$previousPhase = pipeline.getPhase();
 		pipeline.setPhase(WorldRenderingPhase.BLOCK_ENTITIES);
 
 		Object2IntMap<BlockState> blockStateIds = BlockRenderingSettings.INSTANCE.getBlockStateIds();
@@ -41,14 +41,14 @@ public class MixinBlockEntityRenderDispatcher {
 	}
 
 	@Inject(method = "render(Lnet/minecraft/block/entity/BlockEntity;DDDFI)V", at = @At("RETURN"))
-	private void iris$endBlockEntityRender(BlockEntity blockEntity, double dx, double dy, double dz, float tickDelta, int blockMiningProgress, CallbackInfo ci) {
+	private void lucerna$endBlockEntityRender(BlockEntity blockEntity, double dx, double dy, double dz, float tickDelta, int blockMiningProgress, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline == null) {
 			return;
 		}
 
-		pipeline.setPhase(iris$previousPhase);
+		pipeline.setPhase(lucerna$previousPhase);
 		CapturedRenderingState.INSTANCE.setCurrentBlockEntity(0);
 	}
 }
