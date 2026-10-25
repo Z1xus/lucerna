@@ -35,6 +35,7 @@ public class StandardMacros {
 		ArrayList<StringPair> standardDefines = new ArrayList<>();
 
 		define(standardDefines, "MC_VERSION", getMcVersion());
+		define(standardDefines, "IS_IRIS");
 		define(standardDefines, "MC_GL_VERSION", getGlVersion(GL20C.GL_VERSION));
 		define(standardDefines, "MC_GLSL_VERSION", getGlVersion(GL20C.GL_SHADING_LANGUAGE_VERSION));
 		define(standardDefines, getOsString());
