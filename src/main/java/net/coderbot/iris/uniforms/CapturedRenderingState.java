@@ -24,6 +24,9 @@ public class CapturedRenderingState {
 	private final Vector4f currentEntityColor = new Vector4f();
 	private Runnable entityColorListener = null;
 
+	private int currentRenderedItem;
+	private Runnable itemIdListener = null;
+
 	private boolean compilingDisplayList;
 
 	private CapturedRenderingState() {
@@ -107,6 +110,22 @@ public class CapturedRenderingState {
 
 	public ValueUpdateNotifier getEntityColorNotifier() {
 		return listener -> this.entityColorListener = listener;
+	}
+
+	public int getCurrentRenderedItem() {
+		return currentRenderedItem;
+	}
+
+	public void setCurrentRenderedItem(int item) {
+		this.currentRenderedItem = item;
+
+		if (this.itemIdListener != null) {
+			this.itemIdListener.run();
+		}
+	}
+
+	public ValueUpdateNotifier getItemIdNotifier() {
+		return listener -> this.itemIdListener = listener;
 	}
 
 	public ValueUpdateNotifier getEntityIdNotifier() {

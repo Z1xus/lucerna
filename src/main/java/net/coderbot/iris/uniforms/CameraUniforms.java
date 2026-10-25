@@ -4,6 +4,8 @@ import net.coderbot.iris.gl.uniform.UniformHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.ONCE;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
@@ -24,7 +26,11 @@ public class CameraUniforms {
 			.uniform1f(ONCE, "near", () -> 0.05)
 			.uniform1f(PER_FRAME, "far", CameraUniforms::getRenderDistanceInBlocks)
 			.uniform3d(PER_FRAME, "cameraPosition", tracker::getCurrentCameraPosition)
-			.uniform3d(PER_FRAME, "previousCameraPosition", tracker::getPreviousCameraPosition);
+			.uniform3d(PER_FRAME, "previousCameraPosition", tracker::getPreviousCameraPosition)
+			.uniform3i(PER_FRAME, "cameraPositionInt", () -> tracker.currentInt)
+			.uniform3f(PER_FRAME, "cameraPositionFract", () -> tracker.currentFract)
+			.uniform3i(PER_FRAME, "previousCameraPositionInt", () -> tracker.previousInt)
+			.uniform3f(PER_FRAME, "previousCameraPositionFract", () -> tracker.previousFract);
 	}
 
 	private static int getRenderDistanceInBlocks() {
@@ -54,14 +60,25 @@ public class CameraUniforms {
 		private Vector3d previousCameraPosition = new Vector3d();
 		private Vector3d currentCameraPosition = new Vector3d();
 		private final Vector3d shift = new Vector3d();
+		// unshifted positions split for precision, as modern iris provides them
+		private final Vector3i currentInt = new Vector3i();
+		private final Vector3f currentFract = new Vector3f();
+		private final Vector3i previousInt = new Vector3i();
+		private final Vector3f previousFract = new Vector3f();
 
 		CameraPositionTracker(FrameUpdateNotifier notifier) {
 			notifier.addListener(this::update);
 		}
 
 		private void update() {
+			Vector3d unshifted = getUnshiftedCameraPosition();
+			previousInt.set(currentInt);
+			previousFract.set(currentFract);
+			currentInt.set((int) Math.floor(unshifted.x), (int) Math.floor(unshifted.y), (int) Math.floor(unshifted.z));
+			currentFract.set((float) (unshifted.x - currentInt.x), (float) (unshifted.y - currentInt.y), (float) (unshifted.z - currentInt.z));
+
 			previousCameraPosition = currentCameraPosition;
-			currentCameraPosition = getUnshiftedCameraPosition().add(shift);
+			currentCameraPosition = unshifted.add(shift);
 
 			updateShift();
 		}

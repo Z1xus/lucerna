@@ -15,10 +15,12 @@ import net.coderbot.iris.uniforms.custom.cached.Float4MatrixCachedUniform;
 import net.coderbot.iris.uniforms.custom.cached.Float4VectorCachedUniform;
 import net.coderbot.iris.uniforms.custom.cached.FloatCachedUniform;
 import net.coderbot.iris.uniforms.custom.cached.Int2VectorCachedUniform;
+import net.coderbot.iris.uniforms.custom.cached.Int3VectorCachedUniform;
 import net.coderbot.iris.uniforms.custom.cached.IntCachedUniform;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.joml.Vector3i;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -109,6 +111,11 @@ public class CustomUniformFixedInputUniformsHolder {
 		@Override
 		public Builder uniform2i(UniformUpdateFrequency updateFrequency, String name, Supplier<Vector2i> value) {
 			return this.put(name, new Int2VectorCachedUniform(name, updateFrequency, value));
+		}
+
+		@Override
+		public Builder uniform3i(UniformUpdateFrequency updateFrequency, String name, Supplier<Vector3i> value) {
+			return this.put(name, new Int3VectorCachedUniform(name, updateFrequency, value));
 		}
 
 		@Override

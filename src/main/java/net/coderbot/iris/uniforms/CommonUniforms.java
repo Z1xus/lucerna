@@ -57,6 +57,9 @@ public final class CommonUniforms {
 		uniforms.uniform1i("entityId", CapturedRenderingState.INSTANCE::getCurrentRenderedEntity,
 				CapturedRenderingState.INSTANCE.getEntityIdNotifier());
 
+		uniforms.uniform1i("currentRenderedItemId", CapturedRenderingState.INSTANCE::getCurrentRenderedItem,
+				CapturedRenderingState.INSTANCE.getItemIdNotifier());
+
 		uniforms.uniform1i("blockEntityId", CapturedRenderingState.INSTANCE::getCurrentRenderedBlockEntity,
 				CapturedRenderingState.INSTANCE.getBlockEntityIdNotifier());
 
@@ -124,6 +127,7 @@ public final class CommonUniforms {
 			.uniform1f(PER_FRAME, "nightVision", CommonUniforms::getNightVision)
 			// 1.8.9 has no darkness effect
 			.uniform1f(PER_FRAME, "darknessFactor", () -> 0.0F)
+			.uniform1f(PER_FRAME, "darknessLightFactor", () -> 0.0F)
 			// TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
 			//       that the player is trying to turn on fullbright?
 			.uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)

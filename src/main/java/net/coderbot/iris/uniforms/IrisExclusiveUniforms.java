@@ -7,13 +7,16 @@ import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.global.LightningBoltEntity;
+import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.world.WorldSettings;
 import org.joml.Math;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class IrisExclusiveUniforms {
 	private static final Vector4f ZERO = new Vector4f(0, 0, 0, 0);
+	private static final Vector3f DIRECTION = new Vector3f();
 
 	public static void addIrisExclusiveUniforms(UniformHolder uniforms) {
 		WorldInfoUniforms.addWorldInfoUniforms(uniforms);
@@ -29,6 +32,12 @@ public class IrisExclusiveUniforms {
 		uniforms.uniform1b(UniformUpdateFrequency.PER_FRAME, "firstPersonCamera", () -> Minecraft.getInstance().options.perspective == 0);
 		uniforms.uniform1b(UniformUpdateFrequency.PER_TICK, "isSpectator", IrisExclusiveUniforms::isSpectator);
 		uniforms.uniform3d(UniformUpdateFrequency.PER_FRAME, "eyePosition", IrisExclusiveUniforms::getEyePosition);
+		uniforms.uniform3d(UniformUpdateFrequency.PER_FRAME, "relativeEyePosition", () -> CameraUniforms.getUnshiftedCameraPosition().sub(getEyePosition()));
+		uniforms.uniform3f(UniformUpdateFrequency.PER_FRAME, "playerLookVector", IrisExclusiveUniforms::getPlayerLookVector);
+		uniforms.uniform3f(UniformUpdateFrequency.PER_FRAME, "playerBodyVector", IrisExclusiveUniforms::getPlayerBodyVector);
+		// 1.8.9 has no left handed option
+		uniforms.uniform1b(UniformUpdateFrequency.ONCE, "isRightHanded", () -> true);
+		uniforms.uniform1f(UniformUpdateFrequency.PER_FRAME, "cloudTime", IrisExclusiveUniforms::getCloudTime);
 		uniforms.uniform4f(UniformUpdateFrequency.PER_TICK, "lightningBoltPosition", IrisExclusiveUniforms::getLightningBoltPosition);
 	}
 
@@ -94,14 +103,49 @@ public class IrisExclusiveUniforms {
 	}
 
 	private static Vector3d getEyePosition() {
+		return CameraUniforms.getUnshiftedCameraPosition().add(0.0, Minecraft.getInstance().getCamera().getEyeHeight(), 0.0);
+	}
+
+	private static Vector3f getPlayerLookVector() {
 		Entity camera = Minecraft.getInstance().getCamera();
-		return new Vector3d(camera.x, camera.y + camera.getEyeHeight(), camera.z);
+		float tickDelta = CapturedRenderingState.INSTANCE.getTickDelta();
+		return direction(camera.lastYaw + (camera.yaw - camera.lastYaw) * tickDelta, camera.lastPitch + (camera.pitch - camera.lastPitch) * tickDelta);
+	}
+
+	private static Vector3f getPlayerBodyVector() {
+		Entity camera = Minecraft.getInstance().getCamera();
+
+		if (!(camera instanceof LivingEntity)) {
+			return direction(camera.yaw, 0.0F);
+		}
+
+		LivingEntity living = (LivingEntity) camera;
+		float tickDelta = CapturedRenderingState.INSTANCE.getTickDelta();
+		return direction(living.lastBodyYaw + (living.bodyYaw - living.lastBodyYaw) * tickDelta, 0.0F);
+	}
+
+	private static Vector3f direction(float yaw, float pitch) {
+		float yawRadians = Math.toRadians(yaw);
+		float pitchRadians = Math.toRadians(pitch);
+		float horizontal = Math.cos(pitchRadians);
+		return DIRECTION.set(-Math.sin(yawRadians) * horizontal, -Math.sin(pitchRadians), Math.cos(yawRadians) * horizontal);
+	}
+
+	private static float getCloudTime() {
+		ClientWorld world = Minecraft.getInstance().world;
+		// vanilla moves clouds by 0.03 blocks per tick
+		return world == null ? 0.0F : (world.getTime() + CapturedRenderingState.INSTANCE.getTickDelta()) * 0.03F;
 	}
 
 	public static class WorldInfoUniforms {
 		public static void addWorldInfoUniforms(UniformHolder uniforms) {
 			uniforms.uniform1i(UniformUpdateFrequency.PER_FRAME, "bedrockLevel", () -> 0);
 			uniforms.uniform1i(UniformUpdateFrequency.PER_FRAME, "heightLimit", () -> 256);
+			uniforms.uniform1i(UniformUpdateFrequency.PER_FRAME, "logicalHeightLimit", () -> 256);
+			uniforms.uniform1f(UniformUpdateFrequency.PER_FRAME, "cloudHeight", () -> {
+				ClientWorld world = Minecraft.getInstance().world;
+				return world == null ? 128.0F : world.dimension.getCloudHeight();
+			});
 			uniforms.uniform1b(UniformUpdateFrequency.PER_FRAME, "hasCeiling", () -> {
 				ClientWorld world = Minecraft.getInstance().world;
 				return world != null && world.dimension.getId() == -1;

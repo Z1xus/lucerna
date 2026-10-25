@@ -91,6 +91,10 @@ public class IrisRenderSystem {
         GL30C.glUniform2f(location, v0, v1);
 	}
 
+	public static void uniform3i(int location, int v0, int v1, int v2) {
+		GL30C.glUniform3i(location, v0, v1, v2);
+	}
+
 	public static void uniform2i(int location, int v0, int v1) {
         GL30C.glUniform2i(location, v0, v1);
 	}

@@ -17,6 +17,7 @@ public class BlockRenderingSettings {
 	private Object2IntMap<BlockState> blockStateIds;
 	private Map<Block, BlockLayer> blockTypeIds;
 	private Object2IntFunction<NamespacedId> entityIds;
+	private Object2IntFunction<NamespacedId> itemIds;
 	private float ambientOcclusionLevel;
 	private boolean disableDirectionalShading;
 	private boolean useSeparateAo;
@@ -72,6 +73,15 @@ public class BlockRenderingSettings {
 
 		this.reloadRequired = true;
 		this.blockTypeIds = blockTypeIds;
+	}
+
+	@Nullable
+	public Object2IntFunction<NamespacedId> getItemIds() {
+		return itemIds;
+	}
+
+	public void setItemIds(Object2IntFunction<NamespacedId> itemIds) {
+		this.itemIds = itemIds;
 	}
 
 	public void setEntityIds(Object2IntFunction<NamespacedId> entityIds) {

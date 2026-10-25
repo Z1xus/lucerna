@@ -1,0 +1,35 @@
+package net.coderbot.iris.mixin;
+
+import it.unimi.dsi.fastutil.objects.Object2IntFunction;
+import net.coderbot.iris.block_rendering.BlockRenderingSettings;
+import net.coderbot.iris.shaderpack.materialmap.NamespacedId;
+import net.coderbot.iris.uniforms.CapturedRenderingState;
+import net.minecraft.client.render.entity.ItemRenderer;
+import net.minecraft.client.render.model.block.BakedModel;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.resource.Identifier;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(ItemRenderer.class)
+public class MixinItemRenderer {
+	@Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("HEAD"))
+	private void lucerna$beginItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
+		Object2IntFunction<NamespacedId> itemIds = BlockRenderingSettings.INSTANCE.getItemIds();
+
+		if (itemIds != null && stack != null) {
+			Identifier id = Item.REGISTRY.getKey(stack.getItem());
+			CapturedRenderingState.INSTANCE.setCurrentRenderedItem(itemIds.applyAsInt(new NamespacedId(id.getNamespace(), id.getPath())));
+		}
+	}
+
+	@Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("RETURN"))
+	private void lucerna$endItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
+		if (BlockRenderingSettings.INSTANCE.getItemIds() != null) {
+			CapturedRenderingState.INSTANCE.setCurrentRenderedItem(0);
+		}
+	}
+}

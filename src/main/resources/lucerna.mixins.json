@@ -15,6 +15,7 @@
     "MixinGameGui",
     "MixinGameOptions",
     "MixinGameRenderer",
+    "MixinItemRenderer",
     "MixinGlStateManager",
     "MixinGlintRenderers",
     "MixinItemInHandRenderer",
