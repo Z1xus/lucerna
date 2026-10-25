@@ -520,7 +520,7 @@ public class Iris {
 		// allows shaderpacks to be changed at runtime
 		irisConfig.initialize();
 
-		boolean hadPack = currentPack != null;
+		boolean hadPack = isShaderPackActive();
 
 		// Destroy all allocated resources
 		destroyEverything();
@@ -529,7 +529,7 @@ public class Iris {
 		loadShaderpack();
 
 		// Argentum's section manager only gets a shadow pass while a shader pack is loaded
-		if (hadPack != (currentPack != null) && Minecraft.getInstance().worldRenderer != null) {
+		if (hadPack != isShaderPackActive() && Minecraft.getInstance().worldRenderer != null) {
 			Minecraft.getInstance().worldRenderer.reload();
 		}
 
@@ -599,6 +599,12 @@ public class Iris {
 			logger.error("Failed to create shader rendering pipeline, disabling shaders!", e);
 			// TODO: This should be reverted if a dimension change causes shaders to compile again
 			fallback = true;
+			ArgentumCompat.setShadersActive(false);
+
+			// chunks may already be meshed in the shader vertex format
+			if (Minecraft.getInstance().worldRenderer != null) {
+				Minecraft.getInstance().worldRenderer.reload();
+			}
 
 			return new FixedFunctionWorldRenderingPipeline();
 		}
@@ -624,6 +630,10 @@ public class Iris {
 
 	public static IrisConfig getIrisConfig() {
 		return irisConfig;
+	}
+
+	public static boolean isShaderPackActive() {
+		return currentPack != null && !fallback;
 	}
 
 	public static boolean isFallback() {

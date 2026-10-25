@@ -16,7 +16,7 @@ public abstract class MixinArgentumRenderSectionManager extends RenderSectionMan
 
 	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/RenderSectionManager;<init>(Lorg/embeddedt/embeddium/impl/render/chunk/RenderPassConfiguration;Ljava/util/function/Supplier;Ljava/util/function/BiFunction;ILorg/embeddedt/embeddium/impl/gl/device/CommandList;IIIZ)V"), index = 8)
 	private static boolean lucerna$enableShadowPass(boolean hasShadowPass) {
-		return hasShadowPass || Iris.getCurrentPack().isPresent();
+		return hasShadowPass || Iris.isShaderPackActive();
 	}
 
 	@Override

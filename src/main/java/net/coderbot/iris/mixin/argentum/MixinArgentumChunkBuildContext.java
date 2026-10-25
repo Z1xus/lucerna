@@ -48,7 +48,7 @@ public abstract class MixinArgentumChunkBuildContext implements TerrainContextRa
 
 	@Inject(method = "renderFluid", remap = false, at = @At("HEAD"))
 	private void lucerna$beginFluid(BlockState state, BlockPos pos, ChunkRenderContext world, BlockLayer layer, CallbackInfo ci) {
-		if (Iris.getCurrentPack().isPresent()) {
+		if (Iris.isShaderPackActive()) {
 			lucerna$recordBlock(layer, TerrainBlockContext.packId(state), pos);
 		}
 	}
