@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
@@ -82,6 +83,8 @@ public class ShaderProperties {
 	private final Object2ObjectMap<String, BlendModeOverride> blendModeOverrides = new Object2ObjectOpenHashMap<>();
 	private final Object2ObjectMap<String, ArrayList<BufferBlendInformation>> bufferBlendOverrides = new Object2ObjectOpenHashMap<>();
 	private final EnumMap<TextureStage, Object2ObjectMap<String, String>> customTextures = new EnumMap<>(TextureStage.class);
+	private final EnumMap<TextureStage, Object2ObjectMap<String, String>> customTexturePatching = new EnumMap<>(TextureStage.class);
+	private int customTextureCount;
 	private final Object2ObjectMap<String, Object2BooleanMap<String>> explicitFlips = new Object2ObjectOpenHashMap<>();
 	private String noiseTexturePath = null;
 	private Object2ObjectMap<String, String> conditionallyEnabledPrograms = new Object2ObjectOpenHashMap<>();
@@ -287,8 +290,19 @@ public class ShaderProperties {
 				TextureStage stage = optionalTextureStage.get();
 
 				// packs add a suffix such as colortex6.1 to set one sampler from several directives
-				customTextures.computeIfAbsent(stage, _stage -> new Object2ObjectOpenHashMap<>())
-						.put(samplerName.split("\\.")[0], value);
+				String name = samplerName.split("\\.")[0];
+				String[] parts = value.split(" ");
+
+				// like iris, a raw texture gets its own sampler that replaces only declarations of its type, see TransformPatcher
+				if (parts.length > 1) {
+					String type = parts[1].equals("TEXTURE_1D") ? "SAMPLER1D" : parts[1].equals("TEXTURE_3D") ? "SAMPLER3D"
+						: parts[1].equals("TEXTURE_RECTANGLE") ? "SAMPLER2DRECT" : "SAMPLER2D";
+					String customName = "customtex" + customTextureCount++;
+					customTexturePatching.computeIfAbsent(stage, _stage -> new Object2ObjectOpenHashMap<>()).put(type + " " + name, customName);
+					name = customName;
+				}
+
+				customTextures.computeIfAbsent(stage, _stage -> new Object2ObjectOpenHashMap<>()).put(name, value);
 			});
 
 			handleTwoArgDirective("flip.", key, value, (pass, buffer) -> {
@@ -589,6 +603,10 @@ public class ShaderProperties {
 
 	public EnumMap<TextureStage, Object2ObjectMap<String, String>> getCustomTextures() {
 		return customTextures;
+	}
+
+	public Object2ObjectMap<String, String> getCustomTexturePatching(TextureStage stage) {
+		return customTexturePatching.getOrDefault(stage, Object2ObjectMaps.emptyMap());
 	}
 
 	public Optional<String> getNoiseTexturePath() {

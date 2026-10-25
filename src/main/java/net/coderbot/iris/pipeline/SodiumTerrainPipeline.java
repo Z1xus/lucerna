@@ -18,6 +18,7 @@ import net.coderbot.iris.rendertarget.RenderTargets;
 import net.coderbot.iris.shaderpack.ProgramSet;
 import net.coderbot.iris.shaderpack.ProgramSource;
 import net.coderbot.iris.shaderpack.loading.ProgramId;
+import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.coderbot.iris.uniforms.CommonUniforms;
 import net.coderbot.iris.uniforms.builtin.BuiltinReplacementUniforms;
 import net.coderbot.iris.uniforms.custom.CustomUniforms;
@@ -120,11 +121,12 @@ public class SodiumTerrainPipeline {
 		Optional<ProgramSource> entitySource = first(programSet.getGbuffersEntities(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
 		int[] entityDrawBuffers = entitySource.map(source -> source.getDirectives().getDrawBuffers()).orElse(new int[] {0});
 		entityPassInfo.framebuffer = targets.createGbufferFramebuffer(flippedAfterPrepare, entityDrawBuffers);
-		patchEntityShaders(entityPassInfo, entitySource, ProgramId.Entities);
+		Map<String, String> textureRenames = programSet.getPack().getCustomTexturePatching(TextureStage.GBUFFERS_AND_SHADOW);
+		patchEntityShaders(entityPassInfo, entitySource, ProgramId.Entities, textureRenames);
 
 		if (createShadowSamplers != null) {
 			shadowEntityPassInfo.framebuffer = shadowFramebuffer.get();
-			patchEntityShaders(shadowEntityPassInfo, programSet.getShadow(), ProgramId.Shadow);
+			patchEntityShaders(shadowEntityPassInfo, programSet.getShadow(), ProgramId.Shadow, textureRenames);
 		}
 
 		this.createTerrainSamplers = createTerrainSamplers;
@@ -161,7 +163,8 @@ public class SodiumTerrainPipeline {
 				Map<PatchShaderType, String> result = TransformPatcher.patchSodiumTerrain(
 					sources.getVertexSource().orElse(null),
 					sources.getGeometrySource().orElse(null),
-					sources.getFragmentSource().orElse(null));
+					sources.getFragmentSource().orElse(null),
+					programSet.getPack().getCustomTexturePatching(TextureStage.GBUFFERS_AND_SHADOW));
 
 				info.sources.putAll(result);
 
@@ -171,7 +174,7 @@ public class SodiumTerrainPipeline {
 		}
 	}
 
-	private static void patchEntityShaders(PassInfo info, Optional<ProgramSource> source, ProgramId programId) {
+	private static void patchEntityShaders(PassInfo info, Optional<ProgramSource> source, ProgramId programId, Map<String, String> textureRenames) {
 		source.filter(sources -> !sources.getGeometrySource().isPresent()).ifPresent(sources -> {
 			info.blendModeOverride = sources.getDirectives().getBlendModeOverride().orElse(programId.getBlendModeOverride());
 			info.bufferOverrides = new ArrayList<>();
@@ -183,7 +186,7 @@ public class SodiumTerrainPipeline {
 			});
 
 			try {
-				Map<PatchShaderType, String> result = TransformPatcher.patchInstancedEntity(sources.getVertexSource().orElse(null), sources.getFragmentSource().orElse(null));
+				Map<PatchShaderType, String> result = TransformPatcher.patchInstancedEntity(sources.getVertexSource().orElse(null), sources.getFragmentSource().orElse(null), textureRenames);
 				info.sources.putAll(result);
 				PatchedShaderPrinter.debugPatchedShaders(sources.getName() + "_instanced", result.get(PatchShaderType.VERTEX), null, result.get(PatchShaderType.FRAGMENT));
 			} catch (RuntimeException e) {

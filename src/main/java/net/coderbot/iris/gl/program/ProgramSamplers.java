@@ -215,6 +215,7 @@ public class ProgramSamplers {
 		private final SamplerHolder samplerHolder;
 		private final Object2ObjectMap<String, IntSupplier> customTextureIds;
 		private final ImmutableSet<String> deactivatedOverrides;
+		private boolean customTexturesAdded;
 
 		private CustomTextureSamplerInterceptor(SamplerHolder samplerHolder, Object2ObjectMap<String, IntSupplier> customTextureIds, ImmutableSet<Integer> flippedAtLeastOnceSnapshot) {
 			this.samplerHolder = samplerHolder;
@@ -231,6 +232,21 @@ public class ProgramSamplers {
 			}
 
 			this.deactivatedOverrides = deactivatedOverrides.build();
+		}
+
+		// raw custom textures have samplers of their own, the patcher renames the pack's matching declarations to them
+		// they go after the first sampler, which may have to be the default one on unit 0
+		private <T> T addCustomTextures(T result) {
+			if (!customTexturesAdded) {
+				customTexturesAdded = true;
+				customTextureIds.forEach((name, texture) -> {
+					if (name.startsWith("customtex")) {
+						samplerHolder.addDynamicSampler(texture, name);
+					}
+				});
+			}
+
+			return result;
 		}
 
 		private IntSupplier getOverride(IntSupplier existing, String... names) {
@@ -256,6 +272,8 @@ public class ProgramSamplers {
 			} else {
 				samplerHolder.addExternalSampler(textureUnit, names);
 			}
+
+			addCustomTextures(null);
 		}
 
 		@Override
@@ -267,21 +285,21 @@ public class ProgramSamplers {
 		public boolean addDefaultSampler(IntSupplier sampler, String... names) {
 			sampler = getOverride(sampler, names);
 
-			return samplerHolder.addDefaultSampler(sampler, names);
+			return addCustomTextures(samplerHolder.addDefaultSampler(sampler, names));
 		}
 
 		@Override
 		public boolean addDynamicSampler(IntSupplier sampler, String... names) {
 			sampler = getOverride(sampler, names);
 
-			return samplerHolder.addDynamicSampler(sampler, names);
+			return addCustomTextures(samplerHolder.addDynamicSampler(sampler, names));
 		}
 
 		@Override
 		public boolean addDynamicSampler(IntSupplier sampler, ValueUpdateNotifier notifier, String... names) {
 			sampler = getOverride(sampler, names);
 
-			return samplerHolder.addDynamicSampler(sampler, notifier, names);
+			return addCustomTextures(samplerHolder.addDynamicSampler(sampler, notifier, names));
 		}
 	}
 }

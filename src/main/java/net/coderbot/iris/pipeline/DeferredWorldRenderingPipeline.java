@@ -127,6 +127,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 	private final float sunPathRotation;
 	private final CloudSetting cloudSetting;
+	private final Map<String, String> gbufferTextureRenames;
 	private final boolean shouldRenderUnderwaterOverlay;
 	private final boolean shouldRenderVignette;
 	private final boolean shouldRenderSun;
@@ -155,6 +156,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 	public DeferredWorldRenderingPipeline(ProgramSet programs) {
 		Objects.requireNonNull(programs);
+
+		this.gbufferTextureRenames = programs.getPack().getCustomTexturePatching(TextureStage.GBUFFERS_AND_SHADOW);
 
 		this.cloudSetting = programs.getPackDirectives().getCloudSetting();
 		this.shouldRenderUnderwaterOverlay = programs.getPackDirectives().underwaterOverlay();
@@ -239,21 +242,21 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 		this.prepareRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getPrepare(), programs.getPrepareCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
-				customTextureManager.getCustomTextureIdMap(TextureStage.PREPARE),
+				customTextureManager.getCustomTextureIdMap(TextureStage.PREPARE), programs.getPack().getCustomTexturePatching(TextureStage.PREPARE),
 				programs.getPackDirectives().getExplicitFlips("prepare_pre"), customUniforms);
 
 		flippedAfterPrepare = flipper.snapshot();
 
 		this.deferredRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getDeferred(), programs.getDeferredCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
-				customTextureManager.getCustomTextureIdMap(TextureStage.DEFERRED),
+				customTextureManager.getCustomTextureIdMap(TextureStage.DEFERRED), programs.getPack().getCustomTexturePatching(TextureStage.DEFERRED),
 				programs.getPackDirectives().getExplicitFlips("deferred_pre"), customUniforms);
 
 		flippedAfterTranslucent = flipper.snapshot();
 
 		this.compositeRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getComposite(), programs.getCompositeCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
-				customTextureManager.getCustomTextureIdMap(TextureStage.COMPOSITE_AND_FINAL),
+				customTextureManager.getCustomTextureIdMap(TextureStage.COMPOSITE_AND_FINAL), programs.getPack().getCustomTexturePatching(TextureStage.COMPOSITE_AND_FINAL),
 				programs.getPackDirectives().getExplicitFlips("composite_pre"), customUniforms);
 		this.finalPassRenderer = new FinalPassRenderer(programs, renderTargets, customTextureManager.getNoiseTexture(), updateNotifier, flipper.snapshot(),
 				centerDepthSampler, shadowTargetsSupplier,
@@ -617,7 +620,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			source.getVertexSource().orElseThrow(NullPointerException::new),
 			source.getGeometrySource().orElse(null),
 			source.getFragmentSource().orElseThrow(NullPointerException::new),
-			availability);
+			availability, gbufferTextureRenames);
 		String vertex = transformed.get(PatchShaderType.VERTEX);
 		String geometry = transformed.get(PatchShaderType.GEOMETRY);
 		String fragment = transformed.get(PatchShaderType.FRAGMENT);

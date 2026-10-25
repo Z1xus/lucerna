@@ -63,6 +63,7 @@ public class ShaderPack {
 	private final LanguageMap languageMap;
 	private final EnumMap<TextureStage, Object2ObjectMap<String, CustomTextureData>> customTextureDataMap = new EnumMap<>(TextureStage.class);
 	private final CustomTextureData customNoiseTexture;
+	private final ShaderProperties shaderProperties;
 	private final CustomUniforms.Builder customUniforms;
 	private final ShaderPackOptions shaderPackOptions;
 	private final OptionMenuContainer menuContainer;
@@ -237,6 +238,8 @@ public class ShaderPack {
 				return null;
 			}
 		}).orElse(null);
+
+		this.shaderProperties = shaderProperties;
 
 		shaderProperties.getCustomTextures().forEach((textureStage, customTexturePropertiesMap) -> {
 			Object2ObjectMap<String, CustomTextureData> innerCustomTextureDataMap = new Object2ObjectOpenHashMap<>();
@@ -416,6 +419,10 @@ public class ShaderPack {
 
 	public EnumMap<TextureStage, Object2ObjectMap<String, CustomTextureData>> getCustomTextureDataMap() {
 		return customTextureDataMap;
+	}
+
+	public Object2ObjectMap<String, String> getCustomTexturePatching(TextureStage stage) {
+		return shaderProperties.getCustomTexturePatching(stage);
 	}
 
 	public Optional<CustomTextureData> getCustomNoiseTexture() {

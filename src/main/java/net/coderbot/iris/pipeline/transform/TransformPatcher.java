@@ -3,6 +3,9 @@ package net.coderbot.iris.pipeline.transform;
 import io.github.douira.glsl_transformer.ast.node.Identifier;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.Version;
+import io.github.douira.glsl_transformer.ast.node.declaration.DeclarationMember;
+import io.github.douira.glsl_transformer.ast.node.declaration.TypeAndInitDeclaration;
+import io.github.douira.glsl_transformer.ast.node.type.specifier.BuiltinFixedTypeSpecifier;
 import io.github.douira.glsl_transformer.ast.print.PrintType;
 import io.github.douira.glsl_transformer.ast.query.Root;
 import io.github.douira.glsl_transformer.ast.transform.EnumASTTransformer;
@@ -154,6 +157,7 @@ public class TransformPatcher {
 
 				Root.indexBuildSession(tree, () -> {
 					CompatibilityTransformer.transformCore(transformer, tree, root, parameters);
+					renameCustomTextures(root, parameters.textureRenames);
 					switch (parameters.patch) {
 						case ATTRIBUTES:
 							AttributeTransformer.transform(transformer, tree, root, (AttributeParameters) parameters);
@@ -212,19 +216,40 @@ public class TransformPatcher {
 		return result;
 	}
 
-	public static Map<PatchShaderType, String> patchAttributes(String vertex, String geometry, String fragment, InputAvailability inputs) {
-		return transform(vertex, geometry, fragment, new AttributeParameters(Patch.ATTRIBUTES, geometry != null, inputs));
+	public static Map<PatchShaderType, String> patchAttributes(String vertex, String geometry, String fragment, InputAvailability inputs, Map<String, String> textureRenames) {
+		return transform(vertex, geometry, fragment, withRenames(new AttributeParameters(Patch.ATTRIBUTES, geometry != null, inputs), textureRenames));
 	}
 
-	public static Map<PatchShaderType, String> patchSodiumTerrain(String vertex, String geometry, String fragment) {
-		return transform(vertex, geometry, fragment, new Parameters(Patch.SODIUM_TERRAIN));
+	public static Map<PatchShaderType, String> patchSodiumTerrain(String vertex, String geometry, String fragment, Map<String, String> textureRenames) {
+		return transform(vertex, geometry, fragment, withRenames(new Parameters(Patch.SODIUM_TERRAIN), textureRenames));
 	}
 
-	public static Map<PatchShaderType, String> patchInstancedEntity(String vertex, String fragment) {
-		return transform(vertex, null, fragment, new Parameters(Patch.INSTANCED_ENTITY));
+	public static Map<PatchShaderType, String> patchInstancedEntity(String vertex, String fragment, Map<String, String> textureRenames) {
+		return transform(vertex, null, fragment, withRenames(new Parameters(Patch.INSTANCED_ENTITY), textureRenames));
 	}
 
-	public static Map<PatchShaderType, String> patchComposite(String vertex, String geometry, String fragment) {
-		return transform(vertex, geometry, fragment, new Parameters(Patch.COMPOSITE));
+	public static Map<PatchShaderType, String> patchComposite(String vertex, String geometry, String fragment, Map<String, String> textureRenames) {
+		return transform(vertex, geometry, fragment, withRenames(new Parameters(Patch.COMPOSITE), textureRenames));
+	}
+
+	private static Parameters withRenames(Parameters parameters, Map<String, String> textureRenames) {
+		parameters.textureRenames = textureRenames;
+		return parameters;
+	}
+
+	private static void renameCustomTextures(Root root, Map<String, String> textureRenames) {
+		textureRenames.forEach((declaration, name) -> {
+			String[] parts = declaration.split(" ");
+
+			for (Identifier id : root.identifierIndex.get(parts[1])) {
+				TypeAndInitDeclaration initDeclaration = id.getParent() instanceof DeclarationMember ? id.getAncestor(TypeAndInitDeclaration.class) : null;
+
+				if (initDeclaration != null && initDeclaration.getType().getTypeSpecifier() instanceof BuiltinFixedTypeSpecifier specifier
+						&& specifier.type.name().equals(parts[0])) {
+					root.rename(parts[1], name);
+					break;
+				}
+			}
+		});
 	}
 }

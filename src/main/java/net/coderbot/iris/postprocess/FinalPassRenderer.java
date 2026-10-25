@@ -25,6 +25,7 @@ import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
 import net.coderbot.iris.shaderpack.ProgramDirectives;
 import net.coderbot.iris.shaderpack.ProgramSet;
 import net.coderbot.iris.shaderpack.ProgramSource;
+import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
 import net.coderbot.iris.uniforms.CommonUniforms;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
@@ -58,6 +59,7 @@ public class FinalPassRenderer {
 	private final CustomUniforms customUniforms;
 	private final CenterDepthSampler centerDepthSampler;
 	private final Object2ObjectMap<String, IntSupplier> customTextureIds;
+	private final Map<String, String> textureRenames;
 
 	// TODO: The length of this argument list is getting a bit ridiculous
 	public FinalPassRenderer(ProgramSet pack, RenderTargets renderTargets, IntSupplier noiseTexture,
@@ -70,6 +72,7 @@ public class FinalPassRenderer {
 		this.customUniforms = customUniforms;
 		this.centerDepthSampler = centerDepthSampler;
 		this.customTextureIds = customTextureIds;
+		this.textureRenames = pack.getPack().getCustomTexturePatching(TextureStage.COMPOSITE_AND_FINAL);
 
 		final PackRenderTargetDirectives renderTargetDirectives = pack.getPackDirectives().getRenderTargetDirectives();
 		final Map<Integer, PackRenderTargetDirectives.RenderTargetSettings> renderTargetSettings =
@@ -312,7 +315,7 @@ public class FinalPassRenderer {
 		Map<PatchShaderType, String> transformed = TransformPatcher.patchComposite(
 			source.getVertexSource().orElseThrow(NullPointerException::new),
 			source.getGeometrySource().orElse(null),
-			source.getFragmentSource().orElseThrow(NullPointerException::new));
+			source.getFragmentSource().orElseThrow(NullPointerException::new), textureRenames);
 		String vertex = transformed.get(PatchShaderType.VERTEX);
 		String geometry = transformed.get(PatchShaderType.GEOMETRY);
 		String fragment = transformed.get(PatchShaderType.FRAGMENT);

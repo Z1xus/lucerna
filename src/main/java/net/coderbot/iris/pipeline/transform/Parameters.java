@@ -2,9 +2,13 @@ package net.coderbot.iris.pipeline.transform;
 
 import io.github.douira.glsl_transformer.job_parameter.JobParameters;
 
+import java.util.Map;
+
 class Parameters extends JobParameters {
 	public final Patch patch;
 	public PatchShaderType type;
+	// raw custom textures as "SAMPLER3D colortex6" to the sampler that replaces declarations of that type
+	public Map<String, String> textureRenames = Map.of();
 
 	public Parameters(Patch patch) {
 		this.patch = patch;
@@ -16,6 +20,7 @@ class Parameters extends JobParameters {
 		int result = 1;
 		result = prime * result + ((patch == null) ? 0 : patch.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + textureRenames.hashCode();
 		return result;
 	}
 
@@ -32,6 +37,6 @@ class Parameters extends JobParameters {
 			return false;
 		if (type != other.type)
 			return false;
-		return true;
+		return textureRenames.equals(other.textureRenames);
 	}
 }
