@@ -12,10 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.FloatBuffer;
 
-/**
- * Exposes the hurt and creeper flash color as the entityColor uniform, which 1.8.9 otherwise applies with texture
- * combiners that shader programs cannot see.
- */
+// 1.8.9 applies the hurt and creeper flash color with texture combiners, which shader programs cannot see
 @Mixin(LivingEntityRenderer.class)
 public class MixinLivingEntityRenderer {
 	@Shadow

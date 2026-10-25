@@ -19,14 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Sets the entityId uniform from entity.properties, using the modern entity names that shader packs expect.
- */
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher {
 	@Unique
 	private static final Map<Class<?>, NamespacedId> LUCERNA_ENTITY_NAMES = new Reference2ObjectOpenHashMap<>();
 
+	// shader packs expect the modern entity names
 	@Unique
 	private static final Map<String, String> LUCERNA_LEGACY_NAMES = Map.ofEntries(
 		Map.entry("EntityHorse", "horse"),

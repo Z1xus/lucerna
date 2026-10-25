@@ -12,7 +12,6 @@
     "MixinBufferUploader",
     "MixinEntityRenderer",
     "MixinGLX",
-    "MixinGameGui",
     "MixinGameOptions",
     "MixinGameRenderer",
     "MixinGlStateManager",

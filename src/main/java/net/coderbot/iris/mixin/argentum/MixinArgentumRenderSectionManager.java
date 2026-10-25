@@ -8,9 +8,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-/**
- * Gives Argentum's section manager the Celeritas shadow pass when a shader pack is loaded.
- */
 @Mixin(value = ArgentumRenderSectionManager.class, remap = false)
 public abstract class MixinArgentumRenderSectionManager extends RenderSectionManager {
 	private MixinArgentumRenderSectionManager() {

@@ -13,9 +13,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Overrides the chunk programs in {@link ShaderChunkRenderer} with the shader pack's terrain programs.
- */
 @Mixin(value = ShaderChunkRenderer.class, remap = false)
 public class MixinShaderChunkRenderer {
 	@Unique

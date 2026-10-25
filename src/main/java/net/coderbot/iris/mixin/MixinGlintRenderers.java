@@ -9,9 +9,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Selects the enchantment glint program.
- */
 @Mixin({ ItemRenderer.class, AbstractArmorLayer.class })
 public class MixinGlintRenderers {
 	@Inject(method = "renderEnchantmentGlint", at = @At("HEAD"))

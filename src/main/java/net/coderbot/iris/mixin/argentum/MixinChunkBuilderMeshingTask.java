@@ -15,9 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Tells the extended terrain vertex encoder which block is being meshed.
- */
 @Mixin(ChunkBuilderMeshingTask.class)
 public class MixinChunkBuilderMeshingTask {
 	@Inject(method = "execute", remap = false, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;hasBlockEntity()Z", remap = true))

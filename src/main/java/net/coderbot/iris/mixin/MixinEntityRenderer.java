@@ -9,10 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Disables the vanilla blob shadows when the shader pack renders shadows itself. This runs before Argentum batches
- * the blob shadows.
- */
+// priority 900 so this runs before argentum batches the blob shadows
 @Mixin(value = EntityRenderer.class, priority = 900)
 public class MixinEntityRenderer {
 	@Inject(method = "renderShadow", at = @At("HEAD"), cancellable = true)

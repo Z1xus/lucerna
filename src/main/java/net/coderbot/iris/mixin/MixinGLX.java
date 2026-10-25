@@ -7,9 +7,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Keeps the framebuffer bindings that Iris tracks in sync with the ones that vanilla makes.
- */
 @Mixin(GLX.class)
 public class MixinGLX {
 	@Inject(method = "bindFramebuffer", at = @At("RETURN"))

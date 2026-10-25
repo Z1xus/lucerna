@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Adds the shader video settings page and a "Shader Packs..." tab, which opens the shader pack screen instead of
- * selecting a page, to the Celeritas video settings that Argentum shows.
- */
 @Mixin(value = CeleritasVideoOptionsController.class, remap = false)
 public class MixinCeleritasVideoOptionsController {
 	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
@@ -42,6 +38,7 @@ public class MixinCeleritasVideoOptionsController {
 					Minecraft minecraft = Minecraft.getInstance();
 					minecraft.openScreen(new ShaderPackScreen(minecraft.screen));
 
+					// open the screen instead of selecting a page
 					return false;
 				})
 				.build());
