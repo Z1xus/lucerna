@@ -28,10 +28,6 @@ public class ProfileSet {
 		// to another profile but is otherwise the same;
 		sorted.sort(highToLow);
 
-		if (IrisLogging.ENABLE_SPAM) {
-			sorted.forEach(p -> System.out.println(p.name + ":" + p.precedence));
-		}
-
 		this.sortedProfiles = sorted;
 		this.orderedProfiles = orderedProfiles;
 	}

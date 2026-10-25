@@ -388,7 +388,7 @@ public class Iris {
 			irisConfig.setDebugEnabled(enable);
 			irisConfig.save();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to save the debug setting", e);
 		}
 	}
 

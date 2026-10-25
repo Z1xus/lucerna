@@ -54,42 +54,6 @@ public class FunctionResolver {
 		return u;
 	}
 
-	public void logAllFunctions() {
-		final Set<String> names = new LinkedHashSet<>();
-		names.addAll(this.functions.keySet());
-		names.addAll(this.dynamicFunctions.keySet());
-		for (final String name : names) {
-			final Map<Type, List<TypedFunction>> overloads = new Object2ObjectLinkedOpenHashMap<>();
-			Map<Type, List<TypedFunction>> normal = this.functions.get(name);
-			if (normal != null)
-				overloads.putAll(normal);
-
-			Map<Type, List<Supplier<? extends TypedFunction>>> dynamic = this.dynamicFunctions.get(name);
-			if (dynamic != null)
-				overloads.putAll(
-					dynamic
-						.entrySet()
-						.stream()
-						.collect(Collectors.toMap(
-								Map.Entry::getKey,
-								entry -> entry.getValue()
-									.stream()
-									.map(Supplier::get)
-									.collect(Collectors.toList())
-							)
-						)
-				);
-
-			for (Map.Entry<Type, List<TypedFunction>> returnTypeOverloads : overloads.entrySet()) {
-				for (TypedFunction typedFunction : returnTypeOverloads.getValue()) {
-					System.out.println(TypedFunction.format(typedFunction, name));
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-	}
-
 	public static class Builder {
 		private final Map<String, List<TypedFunction>> functions = new Object2ObjectLinkedOpenHashMap<>();
 		private final Map<String, Map<Type, List<Supplier<? extends TypedFunction>>>> dynamicFunctions = new Object2ObjectLinkedOpenHashMap<>();

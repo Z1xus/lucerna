@@ -1211,10 +1211,6 @@ public class IrisFunctions {
 		addCast("to" + to.getClass().getSimpleName(), from, to, function);
 	}
 
-	public static void main(String[] args) {
-		functions.logAllFunctions();
-	}
-
 	interface ObjectObject2BooleanFunction<T, U> {
 		boolean apply(T t, U u);
 	}
