@@ -1,4 +1,4 @@
-package net.coderbot.iris.mixin;
+package net.coderbot.iris.mixin.argentum;
 
 import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
 import org.embeddedt.embeddium.impl.render.chunk.ChunkRenderMatrices;

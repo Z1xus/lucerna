@@ -6,7 +6,7 @@ import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gui.option.IrisVideoSettings;
-import net.coderbot.iris.mixin.ArgentumWorldRendererAccessor;
+import net.coderbot.iris.mixin.argentum.ArgentumWorldRendererAccessor;
 import net.coderbot.iris.shaderpack.OptionalBoolean;
 import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.shaderpack.PackShadowDirectives;

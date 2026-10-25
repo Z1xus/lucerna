@@ -94,7 +94,7 @@ public abstract class MixinGameRenderer {
 		CapturedRenderingState.INSTANCE.setFogColor(fogRed, fogGreen, fogBlue);
 	}
 
-	// Begin shader rendering once the camera has been set up, so that the gbuffer matrices are known.
+	// begin after the camera setup, so the gbuffer matrices are known
 	@Inject(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setup(Lnet/minecraft/entity/living/player/PlayerEntity;Z)V", shift = At.Shift.AFTER))
 	private void lucerna$beginLevelRender(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
 		GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, lucerna$matrixBuffer);
@@ -113,7 +113,7 @@ public abstract class MixinGameRenderer {
 		lucerna$pipeline.beginLevelRendering();
 	}
 
-	// Render shadows before the main terrain setup, since the shadow pass submits the terrain search for this frame.
+	// render shadows before the main terrain setup, since the shadow pass submits the terrain search for this frame
 	@Inject(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/world/WorldRenderer;setupRender(Lnet/minecraft/entity/Entity;DLnet/minecraft/client/render/Culler;IZ)V"))
 	private void lucerna$renderShadows(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci, @Local Culler culler) {
 		lucerna$pipeline.renderShadows(minecraft.worldRenderer, minecraft.getCamera(), culler);
@@ -201,7 +201,7 @@ public abstract class MixinGameRenderer {
 		lucerna$pipeline.setPhase(WorldRenderingPhase.NONE);
 	}
 
-	// The hand is rendered into the gbuffers before the translucent terrain, so skip the vanilla hand pass.
+	// the hand goes into the gbuffers before the translucent terrain, so skip the vanilla hand pass
 	@ModifyExpressionValue(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;newCamPitch:Z"))
 	private boolean lucerna$skipVanillaHand(boolean renderHand) {
 		return renderHand && !IrisApi.getInstance().isShaderPackInUse();
