@@ -51,10 +51,10 @@ public class MixinWorldRenderer {
 	private int ticks;
 
 	@Unique
-	private static final String RENDER_SKY = "renderSky(FI)V";
+	private static final String LUCERNA_RENDER_SKY = "renderSky(FI)V";
 
 	@Unique
-	private static void iris$setPhase(WorldRenderingPhase phase) {
+	private static void lucerna$setPhase(WorldRenderingPhase phase) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -63,7 +63,7 @@ public class MixinWorldRenderer {
 	}
 
 	@Inject(method = "render(Lnet/minecraft/client/render/block/BlockLayer;DILnet/minecraft/entity/Entity;)I", at = @At("HEAD"))
-	private void iris$beginTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
+	private void lucerna$beginTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -73,7 +73,7 @@ public class MixinWorldRenderer {
 	}
 
 	@Inject(method = "render(Lnet/minecraft/client/render/block/BlockLayer;DILnet/minecraft/entity/Entity;)I", at = @At("RETURN"))
-	private void iris$endTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
+	private void lucerna$endTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -82,18 +82,18 @@ public class MixinWorldRenderer {
 		}
 	}
 
-	@Inject(method = RENDER_SKY, at = @At("HEAD"))
-	private void iris$beginSky(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.SKY);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At("HEAD"))
+	private void lucerna$beginSky(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.SKY);
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/dimension/Dimension;getSunriseColor(FF)[F"))
-	private void iris$beginSunset(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.SUNSET);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/dimension/Dimension;getSunriseColor(FF)[F"))
+	private void lucerna$beginSunset(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.SUNSET);
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getTimeOfDay(F)F", ordinal = 1))
-	private void iris$tiltSun(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getTimeOfDay(F)F", ordinal = 1))
+	private void lucerna$tiltSun(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {
@@ -101,47 +101,47 @@ public class MixinWorldRenderer {
 		}
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/world/WorldRenderer;SUN_LOCATION:Lnet/minecraft/resource/Identifier;"))
-	private void iris$beginSun(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.SUN);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/world/WorldRenderer;SUN_LOCATION:Lnet/minecraft/resource/Identifier;"))
+	private void lucerna$beginSun(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.SUN);
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/world/WorldRenderer;MOON_PHASES_LOCATION:Lnet/minecraft/resource/Identifier;"))
-	private void iris$beginMoon(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.MOON);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/world/WorldRenderer;MOON_PHASES_LOCATION:Lnet/minecraft/resource/Identifier;"))
+	private void lucerna$beginMoon(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.MOON);
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getStarBrightness(F)F"))
-	private void iris$beginStars(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.STARS);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getStarBrightness(F)F"))
+	private void lucerna$beginStars(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.STARS);
 	}
 
-	@Inject(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/living/player/LocalClientPlayerEntity;getEyePosition(F)Lnet/minecraft/util/math/Vec3d;"))
-	private void iris$beginVoid(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.VOID);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/living/player/LocalClientPlayerEntity;getEyePosition(F)Lnet/minecraft/util/math/Vec3d;"))
+	private void lucerna$beginVoid(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.VOID);
 	}
 
-	@WrapWithCondition(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
-	private boolean iris$renderSun(Tesselator tesselator) {
+	@WrapWithCondition(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
+	private boolean lucerna$renderSun(Tesselator tesselator) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		return pipeline == null || pipeline.shouldRenderSun();
 	}
 
-	@WrapWithCondition(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
-	private boolean iris$renderMoon(Tesselator tesselator) {
+	@WrapWithCondition(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
+	private boolean lucerna$renderMoon(Tesselator tesselator) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		return pipeline == null || pipeline.shouldRenderMoon();
 	}
 
-	@Inject(method = RENDER_SKY, at = @At("RETURN"))
-	private void iris$endSky(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.NONE);
+	@Inject(method = LUCERNA_RENDER_SKY, at = @At("RETURN"))
+	private void lucerna$endSky(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.NONE);
 	}
 
 	@Inject(method = "renderFancyClouds", at = @At("HEAD"), cancellable = true)
-	private void iris$renderCachedClouds(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+	private void lucerna$renderCachedClouds(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
 		if (!IrisApi.getInstance().isShaderPackInUse()) {
 			return;
 		}
@@ -177,42 +177,42 @@ public class MixinWorldRenderer {
 	}
 
 	@Inject(method = "renderEntities", at = @At("HEAD"))
-	private void iris$beginEntities(Entity camera, Culler culler, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.ENTITIES);
+	private void lucerna$beginEntities(Entity camera, Culler culler, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.ENTITIES);
 	}
 
 	@Inject(method = "renderEntities", at = @At("RETURN"))
-	private void iris$endEntities(Entity camera, Culler culler, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.NONE);
+	private void lucerna$endEntities(Entity camera, Culler culler, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.NONE);
 	}
 
 	@Inject(method = "renderBlockOutline", at = @At("HEAD"))
-	private void iris$beginOutline(PlayerEntity camera, HitResult hit, int mode, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.OUTLINE);
+	private void lucerna$beginOutline(PlayerEntity camera, HitResult hit, int mode, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.OUTLINE);
 	}
 
 	@Inject(method = "renderBlockOutline", at = @At("RETURN"))
-	private void iris$endOutline(PlayerEntity camera, HitResult hit, int mode, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.NONE);
+	private void lucerna$endOutline(PlayerEntity camera, HitResult hit, int mode, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.NONE);
 	}
 
 	@Inject(method = "renderMiningProgress", at = @At("HEAD"))
-	private void iris$beginDestroy(Tesselator tesselator, BufferBuilder bufferBuilder, Entity camera, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.DESTROY);
+	private void lucerna$beginDestroy(Tesselator tesselator, BufferBuilder bufferBuilder, Entity camera, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.DESTROY);
 	}
 
 	@Inject(method = "renderMiningProgress", at = @At("RETURN"))
-	private void iris$endDestroy(Tesselator tesselator, BufferBuilder bufferBuilder, Entity camera, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.NONE);
+	private void lucerna$endDestroy(Tesselator tesselator, BufferBuilder bufferBuilder, Entity camera, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.NONE);
 	}
 
 	@Inject(method = "renderWorldBorder", at = @At("HEAD"))
-	private void iris$beginWorldBorder(Entity camera, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.WORLD_BORDER);
+	private void lucerna$beginWorldBorder(Entity camera, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.WORLD_BORDER);
 	}
 
 	@Inject(method = "renderWorldBorder", at = @At("RETURN"))
-	private void iris$endWorldBorder(Entity camera, float tickDelta, CallbackInfo ci) {
-		iris$setPhase(WorldRenderingPhase.NONE);
+	private void lucerna$endWorldBorder(Entity camera, float tickDelta, CallbackInfo ci) {
+		lucerna$setPhase(WorldRenderingPhase.NONE);
 	}
 }

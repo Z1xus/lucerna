@@ -100,7 +100,7 @@ public class IrisChunkShaderInterface implements ChunkShaderInterface {
 		// See IrisSamplers#addLevelSamplers
 		Minecraft minecraft = Minecraft.getInstance();
 		GlStateManager.activeTexture(GL13.GL_TEXTURE0 + IrisSamplers.LIGHTMAP_TEXTURE_UNIT);
-		GlStateManager.bindTexture(((GameRendererAccessor) minecraft.gameRenderer).getLightMapTexture().getGlId());
+		GlStateManager.bindTexture(((GameRendererAccessor) minecraft.gameRenderer).lucerna$getLightmapTexture().getGlId());
 		GlStateManager.activeTexture(GL13.GL_TEXTURE0 + IrisSamplers.ALBEDO_TEXTURE_UNIT);
 		GlStateManager.bindTexture(minecraft.getTextureManager().get(TextureAtlas.BLOCKS_LOCATION).getGlId());
 

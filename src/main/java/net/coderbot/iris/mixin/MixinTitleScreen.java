@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen {
 	@Unique
-	private static boolean iris$hasFirstInit;
+	private static boolean lucerna$hasFirstInit;
 
 	@Inject(method = "init", at = @At("RETURN"))
-	private void iris$firstInit(CallbackInfo ci) {
-		if (!iris$hasFirstInit) {
-			iris$hasFirstInit = true;
+	private void lucerna$firstInit(CallbackInfo ci) {
+		if (!lucerna$hasFirstInit) {
+			lucerna$hasFirstInit = true;
 			Iris.onLoadingComplete();
 		}
 	}

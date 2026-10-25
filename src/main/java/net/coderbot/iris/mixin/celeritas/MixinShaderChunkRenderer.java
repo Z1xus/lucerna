@@ -19,12 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ShaderChunkRenderer.class, remap = false)
 public class MixinShaderChunkRenderer {
 	@Unique
-	private final IrisChunkProgramOverrides iris$overrides = new IrisChunkProgramOverrides();
+	private final IrisChunkProgramOverrides lucerna$overrides = new IrisChunkProgramOverrides();
 
 	@Inject(method = "compileProgram", at = @At("HEAD"), cancellable = true)
 	@SuppressWarnings("unchecked")
-	private void iris$useOverride(ChunkShaderOptions options, CallbackInfoReturnable<GlProgram<ChunkShaderInterface>> cir) {
-		var override = iris$overrides.getProgramOverride(options.pass());
+	private void lucerna$useOverride(ChunkShaderOptions options, CallbackInfoReturnable<GlProgram<ChunkShaderInterface>> cir) {
+		var override = lucerna$overrides.getProgramOverride(options.pass());
 
 		if (override != null) {
 			cir.setReturnValue((GlProgram<ChunkShaderInterface>) (GlProgram<?>) override);
@@ -32,7 +32,7 @@ public class MixinShaderChunkRenderer {
 	}
 
 	@Inject(method = "delete", at = @At("HEAD"))
-	private void iris$onDelete(CommandList commandList, CallbackInfo ci) {
-		iris$overrides.deleteShaders();
+	private void lucerna$onDelete(CommandList commandList, CallbackInfo ci) {
+		lucerna$overrides.deleteShaders();
 	}
 }

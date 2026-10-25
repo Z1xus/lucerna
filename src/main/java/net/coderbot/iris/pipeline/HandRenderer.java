@@ -19,7 +19,7 @@ public class HandRenderer {
 	private boolean canRender(Minecraft minecraft) {
 		Entity camera = minecraft.getCamera();
 
-		return ((GameRendererAccessor) minecraft.gameRenderer).shouldRenderHand()
+		return ((GameRendererAccessor) minecraft.gameRenderer).lucerna$shouldRenderHand()
 			&& minecraft.options.perspective == 0
 			&& !(camera instanceof LivingEntity && ((LivingEntity) camera).isSleeping())
 			&& !minecraft.options.hideGui
@@ -47,16 +47,16 @@ public class HandRenderer {
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
 		GlStateManager.scalef(1.0F, 1.0F, DEPTH);
-		Project.gluPerspective(accessor.invokeGetFov(tickDelta, false), (float) minecraft.width / minecraft.height, 0.05F, accessor.getRenderDistance() * 2.0F);
+		Project.gluPerspective(accessor.lucerna$getFov(tickDelta, false), (float) minecraft.width / minecraft.height, 0.05F, accessor.lucerna$getRenderDistance() * 2.0F);
 
 		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
 
-		accessor.invokeApplyHurtCam(tickDelta);
+		accessor.lucerna$applyHurtCam(tickDelta);
 
 		if (minecraft.options.viewBobbing) {
-			accessor.invokeApplyViewBobbing(tickDelta);
+			accessor.lucerna$applyViewBobbing(tickDelta);
 		}
 
 		gameRenderer.enableLightMap();

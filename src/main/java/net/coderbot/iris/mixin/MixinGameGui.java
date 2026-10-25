@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameGui.class)
 public class MixinGameGui {
 	@Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
-	private void iris$disableVignette(float brightnessAtEyes, Window window, CallbackInfo ci) {
+	private void lucerna$disableVignette(float brightnessAtEyes, Window window, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null && !pipeline.shouldRenderVignette()) {

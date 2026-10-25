@@ -26,7 +26,7 @@ import java.util.Map;
 @Mixin(value = CeleritasVideoOptionsController.class, remap = false)
 public class MixinCeleritasVideoOptionsController {
 	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
-	private static List<OptionPage> iris$addOptionPage(List<OptionPage> pages) {
+	private static List<OptionPage> lucerna$addOptionPage(List<OptionPage> pages) {
 		List<OptionPage> withShaders = new ArrayList<>(pages);
 		withShaders.add(IrisOptionPage.create());
 
@@ -34,7 +34,7 @@ public class MixinCeleritasVideoOptionsController {
 	}
 
 	@Inject(method = "createExtraTabs", at = @At("HEAD"))
-	private void iris$addShaderPackTab(Map<String, List<Tab<?>>> tabs, CallbackInfo ci) {
+	private void lucerna$addShaderPackTab(Map<String, List<Tab<?>>> tabs, CallbackInfo ci) {
 		tabs.computeIfAbsent(Iris.MODID, id -> new ArrayList<>()).add(Tab.createBuilder()
 				.setId(OptionIdentifier.create(Iris.MODID, "shader_packs"))
 				.setTitle(TextComponent.translatable("options.iris.shaderPackSelection"))

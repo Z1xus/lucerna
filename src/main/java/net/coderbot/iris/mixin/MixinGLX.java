@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GLX.class)
 public class MixinGLX {
 	@Inject(method = "bindFramebuffer", at = @At("RETURN"))
-	private static void iris$onBindFramebuffer(int target, int framebuffer, CallbackInfo ci) {
+	private static void lucerna$onBindFramebuffer(int target, int framebuffer, CallbackInfo ci) {
 		IrisRenderSystem.onFramebufferBound(target, framebuffer);
 	}
 }

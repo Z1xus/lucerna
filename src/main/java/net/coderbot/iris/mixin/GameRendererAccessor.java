@@ -9,26 +9,20 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(GameRenderer.class)
 public interface GameRendererAccessor {
 	@Accessor("lightmapTexture")
-	DynamicTexture getLightMapTexture();
+	DynamicTexture lucerna$getLightmapTexture();
 
 	@Accessor("renderDistance")
-	float getRenderDistance();
+	float lucerna$getRenderDistance();
 
 	@Accessor("newCamPitch")
-	boolean shouldRenderHand();
+	boolean lucerna$shouldRenderHand();
 
 	@Invoker("getFov")
-	float invokeGetFov(float tickDelta, boolean fovChanged);
+	float lucerna$getFov(float tickDelta, boolean fovChanged);
 
 	@Invoker("applyHurtCam")
-	void invokeApplyHurtCam(float tickDelta);
+	void lucerna$applyHurtCam(float tickDelta);
 
 	@Invoker("applyViewBobbing")
-	void invokeApplyViewBobbing(float tickDelta);
-
-	@Invoker("setupFog")
-	void invokeSetupFog(int mode, float tickDelta);
-
-	@Invoker("renderSnowAndRain")
-	void invokeRenderSnowAndRain(float tickDelta);
+	void lucerna$applyViewBobbing(float tickDelta);
 }

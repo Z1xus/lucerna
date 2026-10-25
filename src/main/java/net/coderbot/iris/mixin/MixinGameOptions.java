@@ -22,12 +22,12 @@ public class MixinGameOptions {
 	public KeyBinding[] keyBindings;
 
 	@Inject(method = "<init>(Lnet/minecraft/client/Minecraft;Ljava/io/File;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/options/GameOptions;load()V"))
-	private void iris$beforeLoadOptions(CallbackInfo ci) {
+	private void lucerna$beforeLoadOptions(CallbackInfo ci) {
 		keyBindings = ArrayUtils.addAll(keyBindings, Iris.onEarlyInitialize());
 	}
 
 	@Inject(method = "getCloudRenderMode", at = @At("RETURN"), cancellable = true)
-	private void iris$overrideCloudMode(CallbackInfoReturnable<Integer> cir) {
+	private void lucerna$overrideCloudMode(CallbackInfoReturnable<Integer> cir) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline == null) {

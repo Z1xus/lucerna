@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = EntityRenderer.class, priority = 900)
 public class MixinEntityRenderer {
 	@Inject(method = "renderShadow", at = @At("HEAD"), cancellable = true)
-	private void iris$disableVanillaShadows(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, CallbackInfo ci) {
+	private void lucerna$disableVanillaShadows(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null && pipeline.shouldDisableVanillaEntityShadows()) {

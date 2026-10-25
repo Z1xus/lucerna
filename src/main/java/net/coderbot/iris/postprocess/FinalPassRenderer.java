@@ -100,7 +100,7 @@ public class FinalPassRenderer {
 		this.baseline = renderTargets.createGbufferFramebuffer(flippedBuffers, new int[] {0});
 		this.colorHolder = new GlFramebuffer();
 		this.lastColorTextureId = Minecraft.getInstance().getRenderTarget().colorTextureId;
-		this.lastColorTextureVersion = ((Blaze3dRenderTargetExt) Minecraft.getInstance().getRenderTarget()).iris$getColorBufferVersion();
+		this.lastColorTextureVersion = ((Blaze3dRenderTargetExt) Minecraft.getInstance().getRenderTarget()).lucerna$getColorBufferVersion();
 		this.colorHolder.addColorAttachment(0, lastColorTextureId);
 
 		// TODO: We don't actually fully swap the content, we merely copy it from alt to main
@@ -174,8 +174,8 @@ public class FinalPassRenderer {
 		//
 		// This is not a concern for depthtex1 / depthtex2 since the copy call extracts the depth values, and the
 		// shader pack only ever uses them to read the depth values.
-		if (((Blaze3dRenderTargetExt) main).iris$getColorBufferVersion() != lastColorTextureVersion || main.colorTextureId != lastColorTextureId) {
-			lastColorTextureVersion = ((Blaze3dRenderTargetExt) main).iris$getColorBufferVersion();
+		if (((Blaze3dRenderTargetExt) main).lucerna$getColorBufferVersion() != lastColorTextureVersion || main.colorTextureId != lastColorTextureId) {
+			lastColorTextureVersion = ((Blaze3dRenderTargetExt) main).lucerna$getColorBufferVersion();
 			this.lastColorTextureId = main.colorTextureId;
 			colorHolder.addColorAttachment(0, lastColorTextureId);
 		}

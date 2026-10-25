@@ -8,5 +8,5 @@ import net.minecraft.util.math.BlockPos;
  * chunk vertices only after the whole section is meshed.
  */
 public interface TerrainContextRanges {
-	void iris$recordBlock(BlockLayer layer, int packedId, BlockPos pos);
+	void lucerna$recordBlock(BlockLayer layer, int packedId, BlockPos pos);
 }

@@ -25,10 +25,10 @@ import java.util.Map;
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher {
 	@Unique
-	private static final Map<Class<?>, NamespacedId> iris$ENTITY_NAMES = new Reference2ObjectOpenHashMap<>();
+	private static final Map<Class<?>, NamespacedId> LUCERNA_ENTITY_NAMES = new Reference2ObjectOpenHashMap<>();
 
 	@Unique
-	private static final Map<String, String> iris$LEGACY_NAMES = Map.ofEntries(
+	private static final Map<String, String> LUCERNA_LEGACY_NAMES = Map.ofEntries(
 		Map.entry("EntityHorse", "horse"),
 		Map.entry("PigZombie", "zombie_pigman"),
 		Map.entry("MushroomCow", "mooshroom"),
@@ -48,8 +48,8 @@ public class MixinEntityRenderDispatcher {
 	);
 
 	@Unique
-	private static NamespacedId iris$getName(Entity entity) {
-		return iris$ENTITY_NAMES.computeIfAbsent(entity.getClass(), type -> {
+	private static NamespacedId lucerna$getName(Entity entity) {
+		return LUCERNA_ENTITY_NAMES.computeIfAbsent(entity.getClass(), type -> {
 			if (entity instanceof PlayerEntity) {
 				return new NamespacedId("minecraft", "player");
 			} else if (entity instanceof LightningBoltEntity) {
@@ -62,7 +62,7 @@ public class MixinEntityRenderDispatcher {
 				return new NamespacedId("minecraft", "unknown");
 			}
 
-			String name = iris$LEGACY_NAMES.get(key);
+			String name = LUCERNA_LEGACY_NAMES.get(key);
 
 			if (name == null) {
 				name = key.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase(Locale.ROOT);
@@ -73,18 +73,18 @@ public class MixinEntityRenderDispatcher {
 	}
 
 	@Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFFZ)Z", at = @At("HEAD"))
-	private void iris$beginEntityRender(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, boolean skipHitbox, CallbackInfoReturnable<Boolean> cir) {
+	private void lucerna$beginEntityRender(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, boolean skipHitbox, CallbackInfoReturnable<Boolean> cir) {
 		Object2IntFunction<NamespacedId> entityIds = BlockRenderingSettings.INSTANCE.getEntityIds();
 
 		if (entityIds == null) {
 			return;
 		}
 
-		CapturedRenderingState.INSTANCE.setCurrentEntity(entityIds.applyAsInt(iris$getName(entity)));
+		CapturedRenderingState.INSTANCE.setCurrentEntity(entityIds.applyAsInt(lucerna$getName(entity)));
 	}
 
 	@Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFFZ)Z", at = @At("RETURN"))
-	private void iris$endEntityRender(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, boolean skipHitbox, CallbackInfoReturnable<Boolean> cir) {
+	private void lucerna$endEntityRender(Entity entity, double dx, double dy, double dz, float yaw, float tickDelta, boolean skipHitbox, CallbackInfoReturnable<Boolean> cir) {
 		if (BlockRenderingSettings.INSTANCE.getEntityIds() != null) {
 			CapturedRenderingState.INSTANCE.setCurrentEntity(-1);
 		}

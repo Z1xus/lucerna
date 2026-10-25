@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(value = ArgentumWorldRenderer.class, remap = false)
 public class MixinArgentumWorldRenderer {
 	@ModifyVariable(method = "createRenderSectionManager", at = @At("STORE"))
-	private ChunkVertexType iris$useExtendedVertexFormat(ChunkVertexType vertexType) {
+	private ChunkVertexType lucerna$useExtendedVertexFormat(ChunkVertexType vertexType) {
 		return Iris.getCurrentPack().isPresent() ? XHFPModelVertexType.INSTANCE : vertexType;
 	}
 }

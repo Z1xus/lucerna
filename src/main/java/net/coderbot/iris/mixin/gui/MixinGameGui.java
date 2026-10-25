@@ -18,7 +18,7 @@ public class MixinGameGui {
 
 	// cancel after the gui projection is set up, since screens rely on it when in a world
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;setupGuiState()V", shift = At.Shift.AFTER), cancellable = true)
-	private void iris$handleHudHidingScreens(float tickDelta, CallbackInfo ci) {
+	private void lucerna$handleHudHidingScreens(float tickDelta, CallbackInfo ci) {
 		if (this.minecraft.screen instanceof HudHideable) {
 			ci.cancel();
 		}

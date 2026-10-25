@@ -22,14 +22,14 @@ public class MixinLivingEntityRenderer {
 	protected FloatBuffer tintBuffer;
 
 	@Inject(method = "setupOverlayColor(Lnet/minecraft/entity/living/LivingEntity;FZ)Z", at = @At("RETURN"))
-	private void iris$captureOverlayColor(LivingEntity entity, float tickDelta, boolean alwaysRender, CallbackInfoReturnable<Boolean> cir) {
+	private void lucerna$captureOverlayColor(LivingEntity entity, float tickDelta, boolean alwaysRender, CallbackInfoReturnable<Boolean> cir) {
 		if (cir.getReturnValueZ()) {
 			CapturedRenderingState.INSTANCE.setCurrentEntityColor(tintBuffer.get(0), tintBuffer.get(1), tintBuffer.get(2), tintBuffer.get(3));
 		}
 	}
 
 	@Inject(method = "tearDownOverlayColor", at = @At("RETURN"))
-	private void iris$clearOverlayColor(CallbackInfo ci) {
+	private void lucerna$clearOverlayColor(CallbackInfo ci) {
 		CapturedRenderingState.INSTANCE.setCurrentEntityColor(0.0F, 0.0F, 0.0F, 0.0F);
 	}
 }

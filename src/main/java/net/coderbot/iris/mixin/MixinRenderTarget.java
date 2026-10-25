@@ -15,24 +15,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderTarget.class)
 public class MixinRenderTarget implements Blaze3dRenderTargetExt {
 	@Unique
-	private int iris$depthBufferVersion;
+	private int lucerna$depthBufferVersion;
 
 	@Unique
-	private int iris$colorBufferVersion;
+	private int lucerna$colorBufferVersion;
 
 	@Inject(method = "destroyBuffers()V", at = @At("HEAD"))
-	private void iris$onDestroyBuffers(CallbackInfo ci) {
-		iris$depthBufferVersion++;
-		iris$colorBufferVersion++;
+	private void lucerna$onDestroyBuffers(CallbackInfo ci) {
+		lucerna$depthBufferVersion++;
+		lucerna$colorBufferVersion++;
 	}
 
 	@Override
-	public int iris$getDepthBufferVersion() {
-		return iris$depthBufferVersion;
+	public int lucerna$getDepthBufferVersion() {
+		return lucerna$depthBufferVersion;
 	}
 
 	@Override
-	public int iris$getColorBufferVersion() {
-		return iris$colorBufferVersion;
+	public int lucerna$getColorBufferVersion() {
+		return lucerna$colorBufferVersion;
 	}
 }

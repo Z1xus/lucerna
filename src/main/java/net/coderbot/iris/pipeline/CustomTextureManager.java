@@ -80,7 +80,7 @@ public class CustomTextureManager {
 		} else if (textureData instanceof CustomTextureData.LightmapMarker) {
 			// Special code path for the light texture. While shader packs hardcode the primary light texture, it's
 			// possible that a mod will create a different light texture, so this code path is robust to that.
-			return () -> ((GameRendererAccessor) Minecraft.getInstance().gameRenderer).getLightMapTexture().getGlId();
+			return () -> ((GameRendererAccessor) Minecraft.getInstance().gameRenderer).lucerna$getLightmapTexture().getGlId();
 		} else if (textureData instanceof CustomTextureData.ResourceData) {
 			CustomTextureData.ResourceData resourceData = (CustomTextureData.ResourceData) textureData;
 			String namespace = resourceData.getNamespace();

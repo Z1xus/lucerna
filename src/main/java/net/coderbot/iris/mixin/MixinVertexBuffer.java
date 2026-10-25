@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(VertexBuffer.class)
 public class MixinVertexBuffer {
 	@Inject(method = "draw", at = @At("HEAD"))
-	private void iris$beforeDraw(int mode, CallbackInfo ci) {
+	private void lucerna$beforeDraw(int mode, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline != null) {

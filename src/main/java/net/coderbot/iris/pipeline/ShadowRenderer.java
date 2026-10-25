@@ -332,8 +332,8 @@ public class ShadowRenderer {
 		loadMatrix(GL11.GL_PROJECTION, PROJECTION);
 		loadMatrix(GL11.GL_MODELVIEW, MODELVIEW);
 
-		ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).getMatrices();
-		((ArgentumWorldRendererAccessor) renderer).setMatrices(new ChunkRenderMatrices(PROJECTION, MODELVIEW));
+		ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).lucerna$getMatrices();
+		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(new ChunkRenderMatrices(PROJECTION, MODELVIEW));
 
 		// Disable backface culling
 		// This partially works around an issue where if the front face of a mountain isn't visible, it casts no
@@ -412,7 +412,7 @@ public class ShadowRenderer {
 
 		profiler.swap("restore gl state");
 
-		((ArgentumWorldRendererAccessor) renderer).setMatrices(playerMatrices);
+		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(playerMatrices);
 
 		GlStateManager.enableCull();
 

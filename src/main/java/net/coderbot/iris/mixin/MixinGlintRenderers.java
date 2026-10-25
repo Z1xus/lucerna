@@ -15,12 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin({ ItemRenderer.class, AbstractArmorLayer.class })
 public class MixinGlintRenderers {
 	@Inject(method = "renderEnchantmentGlint", at = @At("HEAD"))
-	private void iris$beginGlint(CallbackInfo ci) {
+	private void lucerna$beginGlint(CallbackInfo ci) {
 		GbufferPrograms.setupSpecialRenderCondition(SpecialCondition.GLINT);
 	}
 
 	@Inject(method = "renderEnchantmentGlint", at = @At("RETURN"))
-	private void iris$endGlint(CallbackInfo ci) {
+	private void lucerna$endGlint(CallbackInfo ci) {
 		GbufferPrograms.teardownSpecialRenderCondition(SpecialCondition.GLINT);
 	}
 }

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BufferUploader.class)
 public class MixinBufferUploader {
 	@Inject(method = "end", at = @At("HEAD"))
-	private void iris$beforeDraw(BufferBuilder builder, CallbackInfo ci) {
+	private void lucerna$beforeDraw(BufferBuilder builder, CallbackInfo ci) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
 		if (pipeline == null) {
@@ -37,7 +37,7 @@ public class MixinBufferUploader {
 	}
 
 	@Inject(method = "end", at = @At("RETURN"))
-	private void iris$afterDraw(BufferBuilder builder, CallbackInfo ci) {
+	private void lucerna$afterDraw(BufferBuilder builder, CallbackInfo ci) {
 		VanillaVertexAttributes.unbind();
 	}
 }
