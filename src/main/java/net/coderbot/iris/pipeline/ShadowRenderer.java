@@ -420,7 +420,7 @@ public class ShadowRenderer {
 		restoreMatrix(GL11.GL_PROJECTION);
 		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 
-		GlStateManager.viewport(0, 0, client.width, client.height);
+		GlStateManager.viewport(0, 0, IrisVideoSettings.scaleRenderSize(client.width), IrisVideoSettings.scaleRenderSize(client.height));
 
 		ACTIVE = false;
 		profiler.pop();

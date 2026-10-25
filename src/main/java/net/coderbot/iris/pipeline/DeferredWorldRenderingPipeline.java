@@ -1,5 +1,6 @@
 package net.coderbot.iris.pipeline;
 
+import net.coderbot.iris.gui.option.IrisVideoSettings;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -780,8 +781,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			if (shadowViewport) {
 				GlStateManager.viewport(0, 0, shadowMapResolution, shadowMapResolution);
 			} else {
-				RenderTarget main = Minecraft.getInstance().getRenderTarget();
-				GlStateManager.viewport(0, 0, main.width, main.height);
+				GlStateManager.viewport(0, 0, renderTargets.getCurrentWidth(), renderTargets.getCurrentHeight());
 			}
 
 			if (program != null && !sodiumTerrainRendering) {
@@ -938,15 +938,16 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 
 		RenderTarget main = Minecraft.getInstance().getRenderTarget();
+		int width = IrisVideoSettings.scaleRenderSize(main.width);
+		int height = IrisVideoSettings.scaleRenderSize(main.height);
 
-		if (main.width != mainDepthWidth || main.height != mainDepthHeight) {
-			mainDepthWidth = main.width;
-			mainDepthHeight = main.height;
-			mainDepth.resize(main.width, main.height, DepthBufferFormat.DEPTH24);
+		if (width != mainDepthWidth || height != mainDepthHeight) {
+			mainDepthWidth = width;
+			mainDepthHeight = height;
+			mainDepth.resize(width, height, DepthBufferFormat.DEPTH24);
 		}
 
-		boolean changed = renderTargets.resizeIfNeeded(0, mainDepth.getTextureId(), main.width,
-			main.height, DepthBufferFormat.DEPTH24, packDirectives);
+		boolean changed = renderTargets.resizeIfNeeded(0, mainDepth.getTextureId(), width, height, DepthBufferFormat.DEPTH24, packDirectives);
 
 		if (changed) {
 			prepareRenderer.recalculateSizes();

@@ -2,6 +2,7 @@ package net.coderbot.iris.gl.shader;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.render.platform.GlStateManager;
+import net.coderbot.iris.gui.option.IrisVideoSettings;
 import net.coderbot.iris.pipeline.HandRenderer;
 import net.coderbot.iris.pipeline.WorldRenderingPhase;
 import net.coderbot.iris.shaderpack.StringPair;
@@ -48,8 +49,8 @@ public class StandardMacros {
 
 		define(standardDefines, "MC_NORMAL_MAP");
 		define(standardDefines, "MC_SPECULAR_MAP");
-		define(standardDefines, "MC_RENDER_QUALITY", "1.0");
-		define(standardDefines, "MC_SHADOW_QUALITY", "1.0");
+		define(standardDefines, "MC_RENDER_QUALITY", Float.toString(IrisVideoSettings.renderQuality));
+		define(standardDefines, "MC_SHADOW_QUALITY", Float.toString(IrisVideoSettings.shadowQuality));
 		define(standardDefines, "MC_HAND_DEPTH", Float.toString(HandRenderer.DEPTH));
 
 		getRenderStages().forEach((stage, index) -> define(standardDefines, stage, index));

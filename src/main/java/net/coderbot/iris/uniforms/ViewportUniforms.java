@@ -1,6 +1,7 @@
 package net.coderbot.iris.uniforms;
 
 import net.coderbot.iris.gl.uniform.UniformHolder;
+import net.coderbot.iris.gui.option.IrisVideoSettings;
 import net.minecraft.client.Minecraft;
 
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
@@ -21,11 +22,9 @@ public final class ViewportUniforms {
 	 * @param uniforms the program to make the uniforms available to
 	 */
 	public static void addViewportUniforms(UniformHolder uniforms) {
-		// TODO: What about the custom scale.composite3 property?
-		// NB: It is not safe to cache the render target due to mods like Resolution Control modifying the render target field.
 		uniforms
-			.uniform1f(PER_FRAME, "viewHeight", () -> Minecraft.getInstance().height)
-			.uniform1f(PER_FRAME, "viewWidth", () -> Minecraft.getInstance().width)
+			.uniform1f(PER_FRAME, "viewHeight", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().height))
+			.uniform1f(PER_FRAME, "viewWidth", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().width))
 			.uniform1f(PER_FRAME, "aspectRatio", ViewportUniforms::getAspectRatio);
 	}
 

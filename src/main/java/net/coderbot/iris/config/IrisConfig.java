@@ -139,9 +139,13 @@ public class IrisConfig {
 		disableUpdateMessage = "true".equals(properties.getProperty("disableUpdateMessage"));
 		try {
 			IrisVideoSettings.shadowDistance = Integer.parseInt(properties.getProperty("maxShadowRenderDistance", "32"));
+			IrisVideoSettings.renderQuality = Float.parseFloat(properties.getProperty("renderQuality", "1.0"));
+			IrisVideoSettings.shadowQuality = Float.parseFloat(properties.getProperty("shadowQuality", "1.0"));
 		} catch (NumberFormatException e) {
-			Iris.logger.error("Shadow distance setting reset; value is invalid.");
+			Iris.logger.error("Video settings reset; a value is invalid.");
 			IrisVideoSettings.shadowDistance = 32;
+			IrisVideoSettings.renderQuality = 1.0F;
+			IrisVideoSettings.shadowQuality = 1.0F;
 			save();
 		}
 
@@ -164,6 +168,8 @@ public class IrisConfig {
 		properties.setProperty("enableDebugOptions", enableDebugOptions ? "true" : "false");
 		properties.setProperty("disableUpdateMessage", disableUpdateMessage ? "true" : "false");
 		properties.setProperty("maxShadowRenderDistance", String.valueOf(IrisVideoSettings.shadowDistance));
+		properties.setProperty("renderQuality", String.valueOf(IrisVideoSettings.renderQuality));
+		properties.setProperty("shadowQuality", String.valueOf(IrisVideoSettings.shadowQuality));
 		// NB: This uses ISO-8859-1 with unicode escapes as the encoding
 		try (OutputStream os = Files.newOutputStream(propertiesPath)) {
 			properties.store(os, COMMENT);

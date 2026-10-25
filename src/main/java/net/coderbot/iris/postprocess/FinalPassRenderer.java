@@ -158,8 +158,8 @@ public class FinalPassRenderer {
 		GlStateManager.depthMask(false);
 
 		final net.minecraft.client.render.pipeline.RenderTarget main = Minecraft.getInstance().getRenderTarget();
-		final int baseWidth = main.width;
-		final int baseHeight = main.height;
+		final int baseWidth = renderTargets.getCurrentWidth();
+		final int baseHeight = renderTargets.getCurrentHeight();
 
 		// Note that since DeferredWorldRenderingPipeline uses the depth texture of the main Minecraft framebuffer,
 		// we'll be writing to that depth buffer directly automatically and won't need to futz around with copying
@@ -204,6 +204,8 @@ public class FinalPassRenderer {
 				}
 			}
 
+			// the final pass upscales from the render quality size to the window
+			GlStateManager.viewport(0, 0, main.width, main.height);
 			finalPass.program.use();
 			FullScreenQuadRenderer.INSTANCE.renderQuad();
 
@@ -214,14 +216,9 @@ public class FinalPassRenderer {
 			//
 			// Thus, the following call transfers the content of colortex0 into the main Minecraft framebuffer.
 			//
-			// Note that glCopyTexSubImage2D is not as strict as glBlitFramebuffer, so we don't have to worry about
-			// colortex0 having a weird format. This should just work.
-			//
-			// We could have used a shader here, but it should be about the same performance either way:
-			// https://stackoverflow.com/a/23994979/18166885
-			this.baseline.bindAsReadBuffer();
-
-			IrisRenderSystem.copyTexSubImage2D(main.colorTextureId, GL11C.GL_TEXTURE_2D, 0, 0, 0, 0, 0, baseWidth, baseHeight);
+			// A blit also scales from the render quality size to the window.
+			IrisRenderSystem.blitFramebuffer(baseline.getId(), main.frameBufferId, 0, 0, baseWidth, baseHeight,
+				0, 0, main.width, main.height, GL11C.GL_COLOR_BUFFER_BIT, GL11C.GL_LINEAR);
 		}
 
 		GlStateManager.activeTexture(GL15C.GL_TEXTURE0);

@@ -219,8 +219,7 @@ public class CompositeRenderer {
 			for (ComputeProgram computeProgram : renderPass.computes) {
 				if (computeProgram != null) {
 					ranCompute = true;
-					net.minecraft.client.render.pipeline.RenderTarget main = Minecraft.getInstance().getRenderTarget();
-					computeProgram.dispatch(main.width, main.height);
+					computeProgram.dispatch(renderTargets.getCurrentWidth(), renderTargets.getCurrentHeight());
 				}
 			}
 

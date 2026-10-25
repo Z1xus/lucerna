@@ -1,5 +1,6 @@
 package net.coderbot.iris.shaderpack;
 
+import net.coderbot.iris.gui.option.IrisVideoSettings;
 import com.google.common.collect.ImmutableList;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
@@ -112,7 +113,7 @@ public class PackShadowDirectives {
 	}
 
 	public int getResolution() {
-		return resolution;
+		return IrisVideoSettings.scaleShadowResolution(resolution);
 	}
 
 	public Float getFov() {
