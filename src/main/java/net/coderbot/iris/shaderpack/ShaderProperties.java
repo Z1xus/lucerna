@@ -277,14 +277,6 @@ public class ShaderProperties {
 			});
 
 			handleTwoArgDirective("texture.", key, value, (stageName, samplerName) -> {
-				String[] parts = value.split(" ");
-
-				// TODO: Support raw textures
-				if (parts.length > 1) {
-					Iris.logger.warn("Custom texture directive for stage " + stageName + ", sampler " + samplerName + " contains more parts than we expected: " + value);
-					return;
-				}
-
 				Optional<TextureStage> optionalTextureStage = TextureStage.parse(stageName);
 
 				if (!optionalTextureStage.isPresent()) {
@@ -294,8 +286,9 @@ public class ShaderProperties {
 
 				TextureStage stage = optionalTextureStage.get();
 
+				// packs add a suffix such as colortex6.1 to set one sampler from several directives
 				customTextures.computeIfAbsent(stage, _stage -> new Object2ObjectOpenHashMap<>())
-						.put(samplerName, value);
+						.put(samplerName.split("\\.")[0], value);
 			});
 
 			handleTwoArgDirective("flip.", key, value, (pass, buffer) -> {

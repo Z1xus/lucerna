@@ -1,6 +1,7 @@
 package net.coderbot.iris.mixin;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.pipeline.CloudRenderer;
 import net.coderbot.iris.pipeline.WorldRenderingPhase;
@@ -121,18 +122,27 @@ public class MixinWorldRenderer {
 		lucerna$setPhase(WorldRenderingPhase.VOID);
 	}
 
-	@WrapWithCondition(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
-	private boolean lucerna$renderSun(Tesselator tesselator) {
+	@WrapOperation(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
+	private void lucerna$renderSun(Tesselator tesselator, Operation<Void> original) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
-
-		return pipeline == null || pipeline.shouldRenderSun();
+		lucerna$endOrDiscard(tesselator, original, pipeline == null || pipeline.shouldRenderSun());
 	}
 
-	@WrapWithCondition(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
-	private boolean lucerna$renderMoon(Tesselator tesselator) {
+	@WrapOperation(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
+	private void lucerna$renderMoon(Tesselator tesselator, Operation<Void> original) {
 		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+		lucerna$endOrDiscard(tesselator, original, pipeline == null || pipeline.shouldRenderMoon());
+	}
 
-		return pipeline == null || pipeline.shouldRenderMoon();
+	@Unique
+	private static void lucerna$endOrDiscard(Tesselator tesselator, Operation<Void> original, boolean draw) {
+		if (draw) {
+			original.call(tesselator);
+		} else {
+			// the buffer still has to finish building, or the next sky draw cannot begin
+			tesselator.getBuffer().end();
+			tesselator.getBuffer().clear();
+		}
 	}
 
 	@Inject(method = LUCERNA_RENDER_SKY, at = @At("RETURN"))

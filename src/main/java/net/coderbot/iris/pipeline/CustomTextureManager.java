@@ -1,5 +1,7 @@
 package net.coderbot.iris.pipeline;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -11,13 +13,18 @@ import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.shaderpack.texture.CustomTextureData;
 import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.AbstractTexture;
 import net.minecraft.client.render.texture.Texture;
 import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.render.texture.TextureUtil;
 import net.minecraft.resource.Identifier;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL12C;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -34,6 +41,7 @@ public class CustomTextureManager {
 	 * Make sure any textures added to this list call releaseId from the close method.
 	 */
 	private final List<AbstractTexture> ownedTextures = new ArrayList<>();
+	private final IntList ownedRawTextures = new IntArrayList();
 
 	public CustomTextureManager(PackDirectives packDirectives,
 								EnumMap<TextureStage, Object2ObjectMap<String, CustomTextureData>> customTextureDataMap,
@@ -77,6 +85,11 @@ public class CustomTextureManager {
 			ownedTextures.add(texture);
 
 			return texture::getGlId;
+		} else if (textureData instanceof CustomTextureData.RawData raw) {
+			int texture = createRawTexture(raw);
+			ownedRawTextures.add(texture);
+
+			return () -> texture;
 		} else if (textureData instanceof CustomTextureData.LightmapMarker) {
 			// Special code path for the light texture. While shader packs hardcode the primary light texture, it's
 			// possible that a mod will create a different light texture, so this code path is robust to that.
@@ -104,6 +117,50 @@ public class CustomTextureManager {
 		}
 	}
 
+	private static int createRawTexture(CustomTextureData.RawData raw) {
+		int target = raw instanceof CustomTextureData.RawData1D ? GL11C.GL_TEXTURE_1D : raw instanceof CustomTextureData.RawData3D ? GL12C.GL_TEXTURE_3D : GL11C.GL_TEXTURE_2D;
+		int texture = GL11C.glGenTextures();
+		int filter = raw.getFilteringData().shouldBlur() ? GL11C.GL_LINEAR : GL11C.GL_NEAREST;
+		int wrap = raw.getFilteringData().shouldClamp() ? GL12C.GL_CLAMP_TO_EDGE : GL11C.GL_REPEAT;
+		ByteBuffer content = MemoryUtil.memAlloc(raw.getContent().length).put(raw.getContent()).flip();
+
+		bind(target, texture);
+		GL11C.glTexParameteri(target, GL11C.GL_TEXTURE_MIN_FILTER, filter);
+		GL11C.glTexParameteri(target, GL11C.GL_TEXTURE_MAG_FILTER, filter);
+		GL11C.glTexParameteri(target, GL11C.GL_TEXTURE_WRAP_S, wrap);
+		GL11C.glTexParameteri(target, GL11C.GL_TEXTURE_WRAP_T, wrap);
+		GL11C.glTexParameteri(target, GL12C.GL_TEXTURE_WRAP_R, wrap);
+		GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, 1);
+
+		int internalFormat = raw.getInternalFormat().getGlFormat();
+		int format = raw.getPixelFormat().getGlFormat();
+		int type = raw.getPixelType().getGlFormat();
+
+		if (raw instanceof CustomTextureData.RawData1D data) {
+			GL11C.glTexImage1D(target, 0, internalFormat, data.getSizeX(), 0, format, type, content);
+		} else if (raw instanceof CustomTextureData.RawData3D data) {
+			GL12C.glTexImage3D(target, 0, internalFormat, data.getSizeX(), data.getSizeY(), data.getSizeZ(), 0, format, type, content);
+		} else {
+			CustomTextureData.RawData2D data = (CustomTextureData.RawData2D) raw;
+			GL11C.glTexImage2D(target, 0, internalFormat, data.getSizeX(), data.getSizeY(), 0, format, type, content);
+		}
+
+		GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, 4);
+		bind(target, 0);
+		MemoryUtil.memFree(content);
+
+		return texture;
+	}
+
+	// 2d binds go through GlStateManager so its cached binding stays correct
+	private static void bind(int target, int texture) {
+		if (target == GL11C.GL_TEXTURE_2D) {
+			GlStateManager.bindTexture(texture);
+		} else {
+			GL11C.glBindTexture(target, texture);
+		}
+	}
+
 	public EnumMap<TextureStage, Object2ObjectMap<String, IntSupplier>> getCustomTextureIdMap() {
 		return customTextureIdMap;
 	}
@@ -118,5 +175,6 @@ public class CustomTextureManager {
 
 	public void destroy() {
 		ownedTextures.forEach(AbstractTexture::clearGlId);
+		ownedRawTextures.forEach(GL11C::glDeleteTextures);
 	}
 }

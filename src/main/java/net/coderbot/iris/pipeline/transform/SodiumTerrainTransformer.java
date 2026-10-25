@@ -1,12 +1,17 @@
 package net.coderbot.iris.pipeline.transform;
 
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
+import io.github.douira.glsl_transformer.ast.node.declaration.TypeAndInitDeclaration;
 import io.github.douira.glsl_transformer.ast.node.expression.Expression;
+import io.github.douira.glsl_transformer.ast.node.external_declaration.DeclarationExternalDeclaration;
+import io.github.douira.glsl_transformer.ast.node.type.qualifier.StorageQualifier;
+import io.github.douira.glsl_transformer.ast.node.type.specifier.BuiltinNumericTypeSpecifier;
 import io.github.douira.glsl_transformer.ast.query.Root;
 import io.github.douira.glsl_transformer.ast.query.match.AutoHintedMatcher;
 import io.github.douira.glsl_transformer.ast.query.match.Matcher;
 import io.github.douira.glsl_transformer.ast.transform.ASTInjectionPoint;
 import io.github.douira.glsl_transformer.ast.transform.ASTParser;
+import io.github.douira.glsl_transformer.util.Type;
 
 /**
  * Patches terrain programs to read the Celeritas chunk vertices that Argentum draws, using glsl-transformer AST.
@@ -82,18 +87,32 @@ class SodiumTerrainTransformer {
 			Parameters parameters) {
 		transformShared(t, tree, root, parameters);
 
-		String output = null;
-
-		if (root.identifierIndex.getOne("gl_FragData") != null) {
-			output = "gl_FragData[0]";
-		} else if (root.identifierIndex.getOne("gl_FragColor") != null) {
-			output = "gl_FragColor";
-		}
+		String output = findFragmentOutput(root);
 
 		if (output != null) {
 			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform float iris_currentAlphaTest;");
 			tree.appendMain(t, "if (" + output + ".a < iris_currentAlphaTest) discard;");
 		}
+	}
+
+	// the first colour output, packs written against modern iris declare their own out variables
+	static String findFragmentOutput(Root root) {
+		if (root.identifierIndex.has("gl_FragData")) {
+			return "gl_FragData[0]";
+		} else if (root.identifierIndex.has("gl_FragColor")) {
+			return "gl_FragColor";
+		}
+
+		for (DeclarationExternalDeclaration declaration : root.nodeIndex.get(DeclarationExternalDeclaration.class)) {
+			if (declaration.getDeclaration() instanceof TypeAndInitDeclaration variable && variable.getType().getTypeQualifier() != null
+					&& variable.getType().getTypeQualifier().getChildren().stream().anyMatch(part -> part instanceof StorageQualifier storage && storage.storageType == StorageQualifier.StorageType.OUT)) {
+				// the alpha test and the glint layers write rgba, so only a plain vec4 output works
+				boolean vec4 = variable.getType().getTypeSpecifier() instanceof BuiltinNumericTypeSpecifier numeric && numeric.type == Type.F32VEC4;
+				return vec4 && variable.getMembers().get(0).getArraySpecifier() == null ? variable.getMembers().get(0).getName().getName() : null;
+			}
+		}
+
+		return null;
 	}
 
 	/**

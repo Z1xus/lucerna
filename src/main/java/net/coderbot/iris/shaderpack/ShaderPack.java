@@ -9,6 +9,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.features.FeatureFlags;
+import net.coderbot.iris.gl.texture.InternalTextureFormat;
+import net.coderbot.iris.gl.texture.PixelFormat;
+import net.coderbot.iris.gl.texture.PixelType;
 import net.coderbot.iris.gui.FeatureMissingErrorScreen;
 import net.coderbot.iris.gui.screen.ShaderPackScreen;
 import net.coderbot.iris.shaderpack.include.AbsolutePackPath;
@@ -25,7 +28,6 @@ import net.coderbot.iris.shaderpack.texture.CustomTextureData;
 import net.coderbot.iris.shaderpack.texture.TextureFilteringData;
 import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.coderbot.iris.uniforms.custom.CustomUniforms;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resource.language.I18n;
 import org.jetbrains.annotations.Nullable;
@@ -132,7 +134,8 @@ public class ShaderPack {
 				Minecraft.getInstance().openScreen(new FeatureMissingErrorScreen(Minecraft.getInstance().screen, I18n.translate("iris.unsupported.pack"), I18n.translate("iris.unsupported.pack.description", FeatureFlags.getInvalidStatus(invalidFlagList), invalidFeatureFlags.stream()
 					.collect(Collectors.joining(", ", ": ", ".")))));
 			}
-			IrisApi.getInstance().getConfig().setShadersEnabledAndApply(false);
+			// reloading here would close the zip this pack is still read from, so let the loader fall back instead
+			throw new IllegalStateException("The shader pack needs unsupported features: " + String.join(", ", invalidFeatureFlags));
 		}
 
 		List<String> optionalFeatureFlags = shaderProperties.getOptionalFeatureFlags().stream().filter(flag -> !FeatureFlags.isInvalid(flag)).collect(Collectors.toList());
@@ -278,19 +281,22 @@ public class ShaderPack {
 	}
 
 	// TODO: Implement raw texture data types
-	public CustomTextureData readTexture(Path root, String path) throws IOException {
+	public CustomTextureData readTexture(Path root, String value) throws IOException {
 		CustomTextureData customTextureData;
-		if (path.contains(":")) {
-			String[] parts = path.split(":");
+		String[] parts = value.split(" ");
+		String path = parts[0];
 
-			if (parts.length > 2) {
+		if (path.contains(":")) {
+			String[] location = path.split(":");
+
+			if (location.length > 2) {
 				Iris.logger.warn("Resource location " + path + " contained more than two parts?");
 			}
 
-			if (parts[0].equals("minecraft") && (parts[1].equals("dynamic/lightmap_1") || parts[1].equals("dynamic/light_map_1"))) {
+			if (location[0].equals("minecraft") && (location[1].equals("dynamic/lightmap_1") || location[1].equals("dynamic/light_map_1"))) {
 				customTextureData = new CustomTextureData.LightmapMarker();
 			} else {
-				customTextureData = new CustomTextureData.ResourceData(parts[0], parts[1]);
+				customTextureData = new CustomTextureData.ResourceData(location[0], location[1]);
 			}
 		} else {
 			// TODO: Make sure the resulting path is within the shaderpack?
@@ -323,10 +329,31 @@ public class ShaderPack {
 			}
 
 			byte[] content = Files.readAllBytes(root.resolve(path));
+			TextureFilteringData filtering = new TextureFilteringData(blur, clamp);
 
-			customTextureData = new CustomTextureData.PngData(new TextureFilteringData(blur, clamp), content);
+			if (parts.length > 1) {
+				customTextureData = readRawTexture(parts, content, filtering);
+			} else {
+				customTextureData = new CustomTextureData.PngData(filtering, content);
+			}
 		}
 		return customTextureData;
+	}
+
+	// <path> <type> <internal format> <size x> [size y] [size z] <pixel format> <pixel type>
+	private static CustomTextureData readRawTexture(String[] parts, byte[] content, TextureFilteringData filtering) throws IOException {
+		InternalTextureFormat internalFormat = InternalTextureFormat.fromString(parts[2]).orElseThrow(() -> new IOException("Unknown internal format " + parts[2]));
+		PixelFormat pixelFormat = PixelFormat.fromString(parts[parts.length - 2]).orElseThrow(() -> new IOException("Unknown pixel format " + parts[parts.length - 2]));
+		PixelType pixelType = PixelType.fromString(parts[parts.length - 1]).orElseThrow(() -> new IOException("Unknown pixel type " + parts[parts.length - 1]));
+
+		return switch (parts[1]) {
+			case "TEXTURE_1D" -> new CustomTextureData.RawData1D(content, internalFormat, pixelFormat, pixelType, filtering, Integer.parseInt(parts[3]));
+			case "TEXTURE_2D", "TEXTURE_RECTANGLE" -> new CustomTextureData.RawData2D(content, internalFormat, pixelFormat, pixelType, filtering,
+				Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
+			case "TEXTURE_3D" -> new CustomTextureData.RawData3D(content, internalFormat, pixelFormat, pixelType, filtering,
+				Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5]));
+			default -> throw new IOException("Unknown texture type " + parts[1]);
+		};
 	}
 
 	private JsonObject loadMcMeta(Path mcMetaPath) throws IOException, JsonParseException {

@@ -74,6 +74,18 @@ public class CompatibilityTransformer {
 			}
 		}
 
+		// chocapic based packs use flat, integer operators and texelFetch2D in 120 shaders without declaring the extension
+		if (tree.getVersionStatement().version.number <= 120) {
+			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "#extension GL_EXT_gpu_shader4 : enable\n");
+		}
+
+		// iris provides these even when a pack uses them without declaring them
+		for (String id : new String[] { "entityId", "blockEntityId", "currentRenderedItemId" }) {
+			if (root.identifierIndex.has(id) && root.identifierIndex.getStream(id).noneMatch(identifier -> identifier.getParent() instanceof DeclarationMember)) {
+				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform int " + id + ";");
+			}
+		}
+
 		// writing both is a link error on strict drivers, optifine treats gl_FragColor as gl_FragData[0]
 		if (parameters.type == PatchShaderType.FRAGMENT && root.identifierIndex.has("gl_FragColor") && root.identifierIndex.has("gl_FragData")) {
 			root.replaceReferenceExpressions(t, "gl_FragColor", "gl_FragData[0]");

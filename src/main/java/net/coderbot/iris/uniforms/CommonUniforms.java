@@ -32,6 +32,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector4i;
 
+import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.ONCE;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_TICK;
 
@@ -128,6 +129,8 @@ public final class CommonUniforms {
 			// 1.8.9 has no darkness effect
 			.uniform1f(PER_FRAME, "darknessFactor", () -> 0.0F)
 			.uniform1f(PER_FRAME, "darknessLightFactor", () -> 0.0F)
+			// the reference of optifine's default alpha test
+			.uniform1f(ONCE, "alphaTestRef", () -> 0.1F)
 			// TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
 			//       that the player is trying to turn on fullbright?
 			.uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)

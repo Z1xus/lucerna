@@ -299,6 +299,13 @@ public class IrisRenderSystem {
 	}
 
 	public static class DSAARB extends DSAUnsupported {
+		@Override
+		public void bindTextureToUnit(int unit, int texture) {
+			// target agnostic, so the 3d and array textures of shader packs bind too
+			ARBDirectStateAccess.glBindTextureUnit(unit, texture);
+			GlStateManager.TEXTURES[unit].texture = texture;
+		}
+
 
 		@Override
 		public void generateMipmaps(int texture, int target) {

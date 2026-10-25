@@ -1,6 +1,8 @@
 package net.coderbot.iris.pipeline.transform;
 
+import io.github.douira.glsl_transformer.ast.node.Profile;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
+import io.github.douira.glsl_transformer.ast.node.VersionStatement;
 import io.github.douira.glsl_transformer.ast.node.basic.ASTNode;
 import io.github.douira.glsl_transformer.ast.node.external_declaration.ExternalDeclaration;
 import io.github.douira.glsl_transformer.ast.query.Root;
@@ -99,7 +101,8 @@ class InstancedEntityTransformer {
 		tree.prependMain(t, "lucerna_lightCoord = (gl_TextureMatrix[1] * vec4(lucerna_light(), 0.0, 1.0)).xy;");
 		tree.prependMain(t, "lucerna_color = lucerna_vertexColor();");
 		tree.prependMain(t, "lucerna_overlay = aOverlay;");
-		tree.appendMain(t, "if (" + NEVER + ") gl_Position.x += uLightDirection0.x + uLightDirection1.x;");
+		tree.appendMain(t, "if (" + NEVER + ") gl_Position.x += float(uBoxInstancing + uGlintPass + uChargePass + uItemGlintPass) + float(uEyeLight)"
+			+ " + uItemGlintMatrix[0][0] + uItemGlintMatrix1[0][0] + uLightDirection0.x + uLightDirection1.x;");
 	}
 
 	private static void transformFragment(ASTParser t, TranslationUnit tree, Root root) {
@@ -129,7 +132,9 @@ class InstancedEntityTransformer {
 			in + " vec4 lucerna_color;",
 			in + " vec4 lucerna_overlay;");
 
-		String sample = modern ? "texture" : "texture2D";
+		// packs often name a sampler texture, so only core profiles, where texture2D is gone, call texture()
+		VersionStatement version = tree.getVersionStatement();
+		String sample = version.version.number >= 140 && version.profile != Profile.COMPATIBILITY ? "texture" : "texture2D";
 		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_FUNCTIONS,
 			"vec4 lucerna_shaded(vec4 color) { color.rgb = mix(color.rgb, lucerna_overlay.rgb, lucerna_overlay.a) * " + sample + "(uLightmap, lucerna_lightCoord).rgb; return color; }",
 			// glint layers add the sum of their squares, see entity_instancing.frag
@@ -142,9 +147,10 @@ class InstancedEntityTransformer {
 		tree.prependMain(t, "float lucerna_alpha = (" + sample + "(uTexture, lucerna_texCoord) * lucerna_color).a;");
 
 		// glint and charged layers blend onto the shaded entity, the other draw buffers are masked while they draw
-		String output = root.identifierIndex.has("gl_FragData") ? "gl_FragData[0]" : "gl_FragColor";
-		tree.appendMain(t, "if (uGlintPass >= 0 || uItemGlintPass >= 0 || uChargePass != 0) " + output + " = lucerna_effect();");
-		tree.appendMain(t, "if (" + NEVER + ") " + output + " += u_FogColor + vec4(u_FogDensity + u_FogStart + u_FogEnd + float(u_FogShape) + float(uLit) + float(uLightmapped));");
+		String output = SodiumTerrainTransformer.findFragmentOutput(root);
+		String effect = output != null ? output + " = lucerna_effect();" : "discard;";
+		tree.appendMain(t, "if (uGlintPass >= 0 || uItemGlintPass >= 0 || uChargePass != 0) " + effect);
+		tree.appendMain(t, "if (" + NEVER + " && " + sample + "(uLightmap, vec2(0.0)).r + u_FogColor.x + u_FogDensity + u_FogStart + u_FogEnd + float(u_FogShape) + float(uLit) + float(uLightmapped) > 0.0) discard;");
 	}
 
 	private static void removeUniform(ASTParser t, Root root, String name) {
