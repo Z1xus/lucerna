@@ -20,6 +20,7 @@ import net.coderbot.iris.gl.blending.BufferBlendInformation;
 import net.coderbot.iris.shaderpack.option.ShaderPackOptions;
 import net.coderbot.iris.shaderpack.preprocessor.PropertiesPreprocessor;
 import net.coderbot.iris.shaderpack.texture.TextureStage;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -74,7 +75,7 @@ public class ShaderProperties {
 	private Integer mainScreenColumnCount = null;
 	private final Map<String, Integer> subScreenColumnCount = new HashMap<>();
 	// TODO: private Map<String, String> optifineVersionRequirements;
-	// TODO: Parse custom uniforms / variables
+	private final CustomUniforms.Builder customUniforms = new CustomUniforms.Builder();
 	private final Object2ObjectMap<String, AlphaTestOverride> alphaTestOverrides = new Object2ObjectOpenHashMap<>();
 	private final Object2FloatMap<String> viewportScaleOverrides = new Object2FloatOpenHashMap<>();
 	private final Object2ObjectMap<String, TextureScaleOverride> textureScaleOverrides = new Object2ObjectOpenHashMap<>();
@@ -152,7 +153,6 @@ public class ShaderProperties {
 			handleBooleanDirective(key, value, "prepareBeforeShadow", bool -> prepareBeforeShadow = bool);
 
 			// TODO: Min optifine versions, shader options layout / appearance / profiles
-			// TODO: Custom uniforms
 
 			handlePassDirective("scale.", key, value, pass -> {
 				float scale;
@@ -305,6 +305,26 @@ public class ShaderProperties {
 				});
 			});
 
+
+			handlePassDirective("variable.", key, value, pass -> {
+				String[] parts = pass.split("\\.");
+				if (parts.length != 2) {
+					Iris.logger.warn("Custom variables should take the form of `variable.<type>.<name> = <expression>. Ignoring " + key);
+					return;
+				}
+
+				customUniforms.addVariable(parts[0], parts[1], value, false);
+			});
+
+			handlePassDirective("uniform.", key, value, pass -> {
+				String[] parts = pass.split("\\.");
+				if (parts.length != 2) {
+					Iris.logger.warn("Custom uniforms should take the form of `uniform.<type>.<name> = <expression>. Ignoring " + key);
+					return;
+				}
+
+				customUniforms.addVariable(parts[0], parts[1], value, true);
+			});
 
 			handleWhitespacedListDirective(key, value, "iris.features.required", options -> requiredFeatureFlags = options);
 			handleWhitespacedListDirective(key, value, "iris.features.optional", options -> optionalFeatureFlags = options);
@@ -620,5 +640,9 @@ public class ShaderProperties {
 
 	public List<String> getOptionalFeatureFlags() {
 		return optionalFeatureFlags;
+	}
+
+	public CustomUniforms.Builder getCustomUniforms() {
+		return customUniforms;
 	}
 }
