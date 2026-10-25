@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShadowRenderer {
-	public static Matrix4f MODELVIEW;
-	public static Matrix4f PROJECTION;
 	public static boolean ACTIVE = false;
 	private final float halfPlaneLength;
 	private final float renderDistanceMultiplier;
@@ -288,7 +286,7 @@ public class ShadowRenderer {
 
 		GlStateManager.viewport(0, 0, resolution, resolution);
 
-		MODELVIEW = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
+		Matrix4f modelView = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
 
 		profiler.push("terrain_setup");
 
@@ -324,17 +322,15 @@ public class ShadowRenderer {
 		profiler.swap("terrain");
 
 		// Set up our orthographic projection matrix and load it into the legacy matrix stack
-		float[] projection = this.fov != null
+		Matrix4f projection = new Matrix4f().set(this.fov != null
 			? ShadowMatrices.createPerspectiveMatrix(this.fov)
-			: ShadowMatrices.createOrthoMatrix(halfPlaneLength);
+			: ShadowMatrices.createOrthoMatrix(halfPlaneLength));
 
-		PROJECTION = new Matrix4f().set(projection);
-
-		loadMatrix(GL11.GL_PROJECTION, PROJECTION);
-		loadMatrix(GL11.GL_MODELVIEW, MODELVIEW);
+		loadMatrix(GL11.GL_PROJECTION, projection);
+		loadMatrix(GL11.GL_MODELVIEW, modelView);
 
 		ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).lucerna$getMatrices();
-		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(new ChunkRenderMatrices(PROJECTION, MODELVIEW));
+		((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(new ChunkRenderMatrices(projection, modelView));
 
 		// Disable backface culling
 		// This partially works around an issue where if the front face of a mountain isn't visible, it casts no
