@@ -204,7 +204,7 @@ public class ShadowRenderer {
 
 			if (packCullingState == OptionalBoolean.FALSE) {
 				reason = "(set by shader pack)";
-			} else /*if (packHasVoxelization)*/ {
+			} else {
 				reason = "(voxelization detected)";
 			}
 
@@ -482,7 +482,6 @@ public class ShadowRenderer {
 			+ (shouldRenderTerrain ? "" : " (no terrain) ") + (shouldRenderTranslucent ? "" : "(no translucent)"));
 		messages.add("[" + Iris.MODNAME + "] Shadow Entities: " + getEntitiesDebugString());
 		messages.add("[" + Iris.MODNAME + "] Shadow Block Entities: " + getBlockEntitiesDebugString());
-
 	}
 
 	private String getEntitiesDebugString() {

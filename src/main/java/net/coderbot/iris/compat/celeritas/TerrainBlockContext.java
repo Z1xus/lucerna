@@ -6,10 +6,7 @@ import net.coderbot.iris.vertices.ExtendedDataHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockState;
 
-/**
- * The block that the chunk mesher on the current thread is emitting quads for. The extended terrain vertex encoder
- * reads it to fill in mc_Entity and at_midBlock.
- */
+// the block that the chunk mesher on this thread emits quads for, read by XHFPTerrainVertex
 public final class TerrainBlockContext {
 	private static final ThreadLocal<TerrainBlockContext> CURRENT = ThreadLocal.withInitial(TerrainBlockContext::new);
 
@@ -46,14 +43,5 @@ public final class TerrainBlockContext {
 		this.localPosX = x & 15;
 		this.localPosY = y & 15;
 		this.localPosZ = z & 15;
-	}
-
-	public void clear() {
-		this.blockId = -1;
-		this.renderType = -1;
-		this.lightValue = 0;
-		this.localPosX = 0;
-		this.localPosY = 0;
-		this.localPosZ = 0;
 	}
 }

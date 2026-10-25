@@ -93,11 +93,11 @@ public class IrisChunkShaderInterface implements ChunkShaderInterface {
 		}
 
 		if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
-			// No back face culling during the shadow pass
+			// no back face culling during the shadow pass
 			GlStateManager.disableCull();
 		}
 
-		// See IrisSamplers#addLevelSamplers
+		// see IrisSamplers#addLevelSamplers
 		Minecraft minecraft = Minecraft.getInstance();
 		GlStateManager.activeTexture(GL13.GL_TEXTURE0 + IrisSamplers.LIGHTMAP_TEXTURE_UNIT);
 		GlStateManager.bindTexture(((GameRendererAccessor) minecraft.gameRenderer).lucerna$getLightmapTexture().getGlId());
@@ -178,7 +178,7 @@ public class IrisChunkShaderInterface implements ChunkShaderInterface {
 
 	@Override
 	public void setTextureSlot(ChunkShaderTextureSlot slot, int val) {
-		// Not used, the pack samplers bind the albedo and lightmap units themselves
+		// unused, the pack samplers bind the albedo and lightmap units themselves
 	}
 
 	private static SodiumTerrainPipeline getSodiumTerrainPipeline() {

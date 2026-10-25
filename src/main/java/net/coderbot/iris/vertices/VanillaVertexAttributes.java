@@ -10,13 +10,13 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
-/**
- * Supplies mc_midTexCoord and at_tangent for vanilla quad draws, which have no room for them in their vertex format,
- * as client side vertex attribute arrays.
- */
+// vanilla vertex formats have no room for mc_midTexCoord and at_tangent, so supply them as client side arrays
 public final class VanillaVertexAttributes {
 	// mc_midTexCoord as two floats, then at_tangent as four normalized bytes
 	private static final int STRIDE = 12;
+	// locations bound in ProgramCreator
+	private static final int MID_TEX_COORD_LOCATION = 12;
+	private static final int TANGENT_LOCATION = 13;
 	private static final BufferBuilderQuadView QUAD = new BufferBuilderQuadView();
 	private static final Vector3f NORMAL = new Vector3f();
 
@@ -60,10 +60,10 @@ public final class VanillaVertexAttributes {
 			}
 		}
 
-		GL20C.nglVertexAttribPointer(12, 2, GL11C.GL_FLOAT, false, STRIDE, target);
-		GL20C.nglVertexAttribPointer(13, 4, GL11C.GL_BYTE, true, STRIDE, target + 8);
-		GL20C.glEnableVertexAttribArray(12);
-		GL20C.glEnableVertexAttribArray(13);
+		GL20C.nglVertexAttribPointer(MID_TEX_COORD_LOCATION, 2, GL11C.GL_FLOAT, false, STRIDE, target);
+		GL20C.nglVertexAttribPointer(TANGENT_LOCATION, 4, GL11C.GL_BYTE, true, STRIDE, target + 8);
+		GL20C.glEnableVertexAttribArray(MID_TEX_COORD_LOCATION);
+		GL20C.glEnableVertexAttribArray(TANGENT_LOCATION);
 		bound = true;
 	}
 
@@ -73,10 +73,10 @@ public final class VanillaVertexAttributes {
 		}
 
 		bound = false;
-		GL20C.glDisableVertexAttribArray(12);
-		GL20C.glDisableVertexAttribArray(13);
+		GL20C.glDisableVertexAttribArray(MID_TEX_COORD_LOCATION);
+		GL20C.glDisableVertexAttribArray(TANGENT_LOCATION);
 		// the current value of an attribute is undefined after an array draw
-		IrisRenderSystem.vertexAttrib4f(12, 0.0F, 0.0F, 0.0F, 1.0F);
-		IrisRenderSystem.vertexAttrib4f(13, 1.0F, 0.0F, 0.0F, 1.0F);
+		IrisRenderSystem.vertexAttrib4f(MID_TEX_COORD_LOCATION, 0.0F, 0.0F, 0.0F, 1.0F);
+		IrisRenderSystem.vertexAttrib4f(TANGENT_LOCATION, 1.0F, 0.0F, 0.0F, 1.0F);
 	}
 }

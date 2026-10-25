@@ -9,12 +9,13 @@ import net.minecraft.entity.living.LivingEntity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Project;
 
-public class HandRenderer {
+public final class HandRenderer {
 	public static final HandRenderer INSTANCE = new HandRenderer();
 
 	public static final float DEPTH = 0.125F;
 
-	private boolean ACTIVE;
+	private HandRenderer() {
+	}
 
 	private boolean canRender(Minecraft minecraft) {
 		Entity camera = minecraft.getCamera();
@@ -36,13 +37,11 @@ public class HandRenderer {
 		GameRenderer gameRenderer = minecraft.gameRenderer;
 		GameRendererAccessor accessor = (GameRendererAccessor) gameRenderer;
 
-		ACTIVE = true;
-
 		pipeline.setPhase(WorldRenderingPhase.HAND_SOLID);
 
 		minecraft.profiler.push("iris_hand");
 
-		// We need to scale the projection by 0.125 so the hand doesn't clip through blocks.
+		// scale the projection depth so the hand does not clip through blocks
 		GlStateManager.matrixMode(GL11.GL_PROJECTION);
 		GlStateManager.pushMatrix();
 		GlStateManager.loadIdentity();
@@ -71,11 +70,5 @@ public class HandRenderer {
 		minecraft.profiler.pop();
 
 		pipeline.setPhase(WorldRenderingPhase.NONE);
-
-		ACTIVE = false;
-	}
-
-	public boolean isActive() {
-		return ACTIVE;
 	}
 }

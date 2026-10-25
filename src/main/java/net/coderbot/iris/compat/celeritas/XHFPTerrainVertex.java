@@ -17,7 +17,7 @@ public class XHFPTerrainVertex implements ChunkVertexEncoder {
 	private static final int MC_ENTITY_OFFSET = 44;
 	private static final int MID_BLOCK_OFFSET = 48;
 
-	private final QuadViewTerrain.QuadViewTerrainUnsafe quad = new QuadViewTerrain.QuadViewTerrainUnsafe();
+	private final QuadViewTerrain quad = new QuadViewTerrain();
 	private final Vector3f normal = new Vector3f();
 
 	private TerrainBlockContext context;
