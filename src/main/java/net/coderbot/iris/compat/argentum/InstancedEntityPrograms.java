@@ -15,6 +15,7 @@ import org.embeddedt.embeddium.impl.gl.shader.GlProgram;
 import org.embeddedt.embeddium.impl.gl.shader.GlShader;
 import org.embeddedt.embeddium.impl.gl.shader.ShaderType;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL30C;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -28,6 +29,10 @@ public final class InstancedEntityPrograms {
 	private static Map<PatchShaderType, String> building;
 	@Nullable
 	private static Entry active;
+	private static int glintPass = -1;
+	private static int itemGlintPass = -1;
+	private static int chargePass;
+	private static boolean effectMasked;
 
 	private InstancedEntityPrograms() {
 	}
@@ -124,6 +129,7 @@ public final class InstancedEntityPrograms {
 		}
 
 		active = null;
+		updateEffectMask();
 		ProgramUniforms.clearActiveUniforms();
 		ProgramSamplers.clearActiveSamplers();
 		BlendModeOverride.restore();
@@ -131,6 +137,34 @@ public final class InstancedEntityPrograms {
 		// argentum unbinds the program, so the next vanilla draw has to set up its gbuffer pass again
 		if (Iris.getPipelineManager().getPipelineNullable() instanceof DeferredWorldRenderingPipeline pipeline) {
 			pipeline.beginPass(null);
+		}
+	}
+
+	public static void setGlintPass(int pass) {
+		glintPass = pass;
+		updateEffectMask();
+	}
+
+	public static void setItemGlintPass(int pass) {
+		itemGlintPass = pass;
+		updateEffectMask();
+	}
+
+	public static void setChargePass(int pass) {
+		chargePass = pass;
+		updateEffectMask();
+	}
+
+	// glint and charged layers only blend into colortex0, see InstancedEntityTransformer
+	private static void updateEffectMask() {
+		boolean effect = active != null && (glintPass >= 0 || itemGlintPass >= 0 || chargePass != 0);
+
+		if (effect != effectMasked) {
+			effectMasked = effect;
+
+			for (int buffer = 1; buffer < 8; buffer++) {
+				GL30C.glColorMaski(buffer, !effect, !effect, !effect, !effect);
+			}
 		}
 	}
 

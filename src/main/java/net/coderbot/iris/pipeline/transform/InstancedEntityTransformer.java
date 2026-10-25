@@ -66,6 +66,8 @@ class InstancedEntityTransformer {
 			"uniform vec3 uLightDirection0;",
 			"uniform vec3 uLightDirection1;",
 			out + " vec2 lucerna_texCoord;",
+			out + " vec2 lucerna_glintCoord;",
+			out + " vec2 lucerna_lightCoord;",
 			out + " vec4 lucerna_color;",
 			out + " vec4 lucerna_overlay;");
 		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_FUNCTIONS,
@@ -76,7 +78,13 @@ class InstancedEntityTransformer {
 			"vec4 lucerna_vertexColor() { return aColor * (uBoxInstancing != 0 ? vec4(1.0) : aVertexColor); }",
 			// 61680 is the light argentum uses for emissive parts
 			"vec2 lucerna_light() { return uEyeLight ? vec2(61680.0, 0.0) : aLightCoord.xy; }",
-			"vec4 lucerna_ftransform() { return gl_ModelViewProjectionMatrix * lucerna_vertex(); }");
+			"vec4 lucerna_ftransform() { return gl_ModelViewProjectionMatrix * lucerna_vertex(); }",
+			"vec2 lucerna_glint(vec2 uv, float layer) { float angle = radians(30.0 - layer * 60.0); uv += vec2(0.0, aEffectTime * (0.001 + layer * 0.003) * 20.0);"
+				+ " return vec2(cos(angle) * uv.x - sin(angle) * uv.y, sin(angle) * uv.x + cos(angle) * uv.y) / 3.0; }",
+			// the coordinates of argentum's glint, item glint and charged layer passes, see entity_instancing.vert
+			"vec2 lucerna_effectCoord(vec2 uv) { return uGlintPass >= 0 ? lucerna_glint(uv, 0.0) : uItemGlintPass >= 0 ? (uItemGlintMatrix * vec4(uv, 0.0, 1.0)).xy"
+				+ " : uChargePass == 1 ? uv + vec2(aEffectTime * 0.01) : uChargePass == 2 ? uv + vec2(cos(aEffectTime * 0.02) * 3.0, aEffectTime * 0.01)"
+				+ " : (gl_TextureMatrix[0] * vec4(uv, 0.0, 1.0)).xy; }");
 
 		root.rename("ftransform", "lucerna_ftransform");
 		root.replaceReferenceExpressions(t, "gl_Vertex", "lucerna_vertex()");
@@ -86,11 +94,12 @@ class InstancedEntityTransformer {
 		root.replaceReferenceExpressions(t, "gl_Color", "lucerna_vertexColor()");
 		root.replaceReferenceExpressions(t, "entityColor", "aOverlay");
 
-		tree.prependMain(t, "lucerna_texCoord = (gl_TextureMatrix[0] * vec4(lucerna_texture(), 0.0, 1.0)).xy;");
+		tree.prependMain(t, "lucerna_texCoord = lucerna_effectCoord(lucerna_texture());");
+		tree.prependMain(t, "lucerna_glintCoord = uGlintPass >= 0 ? lucerna_glint(lucerna_texture(), 1.0) : (uItemGlintMatrix1 * vec4(lucerna_texture(), 0.0, 1.0)).xy;");
+		tree.prependMain(t, "lucerna_lightCoord = (gl_TextureMatrix[1] * vec4(lucerna_light(), 0.0, 1.0)).xy;");
 		tree.prependMain(t, "lucerna_color = lucerna_vertexColor();");
 		tree.prependMain(t, "lucerna_overlay = aOverlay;");
-		tree.appendMain(t, "if (" + NEVER + ") gl_Position.x += float(uBoxInstancing + uGlintPass + uChargePass + uItemGlintPass) + float(uEyeLight) + aEffectTime"
-			+ " + uItemGlintMatrix[0][0] + uItemGlintMatrix1[0][0] + uLightDirection0.x + uLightDirection1.x;");
+		tree.appendMain(t, "if (" + NEVER + ") gl_Position.x += uLightDirection0.x + uLightDirection1.x;");
 	}
 
 	private static void transformFragment(ASTParser t, TranslationUnit tree, Root root) {
@@ -115,19 +124,27 @@ class InstancedEntityTransformer {
 			"uniform float u_FogEnd;",
 			"uniform int u_FogShape;",
 			in + " vec2 lucerna_texCoord;",
+			in + " vec2 lucerna_glintCoord;",
+			in + " vec2 lucerna_lightCoord;",
 			in + " vec4 lucerna_color;",
 			in + " vec4 lucerna_overlay;");
 
 		String sample = modern ? "texture" : "texture2D";
-		// the pack's own programs draw enchantment glint and charged layers, these argentum passes cannot be shaded
-		tree.prependMain(t, "if (uGlintPass >= 0 || uItemGlintPass >= 0 || uChargePass != 0) discard;");
+		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_FUNCTIONS,
+			"vec4 lucerna_shaded(vec4 color) { color.rgb = mix(color.rgb, lucerna_overlay.rgb, lucerna_overlay.a) * " + sample + "(uLightmap, lucerna_lightCoord).rgb; return color; }",
+			// glint layers add the sum of their squares, see entity_instancing.frag
+			"vec4 lucerna_effect() { vec4 color = " + sample + "(uTexture, lucerna_texCoord) * lucerna_color; if (uGlintPass < 0 && uItemGlintPass != 1) return lucerna_shaded(color);"
+				+ " vec4 second = " + sample + "(uTexture, lucerna_glintCoord) * lucerna_color; color = color.a <= 0.1 ? vec4(0.0) : lucerna_shaded(color);"
+				+ " second = second.a <= 0.1 ? vec4(0.0) : lucerna_shaded(second); return sqrt(color * color + second * second); }");
+
 		// argentum splits translucent models into an opaque and a blended pass, see entity_instancing.frag
-		tree.prependMain(t, "if (lucerna_alpha <= 0.1 || (uAlphaPass == 1 && lucerna_alpha >= 254.0 / 255.0) || (uAlphaPass == 2 && lucerna_alpha < 254.0 / 255.0)) discard;");
+		tree.prependMain(t, "if (uGlintPass < 0 && uItemGlintPass != 1 && (lucerna_alpha <= 0.1 || (uAlphaPass == 1 && lucerna_alpha >= 254.0 / 255.0) || (uAlphaPass == 2 && lucerna_alpha < 254.0 / 255.0))) discard;");
 		tree.prependMain(t, "float lucerna_alpha = (" + sample + "(uTexture, lucerna_texCoord) * lucerna_color).a;");
 
+		// glint and charged layers blend onto the shaded entity, the other draw buffers are masked while they draw
 		String output = root.identifierIndex.has("gl_FragData") ? "gl_FragData[0]" : "gl_FragColor";
-		tree.appendMain(t, "if (" + NEVER + ") " + output + " += " + sample + "(uLightmap, vec2(0.0)) + u_FogColor"
-			+ " + vec4(u_FogDensity + u_FogStart + u_FogEnd + float(u_FogShape) + float(uLit) + float(uLightmapped));");
+		tree.appendMain(t, "if (uGlintPass >= 0 || uItemGlintPass >= 0 || uChargePass != 0) " + output + " = lucerna_effect();");
+		tree.appendMain(t, "if (" + NEVER + ") " + output + " += u_FogColor + vec4(u_FogDensity + u_FogStart + u_FogEnd + float(u_FogShape) + float(uLit) + float(uLightmapped));");
 	}
 
 	private static void removeUniform(ASTParser t, Root root, String name) {
