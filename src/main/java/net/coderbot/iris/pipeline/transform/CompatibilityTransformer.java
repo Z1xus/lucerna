@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class CompatibilityTransformer {
-	static Logger LOGGER = LogManager.getLogger(CompatibilityTransformer.class);
+	private static final Logger LOGGER = LogManager.getLogger(CompatibilityTransformer.class);
 
 	private static final AutoHintedMatcher<Expression> sildursWaterFract = new AutoHintedMatcher<>(
 		"fract(worldpos.y + 0.001)", Matcher.expressionPattern);
@@ -98,7 +98,7 @@ public class CompatibilityTransformer {
 				// TODO: integrate into debug mode (allow user to disable this behavior for
 				// debugging purposes)
 				unusedFunctions.add(definition);
-				if (PatchedShaderPrinter.prettyPrintShaders) {
+				if (PatchedShaderPrinter.PRETTY_PRINT_SHADERS) {
 					LOGGER.warn("Removing unused function " + functionName);
 				} else if (unusedFunctions.size() == 1) {
 					LOGGER.warn(
@@ -247,7 +247,7 @@ public class CompatibilityTransformer {
 	private static final DeclarationMatcher outDeclarationMatcher = new DeclarationMatcher(StorageType.OUT);
 	private static final DeclarationMatcher inDeclarationMatcher = new DeclarationMatcher(StorageType.IN);
 
-	private static final String tagPrefix = "iris_template_";
+	private static final String TAG_PREFIX = "iris_template_";
 	private static final Template<ExternalDeclaration> declarationTemplate = Template
 			.withExternalDeclaration("out __type __name;");
 	private static final Template<Statement> initTemplate = Template.withStatement("__decl = __value;");
@@ -348,8 +348,8 @@ public class CompatibilityTransformer {
 			Root prevRoot = prevTree.getRoot();
 
 			// test if the prefix tag is used for some reason
-			if (prevRoot.identifierIndex.prefixQueryFlat(tagPrefix).findAny().isPresent()) {
-				LOGGER.warn("The prefix tag " + tagPrefix + " is used in the shader, bailing compatibility transformation.");
+			if (prevRoot.identifierIndex.prefixQueryFlat(TAG_PREFIX).findAny().isPresent()) {
+				LOGGER.warn("The prefix tag " + TAG_PREFIX + " is used in the shader, bailing compatibility transformation.");
 				return;
 			}
 
@@ -472,7 +472,7 @@ public class CompatibilityTransformer {
 							boolean isVector = outType.isVector();
 
 							// rename all references of this out declaration to a new name (iris_)
-							String newName = tagPrefix + name;
+							String newName = TAG_PREFIX + name;
 							prevRoot.identifierIndex.rename(name, newName);
 
 							// rename the original out declaration back to the original name

@@ -82,7 +82,7 @@ public class Iris {
 	// behavior is more concrete and therefore is more likely to repair a user's issues
 	private static boolean resetShaderPackOptions = false;
 
-	private static Version IRIS_VERSION;
+	private static Version irisVersion;
 	private static boolean fallback;
 
     /**
@@ -98,7 +98,7 @@ public class Iris {
 		ModContainer iris = FabricLoader.getInstance().getModContainer(MODID)
 				.orElseThrow(() -> new IllegalStateException("Couldn't find the mod container for Iris"));
 
-		IRIS_VERSION = iris.getMetadata().getVersion();
+		irisVersion = iris.getMetadata().getVersion();
 
 		try {
 			if (!Files.exists(getShaderpacksDirectory())) {
@@ -631,11 +631,11 @@ public class Iris {
 	}
 
 	public static String getVersion() {
-		if (IRIS_VERSION == null) {
+		if (irisVersion == null) {
 			return "Version info unknown!";
 		}
 
-		return IRIS_VERSION.getFriendlyString();
+		return irisVersion.getFriendlyString();
 	}
 
 	public static String getFormattedVersion() {
