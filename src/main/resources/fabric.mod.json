@@ -8,9 +8,6 @@
   "authors": ["Polyfrost"],
   "contributors": ["coderbot", "IMS212", "douira", "embeddedt"],
   "license": "LGPL-3.0-only",
-  "entrypoints": {
-    "client": ["net.coderbot.iris.Iris"]
-  },
   "depends": {
     "minecraft": "1.8.9",
     "argentum": ">=1.0.2"

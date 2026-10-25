@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.coderbot.iris.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "ArgentumWorldRendererAccessor",
+    "GameRendererAccessor",
+    "MixinBufferUploader",
+    "MixinGameOptions",
+    "MixinGameRenderer",
+    "MixinGlStateManager",
+    "MixinMinecraft",
+    "MixinRenderTarget",
+    "MixinTitleScreen",
+    "MixinVertexBuffer",
+    "MixinWorldRenderer",
+    "entity_render_context.MixinBlockEntityRenderDispatcher",
+    "entity_render_context.MixinEntityRenderDispatcher"
+  ]
+}

@@ -14,9 +14,15 @@ public class StateTracker {
 	// OverlayStateShard / TextureUnit.OVERLAY
 	public boolean overlaySampler;
 
+	private static final InputAvailability[] INPUTS = new InputAvailability[InputAvailability.NUM_VALUES];
+
+	static {
+		for (int i = 0; i < INPUTS.length; i++) {
+			INPUTS[i] = InputAvailability.unpack(i);
+		}
+	}
+
 	public InputAvailability getInputs() {
-		return new InputAvailability(albedoSampler,
-				lightmapSampler,
-				overlaySampler);
+		return INPUTS[(albedoSampler ? 1 : 0) | (lightmapSampler ? 2 : 0) | (overlaySampler ? 4 : 0)];
 	}
 }

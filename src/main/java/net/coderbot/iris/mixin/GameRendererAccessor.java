@@ -28,4 +28,7 @@ public interface GameRendererAccessor {
 
 	@Invoker("setupFog")
 	void invokeSetupFog(int mode, float tickDelta);
+
+	@Invoker("renderSnowAndRain")
+	void invokeRenderSnowAndRain(float tickDelta);
 }
