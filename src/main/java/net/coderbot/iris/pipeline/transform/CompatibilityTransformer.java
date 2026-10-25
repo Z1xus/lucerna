@@ -104,11 +104,7 @@ public class CompatibilityTransformer {
 				// debugging purposes)
 				unusedFunctions.add(definition);
 				if (PatchedShaderPrinter.PRETTY_PRINT_SHADERS) {
-					LOGGER.warn("Removing unused function " + functionName);
-				} else if (unusedFunctions.size() == 1) {
-					LOGGER.warn(
-							"Removing unused function " + functionName
-									+ " and omitting further such messages outside of debug mode. See debugging.md for more information.");
+					LOGGER.info("Removing unused function {}", functionName);
 				}
 				continue;
 			}
