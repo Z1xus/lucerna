@@ -13,48 +13,48 @@ import java.util.List;
 import java.util.OptionalInt;
 
 public interface WorldRenderingPipeline {
-	void beginLevelRendering();
-	void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller);
-	void addDebugText(List<String> messages);
-	OptionalInt getForcedShadowRenderDistanceChunksForDisplay();
+    void beginLevelRendering();
+    void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller);
+    void addDebugText(List<String> messages);
+    OptionalInt getForcedShadowRenderDistanceChunksForDisplay();
 
-	WorldRenderingPhase getPhase();
+    WorldRenderingPhase getPhase();
 
-	void beginSodiumTerrainRendering();
-	void endSodiumTerrainRendering();
-	void setOverridePhase(WorldRenderingPhase phase);
-	void setPhase(WorldRenderingPhase phase);
-	void setInputs(InputAvailability availability);
-	void setSpecialCondition(SpecialCondition special);
-	void syncProgram();
+    void beginSodiumTerrainRendering();
+    void endSodiumTerrainRendering();
+    void setOverridePhase(WorldRenderingPhase phase);
+    void setPhase(WorldRenderingPhase phase);
+    void setInputs(InputAvailability availability);
+    void setSpecialCondition(SpecialCondition special);
+    void syncProgram();
 
-	boolean usesExtendedVertexAttributes();
-	RenderTargetStateListener getRenderTargetStateListener();
+    boolean usesExtendedVertexAttributes();
+    RenderTargetStateListener getRenderTargetStateListener();
 
-	int getCurrentNormalTexture();
-	int getCurrentSpecularTexture();
+    int getCurrentNormalTexture();
+    int getCurrentSpecularTexture();
 
-	void onBindTexture(int id);
+    void onBindTexture(int id);
 
-	void beginHand();
+    void beginHand();
 
-	void beginTranslucents();
-	void finalizeLevelRendering();
-	void destroy();
+    void beginTranslucents();
+    void finalizeLevelRendering();
+    void destroy();
 
-	SodiumTerrainPipeline getSodiumTerrainPipeline();
-	FrameUpdateNotifier getFrameUpdateNotifier();
+    SodiumTerrainPipeline getSodiumTerrainPipeline();
+    FrameUpdateNotifier getFrameUpdateNotifier();
 
-	boolean shouldDisableVanillaEntityShadows();
-	boolean shouldDisableDirectionalShading();
-	CloudSetting getCloudSetting();
-	boolean shouldRenderUnderwaterOverlay();
-	boolean shouldRenderVignette();
-	boolean shouldRenderSun();
-	boolean shouldRenderMoon();
-	boolean shouldWriteRainAndSnowToDepthBuffer();
-	boolean shouldRenderParticlesBeforeDeferred();
-	boolean allowConcurrentCompute();
+    boolean shouldDisableVanillaEntityShadows();
+    boolean shouldDisableDirectionalShading();
+    CloudSetting getCloudSetting();
+    boolean shouldRenderUnderwaterOverlay();
+    boolean shouldRenderVignette();
+    boolean shouldRenderSun();
+    boolean shouldRenderMoon();
+    boolean shouldWriteRainAndSnowToDepthBuffer();
+    boolean shouldRenderParticlesBeforeDeferred();
+    boolean allowConcurrentCompute();
 
-	float getSunPathRotation();
+    float getSunPathRotation();
 }

@@ -5,6 +5,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(targets = "dev.rdh.argentum.impl.render.entity.instancing.InstanceShader", remap = false)
 public interface InstanceShaderInvoker {
-	@Invoker("initialize")
-	void lucerna$initialize();
+    @Invoker("initialize")
+    void lucerna$initialize();
 }

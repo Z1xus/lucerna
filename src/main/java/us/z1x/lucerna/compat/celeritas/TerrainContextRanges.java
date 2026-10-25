@@ -5,5 +5,5 @@ import net.minecraft.util.math.BlockPos;
 
 // argentum converts its vanilla layer buffers to chunk vertices only after the whole section is meshed
 public interface TerrainContextRanges {
-	void lucerna$recordBlock(BlockLayer layer, int packedId, BlockPos pos);
+    void lucerna$recordBlock(BlockLayer layer, int packedId, BlockPos pos);
 }

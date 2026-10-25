@@ -11,43 +11,43 @@ import net.minecraft.client.gui.screen.Screen;
 
 
 public class IrisApiV0Impl implements IrisApi {
-	public static final IrisApiV0Impl INSTANCE = new IrisApiV0Impl();
-	private static final IrisApiV0ConfigImpl CONFIG = new IrisApiV0ConfigImpl();
+    public static final IrisApiV0Impl INSTANCE = new IrisApiV0Impl();
+    private static final IrisApiV0ConfigImpl CONFIG = new IrisApiV0ConfigImpl();
 
-	@Override
-	public int getMinorApiRevision() {
-		return 1;
-	}
+    @Override
+    public int getMinorApiRevision() {
+        return 1;
+    }
 
-	@Override
-	public boolean isShaderPackInUse() {
-		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+    @Override
+    public boolean isShaderPackInUse() {
+        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
-		if (pipeline == null) {
-			return false;
-		}
+        if (pipeline == null) {
+            return false;
+        }
 
-		return !(pipeline instanceof FixedFunctionWorldRenderingPipeline);
-	}
+        return !(pipeline instanceof FixedFunctionWorldRenderingPipeline);
+    }
 
-	@Override
-	public boolean isRenderingShadowPass() {
-		return ShadowRenderingState.areShadowsCurrentlyBeingRendered();
-	}
+    @Override
+    public boolean isRenderingShadowPass() {
+        return ShadowRenderingState.areShadowsCurrentlyBeingRendered();
+    }
 
-	@Override
-	public Object openMainIrisScreenObj(Object parent) {
-		return new ShaderPackScreen((Screen) parent);
-	}
+    @Override
+    public Object openMainIrisScreenObj(Object parent) {
+        return new ShaderPackScreen((Screen) parent);
+    }
 
-	@Override
-	public String getMainScreenLanguageKey() {
-		return "options.iris.shaderPackSelection";
-	}
+    @Override
+    public String getMainScreenLanguageKey() {
+        return "options.iris.shaderPackSelection";
+    }
 
-	@Override
-	public IrisApiConfig getConfig() {
-		return CONFIG;
-	}
+    @Override
+    public IrisApiConfig getConfig() {
+        return CONFIG;
+    }
 
 }

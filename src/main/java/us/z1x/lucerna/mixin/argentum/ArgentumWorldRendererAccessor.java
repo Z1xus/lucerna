@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(value = ArgentumWorldRenderer.class, remap = false)
 public interface ArgentumWorldRendererAccessor {
-	@Accessor("matrices")
-	ChunkRenderMatrices lucerna$getMatrices();
+    @Accessor("matrices")
+    ChunkRenderMatrices lucerna$getMatrices();
 
-	@Accessor("matrices")
-	void lucerna$setMatrices(ChunkRenderMatrices matrices);
+    @Accessor("matrices")
+    void lucerna$setMatrices(ChunkRenderMatrices matrices);
 }

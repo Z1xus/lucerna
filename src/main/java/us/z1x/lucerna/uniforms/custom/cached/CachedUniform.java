@@ -12,81 +12,81 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public abstract class CachedUniform implements VariableExpression {
-	private final String name;
-	private final UniformUpdateFrequency updateFrequency;
-	private int version = 1;
+    private final String name;
+    private final UniformUpdateFrequency updateFrequency;
+    private int version = 1;
 
-	public CachedUniform(String name, UniformUpdateFrequency updateFrequency) {
-		this.name = name;
-		this.updateFrequency = updateFrequency;
-	}
+    public CachedUniform(String name, UniformUpdateFrequency updateFrequency) {
+        this.name = name;
+        this.updateFrequency = updateFrequency;
+    }
 
-	static public CachedUniform forExpression(String name, Type type, Expression expression, FunctionContext context) {
-		final FunctionReturn held = new FunctionReturn();
-		final UniformUpdateFrequency frequency = UniformUpdateFrequency.CUSTOM;
-		if (type.equals(Type.Boolean)) {
-			return new BooleanCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return held.booleanReturn;
-			});
-		} else if (type.equals(Type.Int)) {
-			return new IntCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return held.intReturn;
-			});
-		} else if (type.equals(Type.Float)) {
-			return new FloatCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return held.floatReturn;
-			});
-		} else if (type.equals(VectorType.VEC2)) {
-			return new Float2VectorCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return (Vector2f) held.objectReturn;
-			});
-		} else if (type.equals(VectorType.VEC3)) {
-			return new Float3VectorCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return (Vector3f) held.objectReturn;
-			});
-		} else if (type.equals(VectorType.VEC4)) {
-			return new Float4VectorCachedUniform(name, frequency, () -> {
-				expression.evaluateTo(context, held);
-				return (Vector4f) held.objectReturn;
-			});
-		} else {
-			throw new IllegalArgumentException("Custom uniforms of type: " + type + " are currently not supported");
-		}
-	}
+    static public CachedUniform forExpression(String name, Type type, Expression expression, FunctionContext context) {
+        final FunctionReturn held = new FunctionReturn();
+        final UniformUpdateFrequency frequency = UniformUpdateFrequency.CUSTOM;
+        if (type.equals(Type.Boolean)) {
+            return new BooleanCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return held.booleanReturn;
+            });
+        } else if (type.equals(Type.Int)) {
+            return new IntCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return held.intReturn;
+            });
+        } else if (type.equals(Type.Float)) {
+            return new FloatCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return held.floatReturn;
+            });
+        } else if (type.equals(VectorType.VEC2)) {
+            return new Float2VectorCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return (Vector2f) held.objectReturn;
+            });
+        } else if (type.equals(VectorType.VEC3)) {
+            return new Float3VectorCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return (Vector3f) held.objectReturn;
+            });
+        } else if (type.equals(VectorType.VEC4)) {
+            return new Float4VectorCachedUniform(name, frequency, () -> {
+                expression.evaluateTo(context, held);
+                return (Vector4f) held.objectReturn;
+            });
+        } else {
+            throw new IllegalArgumentException("Custom uniforms of type: " + type + " are currently not supported");
+        }
+    }
 
-	public int getVersion() {
-		return this.version;
-	}
+    public int getVersion() {
+        return this.version;
+    }
 
-	public void update() {
-		if (doUpdate()) {
-			this.version++;
-		}
-	}
+    public void update() {
+        if (doUpdate()) {
+            this.version++;
+        }
+    }
 
-	protected abstract boolean doUpdate();
+    protected abstract boolean doUpdate();
 
-	public abstract void push(int location);
+    public abstract void push(int location);
 
-	@Override
-	public void evaluateTo(FunctionContext context, FunctionReturn functionReturn) {
-		this.writeTo(functionReturn);
-	}
+    @Override
+    public void evaluateTo(FunctionContext context, FunctionReturn functionReturn) {
+        this.writeTo(functionReturn);
+    }
 
-	public abstract void writeTo(FunctionReturn functionReturn);
+    public abstract void writeTo(FunctionReturn functionReturn);
 
-	public abstract Type getType();
+    public abstract Type getType();
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public UniformUpdateFrequency getUpdateFrequency() {
-		return updateFrequency;
-	}
+    public UniformUpdateFrequency getUpdateFrequency() {
+        return updateFrequency;
+    }
 }

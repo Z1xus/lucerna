@@ -10,100 +10,100 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Formatting;
 
 public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBooleanOptionElement> {
-	private final BooleanOption option;
+    private final BooleanOption option;
 
-	private boolean appliedValue;
-	private boolean value;
-	private boolean defaultValue;
+    private boolean appliedValue;
+    private boolean value;
+    private boolean defaultValue;
 
-	public BooleanElementWidget(OptionMenuBooleanOptionElement element) {
-		super(element);
+    public BooleanElementWidget(OptionMenuBooleanOptionElement element) {
+        super(element);
 
-		this.option = element.option;
-	}
+        this.option = element.option;
+    }
 
-	@Override
-	public void init(ShaderPackScreen screen, NavigationController navigation) {
-		super.init(screen, navigation);
+    @Override
+    public void init(ShaderPackScreen screen, NavigationController navigation) {
+        super.init(screen, navigation);
 
-		// The value currently in use by the shader pack
-		this.appliedValue = this.element.getAppliedOptionValues().getBooleanValueOrDefault(this.option.getName());
+        // The value currently in use by the shader pack
+        this.appliedValue = this.element.getAppliedOptionValues().getBooleanValueOrDefault(this.option.getName());
 
-		// The yet-to-be-applied value that has been queued (if that is the case)
-		// Might be equal to the applied value
-		this.value = this.element.getPendingOptionValues().getBooleanValueOrDefault(this.option.getName());
+        // The yet-to-be-applied value that has been queued (if that is the case)
+        // Might be equal to the applied value
+        this.value = this.element.getPendingOptionValues().getBooleanValueOrDefault(this.option.getName());
 
-		this.defaultValue = this.element.getAppliedOptionValues().getOptionSet().getBooleanOptions()
-			.get(this.option.getName()).getOption().getDefaultValue();
+        this.defaultValue = this.element.getAppliedOptionValues().getOptionSet().getBooleanOptions()
+            .get(this.option.getName()).getOption().getDefaultValue();
 
-		this.setLabel(GuiUtil.translateOrDefault(this.option.getName(), "option." + this.option.getName()));
-	}
+        this.setLabel(GuiUtil.translateOrDefault(this.option.getName(), "option." + this.option.getName()));
+    }
 
-	@Override
-	public void render(int x, int y, int width, int height, int mouseX, int mouseY, boolean hovered) {
-		this.updateRenderParams(width, 28);
+    @Override
+    public void render(int x, int y, int width, int height, int mouseX, int mouseY, boolean hovered) {
+        this.updateRenderParams(width, 28);
 
-		this.renderOptionWithValue(x, y, width, height, hovered);
-		this.tryRenderTooltip(mouseX, mouseY, hovered);
-	}
+        this.renderOptionWithValue(x, y, width, height, hovered);
+        this.tryRenderTooltip(mouseX, mouseY, hovered);
+    }
 
-	@Override
-	protected String createValueLabel() {
-		String text = I18n.translate(this.value ? "label.iris.true" : "label.iris.false");
+    @Override
+    protected String createValueLabel() {
+        String text = I18n.translate(this.value ? "label.iris.true" : "label.iris.false");
 
-		// UX: Do not use color if the value is set to default.
-		//
-		// This is because the red color for "Off" and green color of "On"
-		// was causing people to want to change options to On when that was
-		// unnecessary due to red having a bad association.
-		//
-		// This was changed on request of Emin, since people kept on changing
-		// Compatibility Mode to "On" when not needed. Now we use white for
-		// default to avoid giving a positive or negative connotation to a
-		// default value.
-		if (this.value == this.defaultValue) {
-			return text;
-		}
+        // UX: Do not use color if the value is set to default.
+        //
+        // This is because the red color for "Off" and green color of "On"
+        // was causing people to want to change options to On when that was
+        // unnecessary due to red having a bad association.
+        //
+        // This was changed on request of Emin, since people kept on changing
+        // Compatibility Mode to "On" when not needed. Now we use white for
+        // default to avoid giving a positive or negative connotation to a
+        // default value.
+        if (this.value == this.defaultValue) {
+            return text;
+        }
 
-		return (this.value ? Formatting.GREEN : Formatting.RED) + text;
-	}
+        return (this.value ? Formatting.GREEN : Formatting.RED) + text;
+    }
 
-	@Override
-	public String getCommentKey() {
-		return "option." + this.option.getName() + ".comment";
-	}
+    @Override
+    public String getCommentKey() {
+        return "option." + this.option.getName() + ".comment";
+    }
 
-	public String getValue() {
-		return Boolean.toString(this.value);
-	}
+    public String getValue() {
+        return Boolean.toString(this.value);
+    }
 
-	private void queue() {
-		Iris.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
-	}
+    private void queue() {
+        Iris.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
+    }
 
-	@Override
-	public boolean applyNextValue() {
-		this.value = !this.value;
-		this.queue();
+    @Override
+    public boolean applyNextValue() {
+        this.value = !this.value;
+        this.queue();
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean applyPreviousValue() {
-		return this.applyNextValue();
-	}
+    @Override
+    public boolean applyPreviousValue() {
+        return this.applyNextValue();
+    }
 
-	@Override
-	public boolean applyOriginalValue() {
-		this.value = this.option.getDefaultValue();
-		this.queue();
+    @Override
+    public boolean applyOriginalValue() {
+        this.value = this.option.getDefaultValue();
+        this.queue();
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean isValueModified() {
-		return this.value != this.appliedValue;
-	}
+    @Override
+    public boolean isValueModified() {
+        return this.value != this.appliedValue;
+    }
 }

@@ -22,67 +22,67 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class OptionMenuConstructor {
-	private static final Map<Class<? extends OptionMenuElement>, WidgetProvider<OptionMenuElement>> WIDGET_CREATORS = new HashMap<>();
-	private static final Map<Class<? extends OptionMenuElementScreen>, ScreenDataProvider<OptionMenuElementScreen>> SCREEN_DATA_CREATORS = new HashMap<>();
+    private static final Map<Class<? extends OptionMenuElement>, WidgetProvider<OptionMenuElement>> WIDGET_CREATORS = new HashMap<>();
+    private static final Map<Class<? extends OptionMenuElementScreen>, ScreenDataProvider<OptionMenuElementScreen>> SCREEN_DATA_CREATORS = new HashMap<>();
 
-	private OptionMenuConstructor() {}
+    private OptionMenuConstructor() {}
 
-	@SuppressWarnings("unchecked")
-	public static <T extends OptionMenuElement> void registerWidget(Class<T> element, WidgetProvider<T> widget) {
-		WIDGET_CREATORS.put(element, (WidgetProvider<OptionMenuElement>) widget);
-	}
+    @SuppressWarnings("unchecked")
+    public static <T extends OptionMenuElement> void registerWidget(Class<T> element, WidgetProvider<T> widget) {
+        WIDGET_CREATORS.put(element, (WidgetProvider<OptionMenuElement>) widget);
+    }
 
-	@SuppressWarnings("unchecked")
-	public static <T extends OptionMenuElementScreen> void registerScreen(Class<T> screen, ScreenDataProvider<T> data) {
-		SCREEN_DATA_CREATORS.put(screen, (ScreenDataProvider<OptionMenuElementScreen>) data);
-	}
+    @SuppressWarnings("unchecked")
+    public static <T extends OptionMenuElementScreen> void registerScreen(Class<T> screen, ScreenDataProvider<T> data) {
+        SCREEN_DATA_CREATORS.put(screen, (ScreenDataProvider<OptionMenuElementScreen>) data);
+    }
 
-	public static AbstractElementWidget<? extends OptionMenuElement> createWidget(OptionMenuElement element) {
-		return WIDGET_CREATORS.getOrDefault(element.getClass(), e -> AbstractElementWidget.EMPTY).create(element);
-	}
+    public static AbstractElementWidget<? extends OptionMenuElement> createWidget(OptionMenuElement element) {
+        return WIDGET_CREATORS.getOrDefault(element.getClass(), e -> AbstractElementWidget.EMPTY).create(element);
+    }
 
-	public static ElementWidgetScreenData createScreenData(OptionMenuElementScreen screen) {
-		return SCREEN_DATA_CREATORS.getOrDefault(screen.getClass(), s -> ElementWidgetScreenData.EMPTY).create(screen);
-	}
+    public static ElementWidgetScreenData createScreenData(OptionMenuElementScreen screen) {
+        return SCREEN_DATA_CREATORS.getOrDefault(screen.getClass(), s -> ElementWidgetScreenData.EMPTY).create(screen);
+    }
 
-	@SuppressWarnings("unchecked")
-	public static void constructAndApplyToScreen(OptionMenuContainer container, ShaderPackScreen packScreen, ShaderPackOptionList optionList, NavigationController navigation) {
-		OptionMenuElementScreen screen = container.mainScreen;
+    @SuppressWarnings("unchecked")
+    public static void constructAndApplyToScreen(OptionMenuContainer container, ShaderPackScreen packScreen, ShaderPackOptionList optionList, NavigationController navigation) {
+        OptionMenuElementScreen screen = container.mainScreen;
 
-		if (navigation.getCurrentScreen() != null && container.subScreens.containsKey(navigation.getCurrentScreen())) {
-			screen = container.subScreens.get(navigation.getCurrentScreen());
-		}
+        if (navigation.getCurrentScreen() != null && container.subScreens.containsKey(navigation.getCurrentScreen())) {
+            screen = container.subScreens.get(navigation.getCurrentScreen());
+        }
 
-		ElementWidgetScreenData data = createScreenData(screen);
+        ElementWidgetScreenData data = createScreenData(screen);
 
-		optionList.addHeader(data.heading, data.backButton);
-		optionList.addWidgets(screen.getColumnCount(), screen.elements.stream().map(element -> {
-			AbstractElementWidget<OptionMenuElement> widget = (AbstractElementWidget<OptionMenuElement>) createWidget(element);
-			widget.init(packScreen, navigation);
-			return widget;
-		}).collect(Collectors.toList()));
-	}
+        optionList.addHeader(data.heading, data.backButton);
+        optionList.addWidgets(screen.getColumnCount(), screen.elements.stream().map(element -> {
+            AbstractElementWidget<OptionMenuElement> widget = (AbstractElementWidget<OptionMenuElement>) createWidget(element);
+            widget.init(packScreen, navigation);
+            return widget;
+        }).collect(Collectors.toList()));
+    }
 
-	static {
-		registerScreen(OptionMenuMainElementScreen.class, screen ->
-				new ElementWidgetScreenData(Formatting.BOLD + Iris.getCurrentPackName() + (Iris.isFallback() ? " (fallback)" : ""), false));
+    static {
+        registerScreen(OptionMenuMainElementScreen.class, screen ->
+                new ElementWidgetScreenData(Formatting.BOLD + Iris.getCurrentPackName() + (Iris.isFallback() ? " (fallback)" : ""), false));
 
-		registerScreen(OptionMenuSubElementScreen.class, screen ->
-				new ElementWidgetScreenData(GuiUtil.translateOrDefault(screen.screenId, "screen." + screen.screenId), true));
+        registerScreen(OptionMenuSubElementScreen.class, screen ->
+                new ElementWidgetScreenData(GuiUtil.translateOrDefault(screen.screenId, "screen." + screen.screenId), true));
 
-		registerWidget(OptionMenuBooleanOptionElement.class, BooleanElementWidget::new);
-		registerWidget(OptionMenuProfileElement.class, ProfileElementWidget::new);
-		registerWidget(OptionMenuLinkElement.class, LinkElementWidget::new);
+        registerWidget(OptionMenuBooleanOptionElement.class, BooleanElementWidget::new);
+        registerWidget(OptionMenuProfileElement.class, ProfileElementWidget::new);
+        registerWidget(OptionMenuLinkElement.class, LinkElementWidget::new);
 
-		registerWidget(OptionMenuStringOptionElement.class, element ->
-				element.slider ? new SliderElementWidget(element) : new StringElementWidget(element));
-	}
+        registerWidget(OptionMenuStringOptionElement.class, element ->
+                element.slider ? new SliderElementWidget(element) : new StringElementWidget(element));
+    }
 
-	public interface WidgetProvider<T extends OptionMenuElement> {
-		AbstractElementWidget<T> create(T element);
-	}
+    public interface WidgetProvider<T extends OptionMenuElement> {
+        AbstractElementWidget<T> create(T element);
+    }
 
-	public interface ScreenDataProvider<T extends OptionMenuElementScreen> {
-		ElementWidgetScreenData create(T screen);
-	}
+    public interface ScreenDataProvider<T extends OptionMenuElementScreen> {
+        ElementWidgetScreenData create(T screen);
+    }
 }

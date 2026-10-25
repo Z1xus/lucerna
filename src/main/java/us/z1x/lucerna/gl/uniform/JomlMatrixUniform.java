@@ -8,32 +8,32 @@ import java.nio.FloatBuffer;
 import java.util.function.Supplier;
 
 public class JomlMatrixUniform extends Uniform {
-	private final FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-	private Matrix4f cachedValue;
-	private final Supplier<Matrix4f> value;
+    private final FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+    private Matrix4f cachedValue;
+    private final Supplier<Matrix4f> value;
 
-	JomlMatrixUniform(int location, Supplier<Matrix4f> value) {
-		super(location);
+    JomlMatrixUniform(int location, Supplier<Matrix4f> value) {
+        super(location);
 
-		this.cachedValue = null;
-		this.value = value;
-	}
+        this.cachedValue = null;
+        this.value = value;
+    }
 
-	@Override
-	public void update() {
-		Matrix4f newValue = value.get();
+    @Override
+    public void update() {
+        Matrix4f newValue = value.get();
 
-		if (cachedValue == null || !newValue.equals(cachedValue)) {
-			if (cachedValue == null) {
-				cachedValue = new Matrix4f(newValue);
-			} else {
-				cachedValue.set(newValue);
-			}
+        if (cachedValue == null || !newValue.equals(cachedValue)) {
+            if (cachedValue == null) {
+                cachedValue = new Matrix4f(newValue);
+            } else {
+                cachedValue.set(newValue);
+            }
 
-			cachedValue.get(buffer);
-			buffer.rewind();
+            cachedValue.get(buffer);
+            buffer.rewind();
 
-			IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
-		}
-	}
+            IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
+        }
+    }
 }

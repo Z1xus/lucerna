@@ -1,9 +1,9 @@
 package us.z1x.lucerna.pipeline.transform;
 
 enum Patch {
-	ATTRIBUTES,
-	SODIUM_TERRAIN,
-	INSTANCED_ENTITY,
-	COMPOSITE,
-	COMPUTE
+    ATTRIBUTES,
+    SODIUM_TERRAIN,
+    INSTANCED_ENTITY,
+    COMPOSITE,
+    COMPUTE
 }

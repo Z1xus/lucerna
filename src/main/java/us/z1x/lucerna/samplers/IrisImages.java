@@ -12,47 +12,47 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class IrisImages {
-	public static void addRenderTargetImages(ImageHolder images, Supplier<ImmutableSet<Integer>> flipped,
-											 RenderTargets renderTargets) {
-		for (int i = 0; i < renderTargets.getRenderTargetCount(); i++) {
-			final int index = i;
+    public static void addRenderTargetImages(ImageHolder images, Supplier<ImmutableSet<Integer>> flipped,
+                                             RenderTargets renderTargets) {
+        for (int i = 0; i < renderTargets.getRenderTargetCount(); i++) {
+            final int index = i;
 
-			// Note: image bindings *are* impacted by buffer flips.
-			IntSupplier textureID = () -> {
-				ImmutableSet<Integer> flippedBuffers = flipped.get();
-				RenderTarget target = renderTargets.get(index);
+            // Note: image bindings *are* impacted by buffer flips.
+            IntSupplier textureID = () -> {
+                ImmutableSet<Integer> flippedBuffers = flipped.get();
+                RenderTarget target = renderTargets.get(index);
 
-				if (flippedBuffers.contains(index)) {
-					return target.getAltTexture();
-				} else {
-					return target.getMainTexture();
-				}
-			};
+                if (flippedBuffers.contains(index)) {
+                    return target.getAltTexture();
+                } else {
+                    return target.getMainTexture();
+                }
+            };
 
-			final InternalTextureFormat internalFormat = renderTargets.get(i).getInternalFormat();
-			final String name = "colorimg" + i;
+            final InternalTextureFormat internalFormat = renderTargets.get(i).getInternalFormat();
+            final String name = "colorimg" + i;
 
-			images.addTextureImage(textureID, internalFormat, name);
-		}
+            images.addTextureImage(textureID, internalFormat, name);
+        }
 
-		for (CustomImage image : renderTargets.getCustomImages()) {
-			images.addTextureImage(image::getTexture, image.getInfo().internalFormat(), image.getInfo().name());
-		}
-	}
+        for (CustomImage image : renderTargets.getCustomImages()) {
+            images.addTextureImage(image::getTexture, image.getInfo().internalFormat(), image.getInfo().name());
+        }
+    }
 
-	public static boolean hasShadowImages(ImageHolder images) {
-		// TODO: Generalize
-		return images.hasImage("shadowcolorimg0") || images.hasImage("shadowcolorimg1");
-	}
+    public static boolean hasShadowImages(ImageHolder images) {
+        // TODO: Generalize
+        return images.hasImage("shadowcolorimg0") || images.hasImage("shadowcolorimg1");
+    }
 
-	public static void addShadowColorImages(ImageHolder images, ShadowRenderTargets shadowRenderTargets) {
-		for (int i = 0; i < shadowRenderTargets.getNumColorTextures(); i++) {
-			final int index = i;
+    public static void addShadowColorImages(ImageHolder images, ShadowRenderTargets shadowRenderTargets) {
+        for (int i = 0; i < shadowRenderTargets.getNumColorTextures(); i++) {
+            final int index = i;
 
-			IntSupplier textureID = () -> shadowRenderTargets.getColorTextureId(index);
-			InternalTextureFormat format = shadowRenderTargets.getColorTextureFormat(index);
+            IntSupplier textureID = () -> shadowRenderTargets.getColorTextureId(index);
+            InternalTextureFormat format = shadowRenderTargets.getColorTextureFormat(index);
 
-			images.addTextureImage(textureID, format, "shadowcolorimg" + i);
-		}
-	}
+            images.addTextureImage(textureID, format, "shadowcolorimg" + i);
+        }
+    }
 }

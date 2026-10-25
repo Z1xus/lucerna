@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin({ BeaconRenderer.class, SpiderEyesLayer.class, EndermanEyesLayer.class, EnderDragonEyesLayer.class })
 public class MixinSpecialConditions {
-	@Inject(method = "render", at = @At("HEAD"))
-	private void lucerna$beginSpecialCondition(CallbackInfo ci) {
-		GbufferPrograms.setupSpecialRenderCondition((Object) this instanceof BeaconRenderer ? SpecialCondition.BEACON_BEAM : SpecialCondition.ENTITY_EYES);
-	}
+    @Inject(method = "render", at = @At("HEAD"))
+    private void lucerna$beginSpecialCondition(CallbackInfo ci) {
+        GbufferPrograms.setupSpecialRenderCondition((Object) this instanceof BeaconRenderer ? SpecialCondition.BEACON_BEAM : SpecialCondition.ENTITY_EYES);
+    }
 
-	@Inject(method = "render", at = @At("RETURN"))
-	private void lucerna$endSpecialCondition(CallbackInfo ci) {
-		GbufferPrograms.teardownSpecialRenderCondition(null);
-	}
+    @Inject(method = "render", at = @At("RETURN"))
+    private void lucerna$endSpecialCondition(CallbackInfo ci) {
+        GbufferPrograms.teardownSpecialRenderCondition(null);
+    }
 }

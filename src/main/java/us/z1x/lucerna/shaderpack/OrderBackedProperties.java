@@ -11,17 +11,17 @@ import java.util.function.BiConsumer;
  * Properties backed by a {@link java.util.LinkedHashMap}, in order to preserve iteration order
  */
 public class OrderBackedProperties extends Properties {
-	private transient final Map<Object, Object> backing = Object2ObjectMaps.synchronize(new Object2ObjectLinkedOpenHashMap<>());
+    private transient final Map<Object, Object> backing = Object2ObjectMaps.synchronize(new Object2ObjectLinkedOpenHashMap<>());
 
-	@Override
-	public synchronized Object put(Object key, Object value) {
-		backing.put(key, value);
+    @Override
+    public synchronized Object put(Object key, Object value) {
+        backing.put(key, value);
 
-		return super.put(key, value);
-	}
+        return super.put(key, value);
+    }
 
-	@Override
-	public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
-		this.backing.forEach(action);
-	}
+    @Override
+    public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
+        this.backing.forEach(action);
+    }
 }

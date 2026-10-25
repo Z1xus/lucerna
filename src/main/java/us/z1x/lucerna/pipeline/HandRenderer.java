@@ -10,65 +10,65 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Project;
 
 public final class HandRenderer {
-	public static final HandRenderer INSTANCE = new HandRenderer();
+    public static final HandRenderer INSTANCE = new HandRenderer();
 
-	public static final float DEPTH = 0.125F;
+    public static final float DEPTH = 0.125F;
 
-	private HandRenderer() {
-	}
+    private HandRenderer() {
+    }
 
-	private boolean canRender(Minecraft minecraft) {
-		Entity camera = minecraft.getCamera();
+    private boolean canRender(Minecraft minecraft) {
+        Entity camera = minecraft.getCamera();
 
-		return ((GameRendererAccessor) minecraft.gameRenderer).lucerna$shouldRenderHand()
-			&& minecraft.options.perspective == 0
-			&& !(camera instanceof LivingEntity && ((LivingEntity) camera).isSleeping())
-			&& !minecraft.options.hideGui
-			&& !minecraft.interactionManager.hidesGui();
-	}
+        return ((GameRendererAccessor) minecraft.gameRenderer).lucerna$shouldRenderHand()
+            && minecraft.options.perspective == 0
+            && !(camera instanceof LivingEntity && ((LivingEntity) camera).isSleeping())
+            && !minecraft.options.hideGui
+            && !minecraft.interactionManager.hidesGui();
+    }
 
-	public void renderSolid(float tickDelta, WorldRenderingPipeline pipeline) {
-		Minecraft minecraft = Minecraft.getInstance();
+    public void renderSolid(float tickDelta, WorldRenderingPipeline pipeline) {
+        Minecraft minecraft = Minecraft.getInstance();
 
-		if (!canRender(minecraft)) {
-			return;
-		}
+        if (!canRender(minecraft)) {
+            return;
+        }
 
-		GameRenderer gameRenderer = minecraft.gameRenderer;
-		GameRendererAccessor accessor = (GameRendererAccessor) gameRenderer;
+        GameRenderer gameRenderer = minecraft.gameRenderer;
+        GameRendererAccessor accessor = (GameRendererAccessor) gameRenderer;
 
-		pipeline.setPhase(WorldRenderingPhase.HAND_SOLID);
+        pipeline.setPhase(WorldRenderingPhase.HAND_SOLID);
 
-		minecraft.profiler.push("iris_hand");
+        minecraft.profiler.push("iris_hand");
 
-		// scale the projection depth so the hand does not clip through blocks
-		GlStateManager.matrixMode(GL11.GL_PROJECTION);
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
-		GlStateManager.scalef(1.0F, 1.0F, DEPTH);
-		Project.gluPerspective(accessor.lucerna$getFov(tickDelta, false), (float) minecraft.width / minecraft.height, 0.05F, accessor.lucerna$getRenderDistance() * 2.0F);
+        // scale the projection depth so the hand does not clip through blocks
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.pushMatrix();
+        GlStateManager.loadIdentity();
+        GlStateManager.scalef(1.0F, 1.0F, DEPTH);
+        Project.gluPerspective(accessor.lucerna$getFov(tickDelta, false), (float) minecraft.width / minecraft.height, 0.05F, accessor.lucerna$getRenderDistance() * 2.0F);
 
-		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.pushMatrix();
+        GlStateManager.loadIdentity();
 
-		accessor.lucerna$applyHurtCam(tickDelta);
+        accessor.lucerna$applyHurtCam(tickDelta);
 
-		if (minecraft.options.viewBobbing) {
-			accessor.lucerna$applyViewBobbing(tickDelta);
-		}
+        if (minecraft.options.viewBobbing) {
+            accessor.lucerna$applyViewBobbing(tickDelta);
+        }
 
-		gameRenderer.enableLightMap();
-		gameRenderer.itemInHandRenderer.renderInFirstPerson(tickDelta);
-		gameRenderer.disableLightMap();
+        gameRenderer.enableLightMap();
+        gameRenderer.itemInHandRenderer.renderInFirstPerson(tickDelta);
+        gameRenderer.disableLightMap();
 
-		GlStateManager.popMatrix();
-		GlStateManager.matrixMode(GL11.GL_PROJECTION);
-		GlStateManager.popMatrix();
-		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.popMatrix();
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.popMatrix();
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 
-		minecraft.profiler.pop();
+        minecraft.profiler.pop();
 
-		pipeline.setPhase(WorldRenderingPhase.NONE);
-	}
+        pipeline.setPhase(WorldRenderingPhase.NONE);
+    }
 }

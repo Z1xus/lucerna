@@ -13,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // opaque meshes changing invalidates the cached shadow terrain, sorted translucent storage is drawn every frame anyway
 @Mixin(value = SectionRenderDataStorage.class, remap = false)
 public class MixinShadowTerrainChanges {
-	@Shadow
-	@Final
-	private SectionRenderDataUnsafe.Strategy storageStrategy;
+    @Shadow
+    @Final
+    private SectionRenderDataUnsafe.Strategy storageStrategy;
 
-	@Inject(method = {"setMeshes", "removeMeshes"}, at = @At("HEAD"))
-	private void lucerna$invalidateShadowTerrain(CallbackInfo ci) {
-		if (storageStrategy != SectionRenderDataUnsafe.Strategy.FULL) {
-			ShadowRenderer.terrainChanged = true;
-		}
-	}
+    @Inject(method = {"setMeshes", "removeMeshes"}, at = @At("HEAD"))
+    private void lucerna$invalidateShadowTerrain(CallbackInfo ci) {
+        if (storageStrategy != SectionRenderDataUnsafe.Strategy.FULL) {
+            ShadowRenderer.terrainChanged = true;
+        }
+    }
 }

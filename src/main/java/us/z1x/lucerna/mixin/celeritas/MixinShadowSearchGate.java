@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.At;
 // frame's result is still the right one
 @Mixin(value = RenderSectionManager.class, remap = false)
 public class MixinShadowSearchGate {
-	@WrapOperation(method = "updateForShadowPass", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/lists/RenderListManager;startShadowGraphUpdate(Lorg/embeddedt/embeddium/impl/render/viewport/Viewport;IIFLorg/joml/Vector3fc;I)V"))
-	private void lucerna$skipUnchangedShadowSearch(RenderListManager manager, Viewport viewport, int frame, int regionIdsLength, float searchDistance,
-												   Vector3fc lightVector, int targetQueueSize, Operation<Void> original) {
-		if (!ShadowRenderer.reusingTerrain || manager.isNeedsUpdate()) {
-			original.call(manager, viewport, frame, regionIdsLength, searchDistance, lightVector, targetQueueSize);
-		}
-	}
+    @WrapOperation(method = "updateForShadowPass", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/lists/RenderListManager;startShadowGraphUpdate(Lorg/embeddedt/embeddium/impl/render/viewport/Viewport;IIFLorg/joml/Vector3fc;I)V"))
+    private void lucerna$skipUnchangedShadowSearch(RenderListManager manager, Viewport viewport, int frame, int regionIdsLength, float searchDistance,
+                                                   Vector3fc lightVector, int targetQueueSize, Operation<Void> original) {
+        if (!ShadowRenderer.reusingTerrain || manager.isNeedsUpdate()) {
+            original.call(manager, viewport, frame, regionIdsLength, searchDistance, lightVector, targetQueueSize);
+        }
+    }
 }

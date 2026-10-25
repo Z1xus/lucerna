@@ -4,20 +4,20 @@ import kroppeb.stareval.expression.Expression;
 
 @FunctionalInterface
 public interface V2FFunction extends TypedFunction {
-	float eval();
+    float eval();
 
-	@Override
-	default void evaluateTo(Expression[] params, FunctionContext context, FunctionReturn functionReturn) {
-		functionReturn.floatReturn = this.eval();
-	}
+    @Override
+    default void evaluateTo(Expression[] params, FunctionContext context, FunctionReturn functionReturn) {
+        functionReturn.floatReturn = this.eval();
+    }
 
-	@Override
-	default Type getReturnType() {
-		return Type.Float;
-	}
+    @Override
+    default Type getReturnType() {
+        return Type.Float;
+    }
 
-	@Override
-	default Parameter[] getParameters() {
-		return new Parameter[]{};
-	}
+    @Override
+    default Parameter[] getParameters() {
+        return new Parameter[]{};
+    }
 }

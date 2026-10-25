@@ -9,22 +9,22 @@ import java.util.function.Supplier;
 
 public class Float3VectorCachedUniform extends VectorCachedUniform<Vector3f> {
 
-	public Float3VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Vector3f> supplier) {
-		super(name, updateFrequency, new Vector3f(), supplier);
-	}
+    public Float3VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Vector3f> supplier) {
+        super(name, updateFrequency, new Vector3f(), supplier);
+    }
 
-	@Override
-	protected void setFrom(Vector3f other) {
-		this.cached.set(other);
-	}
+    @Override
+    protected void setFrom(Vector3f other) {
+        this.cached.set(other);
+    }
 
-	@Override
-	public void push(int location) {
-		IrisRenderSystem.uniform3f(location, this.cached.x, this.cached.y, this.cached.z);
-	}
+    @Override
+    public void push(int location) {
+        IrisRenderSystem.uniform3f(location, this.cached.x, this.cached.y, this.cached.z);
+    }
 
-	@Override
-	public VectorType getType() {
-		return VectorType.VEC3;
-	}
+    @Override
+    public VectorType getType() {
+        return VectorType.VEC3;
+    }
 }

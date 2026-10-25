@@ -10,13 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // keeps the ArgentumCompat overrides out of the argentum config file
 @Mixin(value = JsonOptionStorage.class, remap = false)
 public class MixinJsonOptionStorage {
-	@Inject(method = "save", at = @At("HEAD"))
-	private void lucerna$beforeSave(CallbackInfo ci) {
-		ArgentumCompat.beforeSave();
-	}
+    @Inject(method = "save", at = @At("HEAD"))
+    private void lucerna$beforeSave(CallbackInfo ci) {
+        ArgentumCompat.beforeSave();
+    }
 
-	@Inject(method = "save", at = @At("RETURN"))
-	private void lucerna$afterSave(CallbackInfo ci) {
-		ArgentumCompat.afterSave();
-	}
+    @Inject(method = "save", at = @At("RETURN"))
+    private void lucerna$afterSave(CallbackInfo ci) {
+        ArgentumCompat.afterSave();
+    }
 }

@@ -25,41 +25,41 @@ import java.util.WeakHashMap;
 
 @Mixin(value = DefaultChunkRenderer.class, remap = false)
 public class MixinShadowBatchCache {
-	// the face mask each shadow batch was built with, it changes when the light crosses an axis
-	@Unique
-	private static final Map<CachedBatch, Integer> lucerna$shadowMasks = new WeakHashMap<>();
+    // the face mask each shadow batch was built with, it changes when the light crosses an axis
+    @Unique
+    private static final Map<CachedBatch, Integer> lucerna$shadowMasks = new WeakHashMap<>();
 
-	@Inject(method = "render", at = @At("HEAD"))
-	private void lucerna$beginShadowPass(CallbackInfo ci, @Local(argsOnly = true) TerrainRenderPass pass) {
-		if (ShadowRenderer.ACTIVE) {
-			ShadowRenderer.beginTerrainPass(pass.isSorted());
-		}
-	}
+    @Inject(method = "render", at = @At("HEAD"))
+    private void lucerna$beginShadowPass(CallbackInfo ci, @Local(argsOnly = true) TerrainRenderPass pass) {
+        if (ShadowRenderer.ACTIVE) {
+            ShadowRenderer.beginTerrainPass(pass.isSorted());
+        }
+    }
 
-	// each region caches two batches per render pass storage, keyed by the face culling flag, and the shadow pass shared
-	// those keys with the main pass, so both rebuilt every frame. the shadow pass uses the pass's sorting as its key
-	// instead: storage is per render pass, so within one storage this never matches the main pass key
-	@ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage$BatchCacheParams;<init>(Z)V"))
-	private boolean lucerna$separateShadowBatches(boolean useBlockFaceCulling, @Local(argsOnly = true) TerrainRenderPass pass) {
-		return ShadowRenderer.ACTIVE ? pass.isSorted() : useBlockFaceCulling;
-	}
+    // each region caches two batches per render pass storage, keyed by the face culling flag, and the shadow pass shared
+    // those keys with the main pass, so both rebuilt every frame. the shadow pass uses the pass's sorting as its key
+    // instead: storage is per render pass, so within one storage this never matches the main pass key
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage$BatchCacheParams;<init>(Z)V"))
+    private boolean lucerna$separateShadowBatches(boolean useBlockFaceCulling, @Local(argsOnly = true) TerrainRenderPass pass) {
+        return ShadowRenderer.ACTIVE ? pass.isSorted() : useBlockFaceCulling;
+    }
 
-	@WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage;getCachedMultiDrawBatch(Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage$BatchCacheParams;)Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/CachedBatch;"))
-	private CachedBatch lucerna$dropStaleShadowBatch(SectionRenderDataStorage storage, SectionRenderDataStorage.BatchCacheParams params, Operation<CachedBatch> original) {
-		CachedBatch cached = original.call(storage, params);
-		return cached != null && ShadowRenderer.ACTIVE && !lucerna$shadowMasks.getOrDefault(cached, -1).equals(ShadowRenderer.faceMask) ? null : cached;
-	}
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage;getCachedMultiDrawBatch(Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage$BatchCacheParams;)Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/CachedBatch;"))
+    private CachedBatch lucerna$dropStaleShadowBatch(SectionRenderDataStorage storage, SectionRenderDataStorage.BatchCacheParams params, Operation<CachedBatch> original) {
+        CachedBatch cached = original.call(storage, params);
+        return cached != null && ShadowRenderer.ACTIVE && !lucerna$shadowMasks.getOrDefault(cached, -1).equals(ShadowRenderer.faceMask) ? null : cached;
+    }
 
-	@WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/BatchAssembler;createCachedBatch(Lorg/embeddedt/embeddium/impl/render/chunk/region/RenderRegion;Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage;Lorg/embeddedt/embeddium/impl/render/chunk/lists/ChunkRenderList;Lorg/embeddedt/embeddium/impl/render/viewport/CameraTransform;Lorg/embeddedt/embeddium/impl/render/chunk/terrain/TerrainRenderPass;ZLorg/embeddedt/embeddium/impl/gl/device/CommandList;Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/BatchAssembler$TessellationProvider;)Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/CachedBatch;"))
-	private CachedBatch lucerna$recordShadowMask(RenderRegion region, SectionRenderDataStorage storage, ChunkRenderList list, CameraTransform camera,
-												 TerrainRenderPass pass, boolean useBlockFaceCulling, CommandList commandList,
-												 BatchAssembler.TessellationProvider tessellation, Operation<CachedBatch> original) {
-		CachedBatch batch = original.call(region, storage, list, camera, pass, useBlockFaceCulling, commandList, tessellation);
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/BatchAssembler;createCachedBatch(Lorg/embeddedt/embeddium/impl/render/chunk/region/RenderRegion;Lorg/embeddedt/embeddium/impl/render/chunk/data/SectionRenderDataStorage;Lorg/embeddedt/embeddium/impl/render/chunk/lists/ChunkRenderList;Lorg/embeddedt/embeddium/impl/render/viewport/CameraTransform;Lorg/embeddedt/embeddium/impl/render/chunk/terrain/TerrainRenderPass;ZLorg/embeddedt/embeddium/impl/gl/device/CommandList;Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/BatchAssembler$TessellationProvider;)Lorg/embeddedt/embeddium/impl/render/chunk/multidraw/CachedBatch;"))
+    private CachedBatch lucerna$recordShadowMask(RenderRegion region, SectionRenderDataStorage storage, ChunkRenderList list, CameraTransform camera,
+                                                 TerrainRenderPass pass, boolean useBlockFaceCulling, CommandList commandList,
+                                                 BatchAssembler.TessellationProvider tessellation, Operation<CachedBatch> original) {
+        CachedBatch batch = original.call(region, storage, list, camera, pass, useBlockFaceCulling, commandList, tessellation);
 
-		if (ShadowRenderer.ACTIVE) {
-			lucerna$shadowMasks.put(batch, ShadowRenderer.faceMask);
-		}
+        if (ShadowRenderer.ACTIVE) {
+            lucerna$shadowMasks.put(batch, ShadowRenderer.faceMask);
+        }
 
-		return batch;
-	}
+        return batch;
+    }
 }

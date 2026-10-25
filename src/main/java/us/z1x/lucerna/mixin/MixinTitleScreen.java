@@ -10,14 +10,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen {
-	@Unique
-	private static boolean lucerna$hasFirstInit;
+    @Unique
+    private static boolean lucerna$hasFirstInit;
 
-	@Inject(method = "init", at = @At("RETURN"))
-	private void lucerna$firstInit(CallbackInfo ci) {
-		if (!lucerna$hasFirstInit) {
-			lucerna$hasFirstInit = true;
-			Iris.onLoadingComplete();
-		}
-	}
+    @Inject(method = "init", at = @At("RETURN"))
+    private void lucerna$firstInit(CallbackInfo ci) {
+        if (!lucerna$hasFirstInit) {
+            lucerna$hasFirstInit = true;
+            Iris.onLoadingComplete();
+        }
+    }
 }

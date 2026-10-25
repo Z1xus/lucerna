@@ -1,7 +1,7 @@
 package kroppeb.stareval.element;
 
 public interface PriorityOperatorElement extends Element {
-	int getPriority();
+    int getPriority();
 
-	ExpressionElement resolveWith(ExpressionElement right);
+    ExpressionElement resolveWith(ExpressionElement right);
 }

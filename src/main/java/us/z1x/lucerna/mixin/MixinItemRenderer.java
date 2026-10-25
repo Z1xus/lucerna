@@ -16,20 +16,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
-	@Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("HEAD"))
-	private void lucerna$beginItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
-		Object2IntFunction<NamespacedId> itemIds = BlockRenderingSettings.INSTANCE.getItemIds();
+    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("HEAD"))
+    private void lucerna$beginItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
+        Object2IntFunction<NamespacedId> itemIds = BlockRenderingSettings.INSTANCE.getItemIds();
 
-		if (itemIds != null && stack != null) {
-			Identifier id = Item.REGISTRY.getKey(stack.getItem());
-			CapturedRenderingState.INSTANCE.setCurrentRenderedItem(itemIds.applyAsInt(new NamespacedId(id.getNamespace(), id.getPath())));
-		}
-	}
+        if (itemIds != null && stack != null) {
+            Identifier id = Item.REGISTRY.getKey(stack.getItem());
+            CapturedRenderingState.INSTANCE.setCurrentRenderedItem(itemIds.applyAsInt(new NamespacedId(id.getNamespace(), id.getPath())));
+        }
+    }
 
-	@Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("RETURN"))
-	private void lucerna$endItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
-		if (BlockRenderingSettings.INSTANCE.getItemIds() != null) {
-			CapturedRenderingState.INSTANCE.setCurrentRenderedItem(0);
-		}
-	}
+    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/block/BakedModel;)V", at = @At("RETURN"))
+    private void lucerna$endItem(ItemStack stack, BakedModel model, CallbackInfo ci) {
+        if (BlockRenderingSettings.INSTANCE.getItemIds() != null) {
+            CapturedRenderingState.INSTANCE.setCurrentRenderedItem(0);
+        }
+    }
 }

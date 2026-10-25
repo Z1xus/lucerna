@@ -11,50 +11,50 @@ import net.minecraft.client.render.texture.AbstractTexture;
 import org.jetbrains.annotations.Nullable;
 
 public class TextureTracker {
-	public static final TextureTracker INSTANCE = new TextureTracker();
+    public static final TextureTracker INSTANCE = new TextureTracker();
 
-	private static Runnable bindTextureListener;
+    private static Runnable bindTextureListener;
 
-	static {
-		StateUpdateNotifiers.bindTextureNotifier = listener -> bindTextureListener = listener;
-	}
+    static {
+        StateUpdateNotifiers.bindTextureNotifier = listener -> bindTextureListener = listener;
+    }
 
-	private final Int2ObjectMap<AbstractTexture> textures = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<AbstractTexture> textures = new Int2ObjectOpenHashMap<>();
 
-	private boolean lockBindCallback;
+    private boolean lockBindCallback;
 
-	private TextureTracker() {
-	}
+    private TextureTracker() {
+    }
 
-	public void trackTexture(int id, AbstractTexture texture) {
-		textures.put(id, texture);
-	}
+    public void trackTexture(int id, AbstractTexture texture) {
+        textures.put(id, texture);
+    }
 
-	@Nullable
-	public AbstractTexture getTexture(int id) {
-		return textures.get(id);
-	}
+    @Nullable
+    public AbstractTexture getTexture(int id) {
+        return textures.get(id);
+    }
 
-	public void onBindTexture(int id) {
-		if (lockBindCallback) {
-			return;
-		}
-		if (GlStateManager.texture == 0) {
-			lockBindCallback = true;
-			if (bindTextureListener != null) {
-				bindTextureListener.run();
-			}
-			WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
-			if (pipeline != null) {
-				pipeline.onBindTexture(id);
-			}
-			// Reset texture state
-			IrisRenderSystem.bindTextureToUnit(0, id);
-			lockBindCallback = false;
-		}
-	}
+    public void onBindTexture(int id) {
+        if (lockBindCallback) {
+            return;
+        }
+        if (GlStateManager.texture == 0) {
+            lockBindCallback = true;
+            if (bindTextureListener != null) {
+                bindTextureListener.run();
+            }
+            WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+            if (pipeline != null) {
+                pipeline.onBindTexture(id);
+            }
+            // Reset texture state
+            IrisRenderSystem.bindTextureToUnit(0, id);
+            lockBindCallback = false;
+        }
+    }
 
-	public void onDeleteTexture(int id) {
-		textures.remove(id);
-	}
+    public void onDeleteTexture(int id) {
+        textures.remove(id);
+    }
 }

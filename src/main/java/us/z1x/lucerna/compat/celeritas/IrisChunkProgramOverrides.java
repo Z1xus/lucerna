@@ -19,99 +19,99 @@ import java.util.Locale;
 import java.util.Map;
 
 public class IrisChunkProgramOverrides {
-	private static final Map<PatchShaderType, ShaderType> SHADER_TYPES = Map.of(
-		PatchShaderType.VERTEX, ShaderType.VERTEX,
-		PatchShaderType.GEOMETRY, ShaderType.GEOM,
-		PatchShaderType.FRAGMENT, ShaderType.FRAGMENT
-	);
+    private static final Map<PatchShaderType, ShaderType> SHADER_TYPES = Map.of(
+        PatchShaderType.VERTEX, ShaderType.VERTEX,
+        PatchShaderType.GEOMETRY, ShaderType.GEOM,
+        PatchShaderType.FRAGMENT, ShaderType.FRAGMENT
+    );
 
-	private final EnumMap<IrisTerrainPass, GlProgram<IrisChunkShaderInterface>> programs = new EnumMap<>(IrisTerrainPass.class);
-	private boolean shadersCreated;
-	private int versionCounterForSodiumShaderReload = -1;
+    private final EnumMap<IrisTerrainPass, GlProgram<IrisChunkShaderInterface>> programs = new EnumMap<>(IrisTerrainPass.class);
+    private boolean shadersCreated;
+    private int versionCounterForSodiumShaderReload = -1;
 
-	@Nullable
-	private GlProgram<IrisChunkShaderInterface> createProgram(IrisTerrainPass pass, SodiumTerrainPipeline pipeline) {
-		SodiumTerrainPipeline.PassInfo info = pipeline.getPassInfo(pass);
+    @Nullable
+    private GlProgram<IrisChunkShaderInterface> createProgram(IrisTerrainPass pass, SodiumTerrainPipeline pipeline) {
+        SodiumTerrainPipeline.PassInfo info = pipeline.getPassInfo(pass);
 
-		if (info.sources().get(PatchShaderType.VERTEX) == null || info.sources().get(PatchShaderType.FRAGMENT) == null) {
-			return null;
-		}
+        if (info.sources().get(PatchShaderType.VERTEX) == null || info.sources().get(PatchShaderType.FRAGMENT) == null) {
+            return null;
+        }
 
-		List<GlShader> shaders = new ArrayList<>();
+        List<GlShader> shaders = new ArrayList<>();
 
-		try {
-			info.sources().forEach((type, source) -> {
-				if (source != null) {
-					ShaderType shaderType = SHADER_TYPES.get(type);
-					shaders.add(new GlShader(shaderType, "iris:celeritas-terrain-" + pass.toString().toLowerCase(Locale.ROOT) + "." + shaderType.fileExtension, source));
-				}
-			});
+        try {
+            info.sources().forEach((type, source) -> {
+                if (source != null) {
+                    ShaderType shaderType = SHADER_TYPES.get(type);
+                    shaders.add(new GlShader(shaderType, "iris:celeritas-terrain-" + pass.toString().toLowerCase(Locale.ROOT) + "." + shaderType.fileExtension, source));
+                }
+            });
 
-			GlProgram.Builder builder = GlProgram.builder("iris:chunk_shader_for_" + pass.getName());
-			shaders.forEach(builder::attachShader);
+            GlProgram.Builder builder = GlProgram.builder("iris:chunk_shader_for_" + pass.getName());
+            shaders.forEach(builder::attachShader);
 
-			int i = 0;
+            int i = 0;
 
-			for (var attr : XHFPModelVertexType.VERTEX_FORMAT.getAttributes()) {
-				builder.bindAttribute(attr.getName(), i++);
-			}
+            for (var attr : XHFPModelVertexType.VERTEX_FORMAT.getAttributes()) {
+                builder.bindAttribute(attr.getName(), i++);
+            }
 
-			return builder.link(shader -> new IrisChunkShaderInterface(((GlObject) shader).handle(), shader, pipeline, pass,
-				info.blendModeOverride(), info.bufferOverrides(), info.alphaReference()));
-		} finally {
-			shaders.forEach(GlShader::delete);
-		}
-	}
+            return builder.link(shader -> new IrisChunkShaderInterface(((GlObject) shader).handle(), shader, pipeline, pass,
+                info.blendModeOverride(), info.bufferOverrides(), info.alphaReference()));
+        } finally {
+            shaders.forEach(GlShader::delete);
+        }
+    }
 
-	private void createShaders(SodiumTerrainPipeline pipeline) {
-		for (IrisTerrainPass pass : IrisTerrainPass.values()) {
-			if (pass.isShadow() && !pipeline.hasShadowPass()) {
-				continue;
-			}
+    private void createShaders(SodiumTerrainPipeline pipeline) {
+        for (IrisTerrainPass pass : IrisTerrainPass.values()) {
+            if (pass.isShadow() && !pipeline.hasShadowPass()) {
+                continue;
+            }
 
-			programs.put(pass, createProgram(pass, pipeline));
-		}
+            programs.put(pass, createProgram(pass, pipeline));
+        }
 
-		shadersCreated = true;
-	}
+        shadersCreated = true;
+    }
 
-	@Nullable
-	public GlProgram<IrisChunkShaderInterface> getProgramOverride(TerrainRenderPass pass) {
-		if (versionCounterForSodiumShaderReload != Iris.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
-			versionCounterForSodiumShaderReload = Iris.getPipelineManager().getVersionCounterForSodiumShaderReload();
-			deleteShaders();
-		}
+    @Nullable
+    public GlProgram<IrisChunkShaderInterface> getProgramOverride(TerrainRenderPass pass) {
+        if (versionCounterForSodiumShaderReload != Iris.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
+            versionCounterForSodiumShaderReload = Iris.getPipelineManager().getVersionCounterForSodiumShaderReload();
+            deleteShaders();
+        }
 
-		WorldRenderingPipeline worldRenderingPipeline = Iris.getPipelineManager().getPipelineNullable();
-		SodiumTerrainPipeline sodiumTerrainPipeline = worldRenderingPipeline != null ? worldRenderingPipeline.getSodiumTerrainPipeline() : null;
+        WorldRenderingPipeline worldRenderingPipeline = Iris.getPipelineManager().getPipelineNullable();
+        SodiumTerrainPipeline sodiumTerrainPipeline = worldRenderingPipeline != null ? worldRenderingPipeline.getSodiumTerrainPipeline() : null;
 
-		if (sodiumTerrainPipeline == null) {
-			return null;
-		}
+        if (sodiumTerrainPipeline == null) {
+            return null;
+        }
 
-		if (!shadersCreated) {
-			createShaders(sodiumTerrainPipeline);
-		}
+        if (!shadersCreated) {
+            createShaders(sodiumTerrainPipeline);
+        }
 
-		if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
-			return programs.get(pass.supportsFragmentDiscard() ? IrisTerrainPass.SHADOW_CUTOUT : IrisTerrainPass.SHADOW);
-		} else if (pass.supportsFragmentDiscard()) {
-			return programs.get(IrisTerrainPass.GBUFFER_CUTOUT);
-		} else if (pass.isReverseOrder()) {
-			return programs.get(IrisTerrainPass.GBUFFER_TRANSLUCENT);
-		} else {
-			return programs.get(IrisTerrainPass.GBUFFER_SOLID);
-		}
-	}
+        if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
+            return programs.get(pass.supportsFragmentDiscard() ? IrisTerrainPass.SHADOW_CUTOUT : IrisTerrainPass.SHADOW);
+        } else if (pass.supportsFragmentDiscard()) {
+            return programs.get(IrisTerrainPass.GBUFFER_CUTOUT);
+        } else if (pass.isReverseOrder()) {
+            return programs.get(IrisTerrainPass.GBUFFER_TRANSLUCENT);
+        } else {
+            return programs.get(IrisTerrainPass.GBUFFER_SOLID);
+        }
+    }
 
-	public void deleteShaders() {
-		for (GlProgram<?> program : programs.values()) {
-			if (program != null) {
-				program.delete();
-			}
-		}
+    public void deleteShaders() {
+        for (GlProgram<?> program : programs.values()) {
+            if (program != null) {
+                program.delete();
+            }
+        }
 
-		programs.clear();
-		shadersCreated = false;
-	}
+        programs.clear();
+        shadersCreated = false;
+    }
 }

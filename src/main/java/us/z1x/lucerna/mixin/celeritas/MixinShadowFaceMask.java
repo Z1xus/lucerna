@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 // faces are culled against the camera, which in the shadow pass is still the player, so the shadow pass picks its own faces
 @Mixin(value = BatchAssembler.class, remap = false)
 public class MixinShadowFaceMask {
-	@Inject(method = "uniformCullMask", at = @At("HEAD"), cancellable = true)
-	private static void lucerna$cullTowardLight(RenderRegion region, CameraTransform camera, CallbackInfoReturnable<Integer> cir) {
-		if (ShadowRenderer.ACTIVE) {
-			cir.setReturnValue(ShadowRenderer.faceMask);
-		}
-	}
+    @Inject(method = "uniformCullMask", at = @At("HEAD"), cancellable = true)
+    private static void lucerna$cullTowardLight(RenderRegion region, CameraTransform camera, CallbackInfoReturnable<Integer> cir) {
+        if (ShadowRenderer.ACTIVE) {
+            cir.setReturnValue(ShadowRenderer.faceMask);
+        }
+    }
 }

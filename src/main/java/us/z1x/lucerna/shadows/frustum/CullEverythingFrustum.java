@@ -8,23 +8,23 @@ import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.joml.Vector3d;
 
 public class CullEverythingFrustum implements Culler, ViewportProvider, Frustum {
-	public CullEverythingFrustum() {
-	}
+    public CullEverythingFrustum() {
+    }
 
-	// For Immersive Portals
-	// We return false here since isVisible is going to return false anyways.
-	public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		return false;
-	}
+    // For Immersive Portals
+    // We return false here since isVisible is going to return false anyways.
+    public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        return false;
+    }
 
-	@Override
-	public void prepare(double cameraX, double cameraY, double cameraZ) {
-	}
+    @Override
+    public void prepare(double cameraX, double cameraY, double cameraZ) {
+    }
 
-	@Override
-	public boolean isVisible(Box box) {
-		return false;
-	}
+    @Override
+    public boolean isVisible(Box box) {
+        return false;
+    }
 
     private static final Vector3d EMPTY = new Vector3d();
 

@@ -14,30 +14,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BufferUploader.class)
 public class MixinBufferUploader {
-	@Inject(method = "end", at = @At("HEAD"))
-	private void lucerna$beforeDraw(BufferBuilder builder, CallbackInfo ci) {
-		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+    @Inject(method = "end", at = @At("HEAD"))
+    private void lucerna$beforeDraw(BufferBuilder builder, CallbackInfo ci) {
+        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 
-		if (pipeline == null) {
-			return;
-		}
+        if (pipeline == null) {
+            return;
+        }
 
-		if (CapturedRenderingState.INSTANCE.isCompilingDisplayList()) {
-			// glUseProgram would be recorded into the display list, and the list can be replayed in any pass
-			if (IrisApi.getInstance().isShaderPackInUse()) {
-				VanillaVertexAttributes.bind(builder);
-			}
-		} else {
-			pipeline.syncProgram();
+        if (CapturedRenderingState.INSTANCE.isCompilingDisplayList()) {
+            // glUseProgram would be recorded into the display list, and the list can be replayed in any pass
+            if (IrisApi.getInstance().isShaderPackInUse()) {
+                VanillaVertexAttributes.bind(builder);
+            }
+        } else {
+            pipeline.syncProgram();
 
-			if (pipeline.usesExtendedVertexAttributes()) {
-				VanillaVertexAttributes.bind(builder);
-			}
-		}
-	}
+            if (pipeline.usesExtendedVertexAttributes()) {
+                VanillaVertexAttributes.bind(builder);
+            }
+        }
+    }
 
-	@Inject(method = "end", at = @At("RETURN"))
-	private void lucerna$afterDraw(BufferBuilder builder, CallbackInfo ci) {
-		VanillaVertexAttributes.unbind();
-	}
+    @Inject(method = "end", at = @At("RETURN"))
+    private void lucerna$afterDraw(BufferBuilder builder, CallbackInfo ci) {
+        VanillaVertexAttributes.unbind();
+    }
 }

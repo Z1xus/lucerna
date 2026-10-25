@@ -9,32 +9,32 @@ import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.joml.Vector3d;
 
 public class BoxCullingFrustum implements Culler, ViewportProvider, Frustum {
-	private final BoxCuller boxCuller;
-	private double x, y, z;
+    private final BoxCuller boxCuller;
+    private double x, y, z;
 
-	public BoxCullingFrustum(BoxCuller boxCuller) {
+    public BoxCullingFrustum(BoxCuller boxCuller) {
 
-		this.boxCuller = boxCuller;
-	}
+        this.boxCuller = boxCuller;
+    }
 
-	public void prepare(double cameraX, double cameraY, double cameraZ) {
-		this.x = cameraX;
-		this.y = cameraY;
-		this.z = cameraZ;
-		boxCuller.setPosition(cameraX, cameraY, cameraZ);
-	}
+    public void prepare(double cameraX, double cameraY, double cameraZ) {
+        this.x = cameraX;
+        this.y = cameraY;
+        this.z = cameraZ;
+        boxCuller.setPosition(cameraX, cameraY, cameraZ);
+    }
 
-	// For Immersive Portals
-	// NB: The shadow culling in Immersive Portals must be disabled, because when Advanced Shadow Frustum Culling
-	//     is not active, we are at a point where we can make no assumptions how the shader pack uses the shadow
-	//     pass beyond what it already tells us. So we cannot use any extra fancy culling methods.
-	public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		return false;
-	}
+    // For Immersive Portals
+    // NB: The shadow culling in Immersive Portals must be disabled, because when Advanced Shadow Frustum Culling
+    //     is not active, we are at a point where we can make no assumptions how the shader pack uses the shadow
+    //     pass beyond what it already tells us. So we cannot use any extra fancy culling methods.
+    public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        return false;
+    }
 
-	public boolean isVisible(Box box) {
-		return !boxCuller.isCulled(box);
-	}
+    public boolean isVisible(Box box) {
+        return !boxCuller.isCulled(box);
+    }
 
     private final Vector3d position = new Vector3d();
 

@@ -11,16 +11,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // lets FinalPassRenderer detect a recreated color texture and attach it again
 @Mixin(RenderTarget.class)
 public class MixinRenderTarget implements Blaze3dRenderTargetExt {
-	@Unique
-	private int lucerna$colorBufferVersion;
+    @Unique
+    private int lucerna$colorBufferVersion;
 
-	@Inject(method = "destroyBuffers()V", at = @At("HEAD"))
-	private void lucerna$onDestroyBuffers(CallbackInfo ci) {
-		lucerna$colorBufferVersion++;
-	}
+    @Inject(method = "destroyBuffers()V", at = @At("HEAD"))
+    private void lucerna$onDestroyBuffers(CallbackInfo ci) {
+        lucerna$colorBufferVersion++;
+    }
 
-	@Override
-	public int lucerna$getColorBufferVersion() {
-		return lucerna$colorBufferVersion;
-	}
+    @Override
+    public int lucerna$getColorBufferVersion() {
+        return lucerna$colorBufferVersion;
+    }
 }

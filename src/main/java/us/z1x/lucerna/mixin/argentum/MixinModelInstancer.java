@@ -21,63 +21,63 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ModelInstancer.class, remap = false)
 public abstract class MixinModelInstancer {
-	@Shadow
-	private boolean textureArraysSupported;
+    @Shadow
+    private boolean textureArraysSupported;
 
-	@Unique
-	private boolean lucerna$restoreTextureArrays;
+    @Unique
+    private boolean lucerna$restoreTextureArrays;
 
-	@Shadow
-	protected abstract GlProgram<?> createProgram(ChunkShaderComponent.Factory<?> fogFactory);
+    @Shadow
+    protected abstract GlProgram<?> createProgram(ChunkShaderComponent.Factory<?> fogFactory);
 
-	@Inject(method = "getProgram", at = @At("HEAD"), cancellable = true)
-	private void lucerna$useShaderPackProgram(CallbackInfoReturnable<GlProgram<?>> cir) {
-		if (!InstancedEntityPrograms.isActive()) {
-			if (lucerna$restoreTextureArrays) {
-				lucerna$restoreTextureArrays = false;
-				textureArraysSupported = true;
-			}
+    @Inject(method = "getProgram", at = @At("HEAD"), cancellable = true)
+    private void lucerna$useShaderPackProgram(CallbackInfoReturnable<GlProgram<?>> cir) {
+        if (!InstancedEntityPrograms.isActive()) {
+            if (lucerna$restoreTextureArrays) {
+                lucerna$restoreTextureArrays = false;
+                textureArraysSupported = true;
+            }
 
-			return;
-		}
+            return;
+        }
 
-		// shader packs sample a plain 2d texture, not argentum's texture arrays
-		if (textureArraysSupported) {
-			lucerna$restoreTextureArrays = true;
-			textureArraysSupported = false;
-		}
+        // shader packs sample a plain 2d texture, not argentum's texture arrays
+        if (textureArraysSupported) {
+            lucerna$restoreTextureArrays = true;
+            textureArraysSupported = false;
+        }
 
-		GlProgram<?> program = InstancedEntityPrograms.get(ShadowRenderer.ACTIVE, this::lucerna$linkProgram);
+        GlProgram<?> program = InstancedEntityPrograms.get(ShadowRenderer.ACTIVE, this::lucerna$linkProgram);
 
-		if (program != null) {
-			cir.setReturnValue(program);
-		}
-	}
+        if (program != null) {
+            cir.setReturnValue(program);
+        }
+    }
 
-	@Unique
-	private GlProgram<?> lucerna$linkProgram() {
-		// the pack program declares every fog uniform, so the smooth fog component binds them all
-		GlProgram<?> program = createProgram(ChunkFogMode.SMOOTH);
-		program.bind();
-		((InstanceShaderInvoker) program.getInterface()).lucerna$initialize();
-		program.unbind();
+    @Unique
+    private GlProgram<?> lucerna$linkProgram() {
+        // the pack program declares every fog uniform, so the smooth fog component binds them all
+        GlProgram<?> program = createProgram(ChunkFogMode.SMOOTH);
+        program.bind();
+        ((InstanceShaderInvoker) program.getInterface()).lucerna$initialize();
+        program.unbind();
 
-		return program;
-	}
+        return program;
+    }
 
-	@WrapOperation(method = "createProgram", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/shader/ShaderLoader;loadShader(Lorg/embeddedt/embeddium/impl/gl/shader/ShaderType;Ljava/lang/String;Lorg/embeddedt/embeddium/impl/gl/shader/ShaderConstants;)Lorg/embeddedt/embeddium/impl/gl/shader/GlShader;"))
-	private GlShader lucerna$loadShaderPackSource(ShaderType type, String name, ShaderConstants constants, Operation<GlShader> original) {
-		GlShader shader = InstancedEntityPrograms.createShader(type);
-		return shader != null ? shader : original.call(type, name, constants);
-	}
+    @WrapOperation(method = "createProgram", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/shader/ShaderLoader;loadShader(Lorg/embeddedt/embeddium/impl/gl/shader/ShaderType;Ljava/lang/String;Lorg/embeddedt/embeddium/impl/gl/shader/ShaderConstants;)Lorg/embeddedt/embeddium/impl/gl/shader/GlShader;"))
+    private GlShader lucerna$loadShaderPackSource(ShaderType type, String name, ShaderConstants constants, Operation<GlShader> original) {
+        GlShader shader = InstancedEntityPrograms.createShader(type);
+        return shader != null ? shader : original.call(type, name, constants);
+    }
 
-	@Inject(method = "flush", at = @At(value = "INVOKE", target = "Ldev/rdh/argentum/impl/render/entity/instancing/InstanceShader;setUniforms()V", shift = At.Shift.AFTER))
-	private void lucerna$prepareShaderPackState(CommandList commandList, CallbackInfoReturnable<ModelInstancer.BatchStats> cir) {
-		InstancedEntityPrograms.prepare(ShadowRenderer.ACTIVE);
-	}
+    @Inject(method = "flush", at = @At(value = "INVOKE", target = "Ldev/rdh/argentum/impl/render/entity/instancing/InstanceShader;setUniforms()V", shift = At.Shift.AFTER))
+    private void lucerna$prepareShaderPackState(CommandList commandList, CallbackInfoReturnable<ModelInstancer.BatchStats> cir) {
+        InstancedEntityPrograms.prepare(ShadowRenderer.ACTIVE);
+    }
 
-	@Inject(method = "flush", at = @At("RETURN"))
-	private void lucerna$restoreShaderPackState(CommandList commandList, CallbackInfoReturnable<ModelInstancer.BatchStats> cir) {
-		InstancedEntityPrograms.restore();
-	}
+    @Inject(method = "flush", at = @At("RETURN"))
+    private void lucerna$restoreShaderPackState(CommandList commandList, CallbackInfoReturnable<ModelInstancer.BatchStats> cir) {
+        InstancedEntityPrograms.restore();
+    }
 }

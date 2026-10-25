@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // name tags never cast shadows, and drawing their text into the shadow map is most of the shadow pass cost
 @Mixin({EntityRenderer.class, LivingEntityRenderer.class})
 public class MixinShadowNameTags {
-	@Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
-	private void lucerna$skipNameTagInShadowPass(CallbackInfo ci) {
-		if (ShadowRenderer.ACTIVE) {
-			ci.cancel();
-		}
-	}
+    @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
+    private void lucerna$skipNameTagInShadowPass(CallbackInfo ci) {
+        if (ShadowRenderer.ACTIVE) {
+            ci.cancel();
+        }
+    }
 }

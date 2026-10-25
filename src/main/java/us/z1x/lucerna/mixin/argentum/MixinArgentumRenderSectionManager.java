@@ -10,17 +10,17 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(value = ArgentumRenderSectionManager.class, remap = false)
 public abstract class MixinArgentumRenderSectionManager extends RenderSectionManager {
-	private MixinArgentumRenderSectionManager() {
-		super(null, null, null, 0, null, 0, 0, 0);
-	}
+    private MixinArgentumRenderSectionManager() {
+        super(null, null, null, 0, null, 0, 0, 0);
+    }
 
-	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/RenderSectionManager;<init>(Lorg/embeddedt/embeddium/impl/render/chunk/RenderPassConfiguration;Ljava/util/function/Supplier;Ljava/util/function/BiFunction;ILorg/embeddedt/embeddium/impl/gl/device/CommandList;IIIZ)V"), index = 8)
-	private static boolean lucerna$enableShadowPass(boolean hasShadowPass) {
-		return hasShadowPass || Iris.isShaderPackActive();
-	}
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/embeddedt/embeddium/impl/render/chunk/RenderSectionManager;<init>(Lorg/embeddedt/embeddium/impl/render/chunk/RenderPassConfiguration;Ljava/util/function/Supplier;Ljava/util/function/BiFunction;ILorg/embeddedt/embeddium/impl/gl/device/CommandList;IIIZ)V"), index = 8)
+    private static boolean lucerna$enableShadowPass(boolean hasShadowPass) {
+        return hasShadowPass || Iris.isShaderPackActive();
+    }
 
-	@Override
-	public boolean isInShadowPass() {
-		return ShadowRenderingState.areShadowsCurrentlyBeingRendered();
-	}
+    @Override
+    public boolean isInShadowPass() {
+        return ShadowRenderingState.areShadowsCurrentlyBeingRendered();
+    }
 }
