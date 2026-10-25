@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.coderbot.iris.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ArgentumWorldRendererAccessor",
+    "GameRendererAccessor",
+    "MixinRenderTarget",
+    "gui.MixinCeleritasVideoOptionsController",
+    "gui.MixinGameGui"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
