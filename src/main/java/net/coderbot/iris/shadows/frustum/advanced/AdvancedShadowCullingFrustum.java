@@ -5,8 +5,12 @@ import net.minecraft.client.render.Culler;
 import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
+import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.embeddedt.embeddium.impl.render.viewport.frustum.ShadowSearchFrustum;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.joml.Math;
 
 /**
@@ -29,7 +33,7 @@ import org.joml.Math;
  * are not sensitive to the specific internal ordering of planes and corners, in order to avoid potential bugs at the
  * cost of slightly more computations.</p>
  */
-public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum, ShadowSearchFrustum {
+public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, Frustum, ShadowSearchFrustum {
 	private static final int MAX_CLIPPING_PLANES = 13;
 
 	protected final BoxCuller boxCuller;

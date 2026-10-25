@@ -271,7 +271,7 @@ public class CompositeRenderer {
 		GlStateManager.activeTexture(GL15C.GL_TEXTURE0);
 	}
 
-	private static void setupMipmapping(net.coderbot.iris.rendertarget.RenderTarget target, boolean readFromAlt) {
+	private static void setupMipmapping(RenderTarget target, boolean readFromAlt) {
 		int texture = readFromAlt ? target.getAltTexture() : target.getMainTexture();
 
 		// TODO: Only generate the mipmap if a valid mipmap hasn't been generated or if we've written to the buffer

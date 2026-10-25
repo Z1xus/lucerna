@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -151,7 +152,7 @@ public class SodiumTerrainPipeline {
 
 				info.sources.putAll(result);
 
-				PatchedShaderPrinter.debugPatchedShaders(sources.getName() + "_celeritas_" + pass.name().toLowerCase(java.util.Locale.ROOT),
+				PatchedShaderPrinter.debugPatchedShaders(sources.getName() + "_celeritas_" + pass.name().toLowerCase(Locale.ROOT),
 					result.get(PatchShaderType.VERTEX), result.get(PatchShaderType.GEOMETRY), result.get(PatchShaderType.FRAGMENT));
 			});
 		}

@@ -157,7 +157,7 @@ public class FinalPassRenderer {
 		GlStateManager.disableAlphaTest();
 		GlStateManager.depthMask(false);
 
-		final net.minecraft.client.render.pipeline.RenderTarget main = Minecraft.getInstance().getRenderTarget();
+		final var main = Minecraft.getInstance().getRenderTarget();
 		final int baseWidth = renderTargets.getCurrentWidth();
 		final int baseHeight = renderTargets.getCurrentHeight();
 

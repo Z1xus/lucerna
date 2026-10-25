@@ -4,10 +4,11 @@ import net.minecraft.client.render.Culler;
 import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
+import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 
-public class CullEverythingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum {
+public class CullEverythingFrustum implements Culler, ViewportProvider, Frustum {
 	public CullEverythingFrustum() {
 	}
 
