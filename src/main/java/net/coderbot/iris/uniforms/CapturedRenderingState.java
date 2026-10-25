@@ -24,7 +24,17 @@ public class CapturedRenderingState {
 	private final Vector4f currentEntityColor = new Vector4f();
 	private Runnable entityColorListener = null;
 
+	private boolean compilingDisplayList;
+
 	private CapturedRenderingState() {
+	}
+
+	public boolean isCompilingDisplayList() {
+		return compilingDisplayList;
+	}
+
+	public void setCompilingDisplayList(boolean compilingDisplayList) {
+		this.compilingDisplayList = compilingDisplayList;
 	}
 
 	public Matrix4f getGbufferModelView() {

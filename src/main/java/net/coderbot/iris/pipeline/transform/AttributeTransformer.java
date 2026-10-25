@@ -75,47 +75,6 @@ class AttributeTransformer {
 			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_FUNCTIONS,
 					"attribute vec4 mc_midTexCoord;");
 		}
-
-		if (parameters.type.glShaderType == ShaderType.VERTEX) {
-			// vanilla geometry has no extended vertex data, so derive it from what the draw does provide
-			replaceAttribute(t, tree, root, MID_TEX_COORD, "mc_midTexCoord", "gl_MultiTexCoord0");
-			replaceAttribute(t, tree, root, TANGENT, "at_tangent",
-					"vec4(normalize(cross(gl_Normal, abs(gl_Normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0))), 1.0)");
-		}
-	}
-
-	private static final String[] SWIZZLES = { ".x", ".xy", ".xyz", "" };
-
-	private static final AutoHintedMatcher<ExternalDeclaration>[][] MID_TEX_COORD = attributeMatchers("mc_midTexCoord");
-	private static final AutoHintedMatcher<ExternalDeclaration>[][] TANGENT = attributeMatchers("at_tangent");
-
-	@SuppressWarnings("unchecked")
-	private static AutoHintedMatcher<ExternalDeclaration>[][] attributeMatchers(String name) {
-		String[] types = { "float", "vec2", "vec3", "vec4" };
-		AutoHintedMatcher<ExternalDeclaration>[][] matchers = new AutoHintedMatcher[types.length][2];
-
-		for (int i = 0; i < types.length; i++) {
-			matchers[i][0] = new AutoHintedMatcher<>("attribute " + types[i] + " " + name + ";", Matcher.externalDeclarationPattern);
-			matchers[i][1] = new AutoHintedMatcher<>("in " + types[i] + " " + name + ";", Matcher.externalDeclarationPattern);
-		}
-
-		return matchers;
-	}
-
-	private static void replaceAttribute(ASTParser t, TranslationUnit tree, Root root,
-			AutoHintedMatcher<ExternalDeclaration>[][] matchers, String name, String value) {
-		String[] types = { "float", "vec2", "vec3", "vec4" };
-
-		for (int i = 0; i < matchers.length; i++) {
-			boolean found = root.processMatches(t, matchers[i][0], ASTNode::detachAndDelete);
-			found |= root.processMatches(t, matchers[i][1], ASTNode::detachAndDelete);
-
-			if (found) {
-				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_FUNCTIONS, types[i] + " " + name + ";");
-				tree.prependMain(t, name + " = (" + value + ")" + SWIZZLES[i] + ";");
-				return;
-			}
-		}
 	}
 
 	private static void patchTextureMatrices(

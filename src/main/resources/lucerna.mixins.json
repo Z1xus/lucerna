@@ -20,6 +20,7 @@
     "MixinItemInHandRenderer",
     "MixinLivingEntityRenderer",
     "MixinMinecraft",
+    "MixinModelPart",
     "MixinRenderTarget",
     "MixinSpecialConditions",
     "MixinTitleScreen",
