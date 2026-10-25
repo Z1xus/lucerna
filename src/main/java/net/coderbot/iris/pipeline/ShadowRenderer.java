@@ -54,6 +54,9 @@ import java.util.List;
 
 public class ShadowRenderer {
 	public static boolean ACTIVE = false;
+	// ModelQuadFacing bits drawn by the current shadow terrain pass, all of them for sorted passes
+	public static int faceMask = 0x7F;
+	private static int lightFaceMask = 0x7F;
 	private final float halfPlaneLength;
 	private final float renderDistanceMultiplier;
 	private final float entityShadowDistanceMultiplier;
@@ -273,6 +276,24 @@ public class ShadowRenderer {
 		GlStateManager.popMatrix();
 	}
 
+	// terrain only needs the faces turned toward the light: the shadow map keeps the surface nearest the light, and for
+	// closed blocks that is never a face turned away from it. the vector points toward the light in world space
+	private static int facesTowardLight(float x, float y, float z) {
+		final float edge = 1.0E-3F;
+		int mask = 1 << 6;
+		mask |= x > -edge ? 1 : 0;
+		mask |= y > -edge ? 1 << 1 : 0;
+		mask |= z > -edge ? 1 << 2 : 0;
+		mask |= x < edge ? 1 << 3 : 0;
+		mask |= y < edge ? 1 << 4 : 0;
+		mask |= z < edge ? 1 << 5 : 0;
+		return mask;
+	}
+
+	public static void beginTerrainPass(boolean sorted) {
+		faceMask = sorted ? 0x7F : lightFaceMask;
+	}
+
 	public void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller) {
 		if (IrisVideoSettings.getOverriddenShadowDistance(IrisVideoSettings.shadowDistance) == 0) {
 			return;
@@ -288,6 +309,7 @@ public class ShadowRenderer {
 		GlStateManager.viewport(0, 0, resolution, resolution);
 
 		Matrix4f modelView = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
+		lightFaceMask = facesTowardLight(-modelView.m20(), -modelView.m21(), -modelView.m22());
 
 		profiler.push("terrain_setup");
 

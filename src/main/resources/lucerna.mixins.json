@@ -38,6 +38,7 @@
     "argentum.MixinModelInstancer",
     "celeritas.MixinShaderChunkRenderer",
     "celeritas.MixinShadowBatchCache",
+    "celeritas.MixinShadowFaceMask",
     "celeritas.MixinSimpleWorldRenderer",
     "entity_render_context.MixinBlockEntityRenderDispatcher",
     "entity_render_context.MixinEntityRenderDispatcher",
