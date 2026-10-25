@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "lucerna",
+  "name": "Lucerna",
+  "version": "${version}",
+  "environment": "client",
+  "description": "Shader pack loader for Minecraft 1.8.9, ported from Iris",
+  "authors": ["Polyfrost"],
+  "contributors": ["coderbot", "IMS212", "douira", "embeddedt"],
+  "license": "LGPL-3.0-only",
+  "entrypoints": {
+    "client": ["net.coderbot.iris.Iris"]
+  },
+  "depends": {
+    "minecraft": "1.8.9",
+    "argentum": ">=1.0.2"
+  },
+  "accessWidener": "lucerna.classtweaker",
+  "mixins": ["lucerna.mixins.json"]
+}

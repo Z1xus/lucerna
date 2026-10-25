@@ -1,0 +1,16 @@
+classTweaker v2 named
+accessible class net/minecraft/client/render/platform/GlStateManager$Alpha
+accessible class net/minecraft/client/render/platform/GlStateManager$Blend
+accessible class net/minecraft/client/render/platform/GlStateManager$Depth
+accessible class net/minecraft/client/render/platform/GlStateManager$ColorMask
+accessible class net/minecraft/client/render/platform/GlStateManager$Fog
+accessible class net/minecraft/client/render/platform/GlStateManager$Texture
+accessible class net/minecraft/client/render/platform/GlStateManager$GlState
+accessible field net/minecraft/client/render/platform/GlStateManager ALPHA_TEST Lnet/minecraft/client/render/platform/GlStateManager$Alpha;
+accessible field net/minecraft/client/render/platform/GlStateManager BLEND Lnet/minecraft/client/render/platform/GlStateManager$Blend;
+accessible field net/minecraft/client/render/platform/GlStateManager DEPTH Lnet/minecraft/client/render/platform/GlStateManager$Depth;
+accessible field net/minecraft/client/render/platform/GlStateManager COLOR_MASK Lnet/minecraft/client/render/platform/GlStateManager$ColorMask;
+accessible field net/minecraft/client/render/platform/GlStateManager FOG Lnet/minecraft/client/render/platform/GlStateManager$Fog;
+accessible field net/minecraft/client/render/platform/GlStateManager TEXTURES [Lnet/minecraft/client/render/platform/GlStateManager$Texture;
+accessible field net/minecraft/client/render/platform/GlStateManager texture I
+accessible field net/minecraft/client/render/platform/GlStateManager$GlState enabled Z
