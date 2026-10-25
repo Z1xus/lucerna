@@ -2,18 +2,28 @@ package net.coderbot.iris.mixin;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.coderbot.iris.Iris;
+import net.coderbot.iris.pipeline.CloudRenderer;
 import net.coderbot.iris.pipeline.WorldRenderingPhase;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
+import net.irisshaders.iris.api.v0.IrisApi;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Culler;
 import net.minecraft.client.render.block.BlockLayer;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.Tesselator;
+import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.render.world.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.player.PlayerEntity;
+import net.minecraft.resource.Identifier;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.HitResult;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +32,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
+	@Shadow
+	@Final
+	private static Identifier CLOUDS_LOCATION;
+
+	@Shadow
+	@Final
+	private Minecraft minecraft;
+
+	@Shadow
+	@Final
+	private TextureManager textureManager;
+
+	@Shadow
+	private ClientWorld world;
+
+	@Shadow
+	private int ticks;
+
 	@Unique
 	private static final String RENDER_SKY = "renderSky(FI)V";
 
@@ -110,6 +138,42 @@ public class MixinWorldRenderer {
 	@Inject(method = RENDER_SKY, at = @At("RETURN"))
 	private void iris$endSky(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
 		iris$setPhase(WorldRenderingPhase.NONE);
+	}
+
+	@Inject(method = "renderFancyClouds", at = @At("HEAD"), cancellable = true)
+	private void iris$renderCachedClouds(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
+		if (!IrisApi.getInstance().isShaderPackInUse()) {
+			return;
+		}
+
+		Entity camera = minecraft.getCamera();
+		double ticks = this.ticks + tickDelta;
+		double x = (camera.lastX + (camera.x - camera.lastX) * tickDelta + ticks * 0.03F) / 12.0;
+		double z = (camera.lastZ + (camera.z - camera.lastZ) * tickDelta) / 12.0 + 0.33F;
+		float height = world.dimension.getCloudHeight() - (float) (camera.prevY + (camera.y - camera.prevY) * tickDelta) + 0.33F;
+		Vec3d color = world.getCloudColor(tickDelta);
+		float red = (float) color.x;
+		float green = (float) color.y;
+		float blue = (float) color.z;
+
+		if (anaglyphRenderPass != 2) {
+			float gray = (red * 30.0F + green * 59.0F + blue * 11.0F) / 100.0F;
+			float redGreen = (red * 30.0F + green * 70.0F) / 100.0F;
+			float redBlue = (red * 30.0F + blue * 70.0F) / 100.0F;
+			red = gray;
+			green = redGreen;
+			blue = redBlue;
+		}
+
+		GlStateManager.disableCull();
+		textureManager.bind(CLOUDS_LOCATION);
+		GlStateManager.enableBlend();
+		GlStateManager.blendFuncSeparate(770, 771, 1, 0);
+		CloudRenderer.INSTANCE.render(x - MathHelper.floor(x / 2048.0) * 2048, z - MathHelper.floor(z / 2048.0) * 2048, height, red, green, blue, anaglyphRenderPass);
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.disableBlend();
+		GlStateManager.enableCull();
+		ci.cancel();
 	}
 
 	@Inject(method = "renderEntities", at = @At("HEAD"))
