@@ -6,17 +6,23 @@ import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.DefaultVertexFormat;
 import net.minecraft.client.render.vertex.Tesselator;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-// fancy clouds from a display list that is rebuilt only when the cell, color or visible faces change
+import java.nio.ByteBuffer;
+
+// fancy clouds from a display list that is rebuilt only when the cell, color, visible faces or texture change
 public final class CloudRenderer {
 	public static final CloudRenderer INSTANCE = new CloudRenderer();
 
-	// one texel of the 256x256 cloud texture
-	private static final float TEXEL = 0.00390625F;
-	private static final float INSET = 9.765625E-4F;
+	// vanilla draws 8 cells of 8 texels around the camera
+	private static final int RADIUS = 32;
 
 	private int list;
+	private int texture;
+	private int width;
+	private int height;
+	private boolean[] opaque;
 	private int cellX;
 	private int cellZ;
 	private int red;
@@ -37,7 +43,9 @@ public final class CloudRenderer {
 		int greenBits = Float.floatToIntBits(green);
 		int blueBits = Float.floatToIntBits(blue);
 
-		if (list == 0 || cellX != this.cellX || cellZ != this.cellZ || bottom != this.bottom || top != this.top
+		int texture = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+
+		if (list == 0 || texture != this.texture || cellX != this.cellX || cellZ != this.cellZ || bottom != this.bottom || top != this.top
 				|| redBits != this.red || greenBits != this.green || blueBits != this.blue) {
 			this.cellX = cellX;
 			this.cellZ = cellZ;
@@ -46,7 +54,8 @@ public final class CloudRenderer {
 			this.red = redBits;
 			this.green = greenBits;
 			this.blue = blueBits;
-			compile(cellX * TEXEL, cellZ * TEXEL, red, green, blue);
+			readTexture(texture);
+			compile(cellX, cellZ, red, green, blue);
 		}
 
 		GlStateManager.scalef(12.0F, 1.0F, 12.0F);
@@ -70,7 +79,7 @@ public final class CloudRenderer {
 		GlStateManager.callList(list);
 	}
 
-	private void compile(float u, float v, float red, float green, float blue) {
+	private void compile(int cellX, int cellZ, float red, float green, float blue) {
 		if (list == 0) {
 			list = GL11.glGenLists(1);
 		}
@@ -82,41 +91,38 @@ public final class CloudRenderer {
 		GL11.glNewList(list, GL11.GL_COMPILE);
 		builder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
 
-		for (int cellX = -3; cellX <= 4; cellX++) {
-			for (int cellZ = -3; cellZ <= 4; cellZ++) {
-				float x = cellX * 8;
-				float z = cellZ * 8;
+		// only opaque texels get geometry, like modern clouds, since packs that skip the texture would draw the whole layer
+		for (int x = -RADIUS; x < RADIUS; x++) {
+			for (int z = -RADIUS; z < RADIUS; z++) {
+				if (!isOpaque(cellX + x, cellZ + z)) {
+					continue;
+				}
+
+				float u = (Math.floorMod(cellX + x, width) + 0.5F) / width;
+				float v = (Math.floorMod(cellZ + z, height) + 0.5F) / height;
 
 				if (bottom) {
-					face(builder, x, z, 0.0F, -1.0F, red * 0.7F, green * 0.7F, blue * 0.7F, u, v);
+					quad(builder, x, 0.0F, z, x + 1, 0.0F, z, x + 1, 0.0F, z + 1, x, 0.0F, z + 1, u, v, red * 0.7F, green * 0.7F, blue * 0.7F, 0.0F, -1.0F, 0.0F);
 				}
 
 				if (top) {
-					face(builder, x, z, 4.0F - INSET, 1.0F, red, green, blue, u, v);
+					quad(builder, x, 4.0F, z + 1, x + 1, 4.0F, z + 1, x + 1, 4.0F, z, x, 4.0F, z, u, v, red, green, blue, 0.0F, 1.0F, 0.0F);
 				}
 
-				if (cellX > -1) {
-					for (int i = 0; i < 8; i++) {
-						sideX(builder, x, z, x + i, i + 0.5F, -1.0F, red * 0.9F, green * 0.9F, blue * 0.9F, u, v);
-					}
+				if (!isOpaque(cellX + x - 1, cellZ + z)) {
+					quad(builder, x, 0.0F, z, x, 0.0F, z + 1, x, 4.0F, z + 1, x, 4.0F, z, u, v, red * 0.9F, green * 0.9F, blue * 0.9F, -1.0F, 0.0F, 0.0F);
 				}
 
-				if (cellX <= 1) {
-					for (int i = 0; i < 8; i++) {
-						sideX(builder, x, z, x + i + 1.0F - INSET, i + 0.5F, 1.0F, red * 0.9F, green * 0.9F, blue * 0.9F, u, v);
-					}
+				if (!isOpaque(cellX + x + 1, cellZ + z)) {
+					quad(builder, x + 1, 0.0F, z + 1, x + 1, 0.0F, z, x + 1, 4.0F, z, x + 1, 4.0F, z + 1, u, v, red * 0.9F, green * 0.9F, blue * 0.9F, 1.0F, 0.0F, 0.0F);
 				}
 
-				if (cellZ > -1) {
-					for (int i = 0; i < 8; i++) {
-						sideZ(builder, x, z, z + i, i + 0.5F, -1.0F, red * 0.8F, green * 0.8F, blue * 0.8F, u, v);
-					}
+				if (!isOpaque(cellX + x, cellZ + z - 1)) {
+					quad(builder, x + 1, 0.0F, z, x, 0.0F, z, x, 4.0F, z, x + 1, 4.0F, z, u, v, red * 0.8F, green * 0.8F, blue * 0.8F, 0.0F, 0.0F, -1.0F);
 				}
 
-				if (cellZ <= 1) {
-					for (int i = 0; i < 8; i++) {
-						sideZ(builder, x, z, z + i + 1.0F - INSET, i + 0.5F, 1.0F, red * 0.8F, green * 0.8F, blue * 0.8F, u, v);
-					}
+				if (!isOpaque(cellX + x, cellZ + z + 1)) {
+					quad(builder, x, 0.0F, z + 1, x + 1, 0.0F, z + 1, x + 1, 4.0F, z + 1, x, 4.0F, z + 1, u, v, red * 0.8F, green * 0.8F, blue * 0.8F, 0.0F, 0.0F, 1.0F);
 				}
 			}
 		}
@@ -126,31 +132,40 @@ public final class CloudRenderer {
 		CapturedRenderingState.INSTANCE.setCompilingDisplayList(false);
 	}
 
-	private static void face(BufferBuilder builder, float x, float z, float y, float normal, float red, float green, float blue, float u, float v) {
-		vertex(builder, x, y, z + 8.0F, x, z + 8.0F, red, green, blue, u, v, 0.0F, normal, 0.0F);
-		vertex(builder, x + 8.0F, y, z + 8.0F, x + 8.0F, z + 8.0F, red, green, blue, u, v, 0.0F, normal, 0.0F);
-		vertex(builder, x + 8.0F, y, z, x + 8.0F, z, red, green, blue, u, v, 0.0F, normal, 0.0F);
-		vertex(builder, x, y, z, x, z, red, green, blue, u, v, 0.0F, normal, 0.0F);
+	// the cloud texture is bound, and a resource reload gives it a new id
+	private void readTexture(int texture) {
+		if (texture == this.texture) {
+			return;
+		}
+
+		this.texture = texture;
+		width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+		height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+		ByteBuffer pixels = BufferUtils.createByteBuffer(width * height * 4);
+		GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
+		opaque = new boolean[width * height];
+
+		for (int i = 0; i < opaque.length; i++) {
+			opaque[i] = (pixels.get(i * 4 + 3) & 0xFF) > 25;
+		}
 	}
 
-	private static void sideX(BufferBuilder builder, float x, float z, float planeX, float texelX, float normal, float red, float green, float blue, float u, float v) {
-		vertex(builder, planeX, 0.0F, z + 8.0F, x + texelX, z + 8.0F, red, green, blue, u, v, normal, 0.0F, 0.0F);
-		vertex(builder, planeX, 4.0F, z + 8.0F, x + texelX, z + 8.0F, red, green, blue, u, v, normal, 0.0F, 0.0F);
-		vertex(builder, planeX, 4.0F, z, x + texelX, z, red, green, blue, u, v, normal, 0.0F, 0.0F);
-		vertex(builder, planeX, 0.0F, z, x + texelX, z, red, green, blue, u, v, normal, 0.0F, 0.0F);
+	private boolean isOpaque(int x, int z) {
+		return opaque[Math.floorMod(z, height) * width + Math.floorMod(x, width)];
 	}
 
-	private static void sideZ(BufferBuilder builder, float x, float z, float planeZ, float texelZ, float normal, float red, float green, float blue, float u, float v) {
-		vertex(builder, x, 4.0F, planeZ, x, z + texelZ, red, green, blue, u, v, 0.0F, 0.0F, normal);
-		vertex(builder, x + 8.0F, 4.0F, planeZ, x + 8.0F, z + texelZ, red, green, blue, u, v, 0.0F, 0.0F, normal);
-		vertex(builder, x + 8.0F, 0.0F, planeZ, x + 8.0F, z + texelZ, red, green, blue, u, v, 0.0F, 0.0F, normal);
-		vertex(builder, x, 0.0F, planeZ, x, z + texelZ, red, green, blue, u, v, 0.0F, 0.0F, normal);
+	private static void quad(BufferBuilder builder, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4,
+							 float u, float v, float red, float green, float blue, float normalX, float normalY, float normalZ) {
+		vertex(builder, x1, y1, z1, u, v, red, green, blue, normalX, normalY, normalZ);
+		vertex(builder, x2, y2, z2, u, v, red, green, blue, normalX, normalY, normalZ);
+		vertex(builder, x3, y3, z3, u, v, red, green, blue, normalX, normalY, normalZ);
+		vertex(builder, x4, y4, z4, u, v, red, green, blue, normalX, normalY, normalZ);
 	}
 
-	private static void vertex(BufferBuilder builder, float x, float y, float z, float texelU, float texelV,
-							   float red, float green, float blue, float u, float v, float normalX, float normalY, float normalZ) {
+	private static void vertex(BufferBuilder builder, float x, float y, float z, float u, float v,
+							   float red, float green, float blue, float normalX, float normalY, float normalZ) {
 		builder.vertex(x, y, z)
-			.texture(texelU * TEXEL + u, texelV * TEXEL + v)
+			.texture(u, v)
 			.color(red, green, blue, 0.8F)
 			.normal(normalX, normalY, normalZ)
 			.nextVertex();

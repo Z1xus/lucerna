@@ -84,6 +84,9 @@ public abstract class MixinGameRenderer {
 	protected abstract void renderSnowAndRain(float tickDelta);
 
 	@Shadow
+	protected abstract void renderClouds(WorldRenderer worldRenderer, float tickDelta, int anaglyphRenderPass);
+
+	@Shadow
 	public abstract void enableLightMap();
 
 	@Shadow
@@ -121,9 +124,10 @@ public abstract class MixinGameRenderer {
 
 	@WrapOperation(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderClouds(Lnet/minecraft/client/render/world/WorldRenderer;FI)V"))
 	private void lucerna$renderClouds(GameRenderer gameRenderer, WorldRenderer worldRenderer, float tickDelta, int anaglyphRenderPass, Operation<Void> original) {
-		lucerna$pipeline.setPhase(WorldRenderingPhase.CLOUDS);
-		original.call(gameRenderer, worldRenderer, tickDelta, anaglyphRenderPass);
-		lucerna$pipeline.setPhase(WorldRenderingPhase.NONE);
+		// shader packs get the clouds after the translucent terrain, see lucerna$renderLateWorld
+		if (!IrisApi.getInstance().isShaderPackInUse()) {
+			original.call(gameRenderer, worldRenderer, tickDelta, anaglyphRenderPass);
+		}
 	}
 
 	@WrapOperation(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ParticleManager;renderLit(Lnet/minecraft/entity/Entity;F)V"))
@@ -175,26 +179,36 @@ public abstract class MixinGameRenderer {
 		minecraft.getTextureManager().bind(TextureAtlas.BLOCKS_LOCATION);
 	}
 
+	// iris packs expect particles, clouds and weather after the deferred passes, but 1.8.9 draws the clouds before the terrain
 	@Inject(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=hand"))
-	private void lucerna$renderDeferredParticlesAndWeather(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
-		if (!lucerna$deferParticlesAndWeather) {
+	private void lucerna$renderLateWorld(int anaglyphRenderPass, float tickDelta, long renderTimeLimit, CallbackInfo ci) {
+		if (!IrisApi.getInstance().isShaderPackInUse()) {
 			return;
 		}
 
-		Entity camera = minecraft.getCamera();
+		if (lucerna$deferParticlesAndWeather) {
+			Entity camera = minecraft.getCamera();
 
-		lucerna$pipeline.setPhase(WorldRenderingPhase.PARTICLES);
-		enableLightMap();
-		minecraft.particleManager.renderLit(camera, tickDelta);
-		Lighting.turnOff();
-		setupFog(0, tickDelta);
-		minecraft.particleManager.render(camera, tickDelta);
-		disableLightMap();
+			lucerna$pipeline.setPhase(WorldRenderingPhase.PARTICLES);
+			enableLightMap();
+			minecraft.particleManager.renderLit(camera, tickDelta);
+			Lighting.turnOff();
+			setupFog(0, tickDelta);
+			minecraft.particleManager.render(camera, tickDelta);
+			disableLightMap();
+		}
 
-		lucerna$pipeline.setPhase(WorldRenderingPhase.RAIN_SNOW);
-		GlStateManager.depthMask(lucerna$pipeline.shouldWriteRainAndSnowToDepthBuffer());
-		GlStateManager.enableCull();
-		renderSnowAndRain(tickDelta);
+		lucerna$pipeline.setPhase(WorldRenderingPhase.CLOUDS);
+		GlStateManager.depthMask(true);
+		renderClouds(minecraft.worldRenderer, tickDelta, anaglyphRenderPass);
+
+		if (lucerna$deferParticlesAndWeather) {
+			lucerna$pipeline.setPhase(WorldRenderingPhase.RAIN_SNOW);
+			GlStateManager.depthMask(lucerna$pipeline.shouldWriteRainAndSnowToDepthBuffer());
+			GlStateManager.enableCull();
+			renderSnowAndRain(tickDelta);
+		}
+
 		GlStateManager.depthMask(true);
 		GlStateManager.disableBlend();
 		GlStateManager.disableFog();
