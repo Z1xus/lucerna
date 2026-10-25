@@ -31,6 +31,7 @@ public class ProgramUniforms {
 	private final ImmutableList<Uniform> perTick;
 	private final ImmutableList<Uniform> perFrame;
 	private final ImmutableList<Uniform> dynamic;
+	private final ImmutableList<Uniform> custom;
 	private final ImmutableList<ValueUpdateNotifier> notifiersToReset;
 
 	private ImmutableList<Uniform> once;
@@ -38,11 +39,12 @@ public class ProgramUniforms {
 	int lastFrame = -1;
 
 	public ProgramUniforms(ImmutableList<Uniform> once, ImmutableList<Uniform> perTick, ImmutableList<Uniform> perFrame,
-						   ImmutableList<Uniform> dynamic, ImmutableList<ValueUpdateNotifier> notifiersToReset) {
+						   ImmutableList<Uniform> dynamic, ImmutableList<Uniform> custom, ImmutableList<ValueUpdateNotifier> notifiersToReset) {
 		this.once = once;
 		this.perTick = perTick;
 		this.perFrame = perFrame;
 		this.dynamic = dynamic;
+		this.custom = custom;
 		this.notifiersToReset = notifiersToReset;
 	}
 
@@ -64,6 +66,7 @@ public class ProgramUniforms {
 		active = this;
 
 		updateStage(dynamic);
+		updateStage(custom);
 
 		if (once != null) {
 			updateStage(once);
@@ -120,6 +123,7 @@ public class ProgramUniforms {
 		private final Map<String, Uniform> perTick;
 		private final Map<String, Uniform> perFrame;
 		private final Map<String, Uniform> dynamic;
+		private final Map<String, Uniform> custom;
 		private final Map<String, UniformType> uniformNames;
 		private final Map<String, UniformType> externalUniformNames;
 		private final List<ValueUpdateNotifier> notifiersToReset;
@@ -133,6 +137,7 @@ public class ProgramUniforms {
 			perTick = new HashMap<>();
 			perFrame = new HashMap<>();
 			dynamic = new HashMap<>();
+			custom = new HashMap<>();
 			uniformNames = new HashMap<>();
 			externalUniformNames = new HashMap<>();
 			notifiersToReset = new ArrayList<>();
@@ -152,6 +157,9 @@ public class ProgramUniforms {
 				case PER_FRAME:
 					perFrame.put(locations.get(uniform.getLocation()), uniform);
 					break;
+				case CUSTOM:
+					custom.put(locations.get(uniform.getLocation()), uniform);
+					break;
 			}
 
 			return this;
@@ -165,8 +173,7 @@ public class ProgramUniforms {
 				return OptionalInt.empty();
 			}
 
-			// TODO: Temporary hack until custom uniforms are merged.
-			if ((!locations.containsKey(id) && !uniformNames.containsKey(name)) || name.equals("framemod8")) {
+			if (!locations.containsKey(id) && !uniformNames.containsKey(name)) {
 				locations.put(id, name);
 				uniformNames.put(name, type);
 			} else {
@@ -235,12 +242,6 @@ public class ProgramUniforms {
 					continue;
 				}
 
-				// TODO: This is an absolutely horrific hack, but is needed until custom uniforms work.
-				if ("framemod8".equals(name) && expected == UniformType.FLOAT && provided == UniformType.INT) {
-					SystemTimeUniforms.addFloatFrameMod8Uniform(this);
-					provided = UniformType.FLOAT;
-				}
-
 				if (provided != null && provided != expected) {
 					String expectedName;
 
@@ -256,11 +257,12 @@ public class ProgramUniforms {
 					perTick.remove(name);
 					perFrame.remove(name);
 					dynamic.remove(name);
+					custom.remove(name);
 				}
 			}
 
 			return new ProgramUniforms(ImmutableList.copyOf(once.values()), ImmutableList.copyOf(perTick.values()), ImmutableList.copyOf(perFrame.values()),
-					ImmutableList.copyOf(dynamic.values()), ImmutableList.copyOf(notifiersToReset));
+					ImmutableList.copyOf(dynamic.values()), ImmutableList.copyOf(custom.values()), ImmutableList.copyOf(notifiersToReset));
 		}
 
 		@Override
@@ -334,6 +336,8 @@ public class ProgramUniforms {
 		if (type == GL20C.GL_FLOAT) {
 			return UniformType.FLOAT;
 		} else if (type == GL20C.GL_INT) {
+			return UniformType.INT;
+		} else if (type == GL20C.GL_BOOL) {
 			return UniformType.INT;
 		} else if (type == GL20C.GL_FLOAT_MAT4) {
 			return UniformType.MAT4;

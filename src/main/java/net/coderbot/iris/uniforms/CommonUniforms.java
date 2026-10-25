@@ -49,16 +49,18 @@ public final class CommonUniforms {
 
 	// Needs to use a LocationalUniformHolder as we need it for the common uniforms
 	public static void addCommonUniforms(DynamicUniformHolder uniforms, IdMap idMap, PackDirectives directives, FrameUpdateNotifier updateNotifier) {
-		CameraUniforms.addCameraUniforms(uniforms, updateNotifier);
-		ViewportUniforms.addViewportUniforms(uniforms);
-		WorldTimeUniforms.addWorldTimeUniforms(uniforms);
-		SystemTimeUniforms.addSystemTimeUniforms(uniforms);
-		new CelestialUniforms(directives.getSunPathRotation()).addCelestialUniforms(uniforms);
-		IdMapUniforms.addIdMapUniforms(updateNotifier, uniforms, idMap, directives.isOldHandLight());
-		IrisExclusiveUniforms.addIrisExclusiveUniforms(uniforms);
-		MatrixUniforms.addMatrixUniforms(uniforms, directives);
-		HardcodedCustomUniforms.addHardcodedCustomUniforms(uniforms, updateNotifier);
+		CommonUniforms.addNonDynamicUniforms(uniforms, idMap, directives, updateNotifier);
+		CommonUniforms.addDynamicUniforms(uniforms);
+	}
+
+	public static void addDynamicUniforms(DynamicUniformHolder uniforms) {
 		FogUniforms.addFogUniforms(uniforms);
+
+		uniforms.uniform1i("entityId", CapturedRenderingState.INSTANCE::getCurrentRenderedEntity,
+				CapturedRenderingState.INSTANCE.getEntityIdNotifier());
+
+		uniforms.uniform1i("blockEntityId", CapturedRenderingState.INSTANCE::getCurrentRenderedBlockEntity,
+				CapturedRenderingState.INSTANCE.getBlockEntityIdNotifier());
 
 		// TODO: OptiFine doesn't think that atlasSize is a "dynamic" uniform,
 		//       but we do. How will custom uniforms depending on atlasSize work?
@@ -93,7 +95,18 @@ public final class CommonUniforms {
 		}, StateUpdateNotifiers.blendFuncNotifier);
 
 		uniforms.uniform1i("renderStage", () -> GbufferPrograms.getCurrentPhase().ordinal(), StateUpdateNotifiers.phaseChangeNotifier);
+	}
 
+	public static void addNonDynamicUniforms(UniformHolder uniforms, IdMap idMap, PackDirectives directives, FrameUpdateNotifier updateNotifier) {
+		CameraUniforms.addCameraUniforms(uniforms, updateNotifier);
+		ViewportUniforms.addViewportUniforms(uniforms);
+		WorldTimeUniforms.addWorldTimeUniforms(uniforms);
+		SystemTimeUniforms.addSystemTimeUniforms(uniforms);
+		BiomeUniforms.addBiomeUniforms(uniforms);
+		new CelestialUniforms(directives.getSunPathRotation()).addCelestialUniforms(uniforms);
+		IdMapUniforms.addIdMapUniforms(updateNotifier, uniforms, idMap, directives.isOldHandLight());
+		IrisExclusiveUniforms.addIrisExclusiveUniforms(uniforms);
+		MatrixUniforms.addMatrixUniforms(uniforms, directives);
 		CommonUniforms.generalCommonUniforms(uniforms, updateNotifier, directives);
 	}
 
@@ -108,6 +121,8 @@ public final class CommonUniforms {
 			.uniform1i(PER_FRAME, "isEyeInWater", CommonUniforms::isEyeInWater)
 			.uniform1f(PER_FRAME, "blindness", CommonUniforms::getBlindness)
 			.uniform1f(PER_FRAME, "nightVision", CommonUniforms::getNightVision)
+			// 1.8.9 has no darkness effect
+			.uniform1f(PER_FRAME, "darknessFactor", () -> 0.0F)
 			// TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
 			//       that the player is trying to turn on fullbright?
 			.uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)

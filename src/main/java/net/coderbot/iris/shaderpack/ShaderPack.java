@@ -24,6 +24,7 @@ import net.coderbot.iris.shaderpack.preprocessor.JcppProcessor;
 import net.coderbot.iris.shaderpack.texture.CustomTextureData;
 import net.coderbot.iris.shaderpack.texture.TextureFilteringData;
 import net.coderbot.iris.shaderpack.texture.TextureStage;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resource.language.I18n;
@@ -61,6 +62,7 @@ public class ShaderPack {
 	private final LanguageMap languageMap;
 	private final EnumMap<TextureStage, Object2ObjectMap<String, CustomTextureData>> customTextureDataMap = new EnumMap<>(TextureStage.class);
 	private final CustomTextureData customNoiseTexture;
+	private final CustomUniforms.Builder customUniforms;
 	private final ShaderPackOptions shaderPackOptions;
 	private final OptionMenuContainer menuContainer;
 
@@ -120,6 +122,8 @@ public class ShaderPack {
 		ShaderProperties shaderProperties = loadProperties(root, "shaders.properties")
 				.map(source -> new ShaderProperties(source, shaderPackOptions, finalEnvironmentDefines))
 				.orElseGet(ShaderProperties::empty);
+
+		this.customUniforms = shaderProperties.getCustomUniforms();
 
 		List<FeatureFlags> invalidFlagList = shaderProperties.getRequiredFeatureFlags().stream().filter(FeatureFlags::isInvalid).map(FeatureFlags::getValue).collect(Collectors.toList());
 		List<String> invalidFeatureFlags = invalidFlagList.stream().map(FeatureFlags::getHumanReadableName).collect(Collectors.toList());
@@ -402,5 +406,9 @@ public class ShaderPack {
 
 	public OptionMenuContainer getMenuContainer() {
 		return menuContainer;
+	}
+
+	public CustomUniforms.Builder getCustomUniforms() {
+		return customUniforms;
 	}
 }

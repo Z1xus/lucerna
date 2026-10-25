@@ -1,7 +1,7 @@
 package net.coderbot.iris.uniforms;
 
 import it.unimi.dsi.fastutil.objects.Object2IntFunction;
-import net.coderbot.iris.gl.uniform.DynamicUniformHolder;
+import net.coderbot.iris.gl.uniform.UniformHolder;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
 import net.coderbot.iris.shaderpack.IdMap;
 import net.coderbot.iris.shaderpack.materialmap.NamespacedId;
@@ -19,7 +19,7 @@ public final class IdMapUniforms {
 	private IdMapUniforms() {
 	}
 
-	public static void addIdMapUniforms(FrameUpdateNotifier notifier, DynamicUniformHolder uniforms, IdMap idMap, boolean isOldHandLight) {
+	public static void addIdMapUniforms(FrameUpdateNotifier notifier, UniformHolder uniforms, IdMap idMap, boolean isOldHandLight) {
 		HeldItemSupplier mainHandSupplier = new HeldItemSupplier(idMap.getItemIdMap());
 		notifier.addListener(mainHandSupplier::update);
 
@@ -28,12 +28,6 @@ public final class IdMapUniforms {
 			.uniform1i(UniformUpdateFrequency.PER_FRAME, "heldItemId2", () -> -1)
 			.uniform1i(PER_FRAME, "heldBlockLightValue", mainHandSupplier::getLightValue)
 			.uniform1i(PER_FRAME, "heldBlockLightValue2", () -> 0);
-
-		uniforms.uniform1i("entityId", CapturedRenderingState.INSTANCE::getCurrentRenderedEntity,
-				CapturedRenderingState.INSTANCE.getEntityIdNotifier());
-
-		uniforms.uniform1i("blockEntityId", CapturedRenderingState.INSTANCE::getCurrentRenderedBlockEntity,
-				CapturedRenderingState.INSTANCE.getBlockEntityIdNotifier());
 	}
 
 	/**
