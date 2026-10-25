@@ -366,8 +366,11 @@ public class CustomUniforms implements FunctionContext {
 			Iris.logger.info("Starting custom uniform resolving");
 			CustomUniformFixedInputUniformsHolder.Builder inputs = new CustomUniformFixedInputUniformsHolder.Builder();
 			CommonUniforms.addNonDynamicUniforms(inputs, idMap, directives, updateNotifier);
-			// constants of optifine's custom uniform expressions
-			inputs.uniform1f(UniformUpdateFrequency.ONCE, "pi", () -> (float) Math.PI);
+			// constants of optifine's custom uniform expressions, a pack may define its own
+			if (!variables.containsKey("pi")) {
+				inputs.uniform1f(UniformUpdateFrequency.ONCE, "pi", () -> (float) Math.PI);
+			}
+
 			inputs.uniform1b(UniformUpdateFrequency.ONCE, "true", () -> true);
 			inputs.uniform1b(UniformUpdateFrequency.ONCE, "false", () -> false);
 			CustomUniformFixedInputUniformsHolder.Builder hardcoded = new CustomUniformFixedInputUniformsHolder.Builder();

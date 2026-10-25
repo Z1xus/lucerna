@@ -1,6 +1,9 @@
 package net.coderbot.iris.pipeline.transform;
 
 import io.github.douira.glsl_transformer.ast.node.Identifier;
+import io.github.douira.glsl_transformer.ast.node.Profile;
+import io.github.douira.glsl_transformer.ast.node.Version;
+import io.github.douira.glsl_transformer.ast.node.VersionStatement;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.basic.ASTNode;
 import io.github.douira.glsl_transformer.ast.node.declaration.DeclarationMember;
@@ -43,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CompatibilityTransformer {
@@ -50,6 +54,12 @@ public class CompatibilityTransformer {
 
 	private static final AutoHintedMatcher<Expression> sildursWaterFract = new AutoHintedMatcher<>(
 		"fract(worldpos.y + 0.001)", Matcher.expressionPattern);
+
+	private static final String[][] CORE_INPUTS = { { "vaPosition", "gl_Vertex.xyz" }, { "vaColor", "gl_Color" }, { "vaUV0", "gl_MultiTexCoord0.xy" },
+		{ "vaUV1", "ivec2(0, 10)" }, { "vaUV2", "ivec2(gl_MultiTexCoord1.xy)" }, { "vaNormal", "gl_Normal" } };
+	private static final String[][] CORE_MATRICES = { { "modelViewMatrix", "gl_ModelViewMatrix" }, { "modelViewMatrixInverse", "gl_ModelViewMatrixInverse" },
+		{ "projectionMatrix", "gl_ProjectionMatrix" }, { "projectionMatrixInverse", "gl_ProjectionMatrixInverse" }, { "normalMatrix", "gl_NormalMatrix" },
+		{ "textureMatrix", "gl_TextureMatrix[0]" }, { "chunkOffset", "vec3(0.0)" } };
 
 	private static StorageQualifier getConstQualifier(TypeQualifier qualifier) {
 		if (qualifier == null) {
@@ -66,6 +76,49 @@ public class CompatibilityTransformer {
 		return null;
 	}
 
+	// core profile packs read the vanilla core attributes and matrices, which 1.8.9 only has as fixed function builtins
+	public static void transformCore(ASTParser t, TranslationUnit tree, Root root, Parameters parameters) {
+		VersionStatement versionStatement = tree.getVersionStatement();
+
+		if (!versionStatement.getNormalizedProfile().isCore()) {
+			return;
+		}
+
+		versionStatement.profile = Profile.COMPATIBILITY;
+
+		if (parameters.type == PatchShaderType.VERTEX) {
+			replaceCore(t, tree, root, CORE_INPUTS);
+		}
+
+		replaceCore(t, tree, root, CORE_MATRICES);
+	}
+
+	// the declarations become globals that main fills, so function parameters with the same names still work
+	private static void replaceCore(ASTParser t, TranslationUnit tree, Root root, String[][] replacements) {
+		for (String[] replacement : replacements) {
+			TypeAndInitDeclaration declaration = root.identifierIndex.getStream(replacement[0])
+				.filter(id -> id.getParent() instanceof DeclarationMember && id.getAncestor(FunctionDefinition.class) == null)
+				.map(id -> id.getAncestor(TypeAndInitDeclaration.class))
+				.findFirst().orElse(null);
+
+			if (declaration == null) {
+				continue;
+			}
+
+			TypeQualifier qualifier = declaration.getType().getTypeQualifier();
+
+			if (qualifier != null) {
+				qualifier.getChildren().stream().filter(StorageQualifier.class::isInstance).collect(Collectors.toList()).forEach(ASTNode::detachAndDelete);
+
+				if (qualifier.getChildren().isEmpty()) {
+					qualifier.detachAndDelete();
+				}
+			}
+
+			tree.prependMain(t, replacement[0] + " = " + replacement[1] + ";");
+		}
+	}
+
 	public static void transformEach(ASTParser t, TranslationUnit tree, Root root, Parameters parameters) {
 		if (parameters.type == PatchShaderType.VERTEX) {
 			if (root.replaceExpressionMatches(t, sildursWaterFract, "fract(worldpos.y + 0.01)")) {
@@ -74,8 +127,35 @@ public class CompatibilityTransformer {
 			}
 		}
 
+		VersionStatement versionStatement = tree.getVersionStatement();
+
+		// 140 drops the fixed function builtins that packs still use, profiles only exist from 150 on
+		if (versionStatement.version.number == 140) {
+			versionStatement.version = Version.GLSL15;
+			versionStatement.profile = Profile.COMPATIBILITY;
+		}
+
+		// varying and attribute are gone from 150 core and cannot take flat, in and out work from 130 on
+		if (versionStatement.version.number >= 130 && parameters.type != PatchShaderType.GEOMETRY) {
+			for (StorageQualifier qualifier : root.nodeIndex.get(StorageQualifier.class)) {
+				if (qualifier.storageType == StorageType.VARYING) {
+					qualifier.storageType = parameters.type == PatchShaderType.VERTEX ? StorageType.OUT : StorageType.IN;
+				} else if (qualifier.storageType == StorageType.ATTRIBUTE) {
+					qualifier.storageType = StorageType.IN;
+				}
+			}
+		}
+
+		// texture() is a builtin from 130 on, so a sampler with that name shadows it, iris renames it the same way
+		if (versionStatement.version.number >= 130 && root.identifierIndex.getStream("texture").anyMatch(id -> id.getParent() instanceof DeclarationMember)) {
+			root.identifierIndex.getStream("texture")
+				.filter(id -> id.getParent() instanceof DeclarationMember || id.getParent() instanceof ReferenceExpression)
+				.collect(Collectors.toList())
+				.forEach(id -> id.setName("gtexture"));
+		}
+
 		// chocapic based packs use flat, integer operators and texelFetch2D in 120 shaders without declaring the extension
-		if (tree.getVersionStatement().version.number <= 120) {
+		if (versionStatement.version.number <= 120 || root.identifierIndex.has("texelFetch2D")) {
 			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "#extension GL_EXT_gpu_shader4 : enable\n");
 		}
 

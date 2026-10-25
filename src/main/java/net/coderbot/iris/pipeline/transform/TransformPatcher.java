@@ -153,6 +153,7 @@ public class TransformPatcher {
 				});
 
 				Root.indexBuildSession(tree, () -> {
+					CompatibilityTransformer.transformCore(transformer, tree, root, parameters);
 					switch (parameters.patch) {
 						case ATTRIBUTES:
 							AttributeTransformer.transform(transformer, tree, root, (AttributeParameters) parameters);

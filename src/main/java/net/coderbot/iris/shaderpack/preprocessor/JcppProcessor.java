@@ -7,7 +7,16 @@ import org.anarres.cpp.Preprocessor;
 import org.anarres.cpp.StringLexerSource;
 import org.anarres.cpp.Token;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class JcppProcessor {
+	private static final Pattern EMPTY_DEFINE = Pattern.compile("(?m)^([ \\t]*#[ \\t]*define[ \\t]+(\\w+))[ \\t]*$");
+	private static final Pattern CONDITION = Pattern.compile("(?m)^[ \\t]*#[ \\t]*(?:el)?if\\b(.*)$");
+	private static final Pattern CONDITION_NAME = Pattern.compile("(defined\\s*\\(?\\s*)?\\b([A-Za-z_]\\w*)");
+
 	// Derived from GlShader from Canvas, licenced under LGPL
 	public static String glslPreprocessSource(String source, Iterable<StringPair> environmentDefines) {
 		if (source.contains(GlslCollectingListener.VERSION_MARKER)
@@ -28,6 +37,9 @@ public class JcppProcessor {
 		source = source.replace("#version", GlslCollectingListener.VERSION_MARKER);
 		source = source.replace("#extension", GlslCollectingListener.EXTENSION_MARKER);
 
+		Set<String> conditionNames = conditionNames(source);
+		source = EMPTY_DEFINE.matcher(source).replaceAll(match -> conditionNames.contains(match.group(2)) ? match.group(1) + " 1" : match.group(0));
+
 		GlslCollectingListener listener = new GlslCollectingListener();
 
 		@SuppressWarnings("resource")
@@ -38,7 +50,7 @@ public class JcppProcessor {
 		// in errors...
 		try {
 			for (StringPair envDefine : environmentDefines) {
-				pp.addMacro(envDefine.getKey(), envDefine.getValue());
+				pp.addMacro(envDefine.getKey(), envDefine.getValue().isEmpty() ? "1" : envDefine.getValue());
 			}
 		} catch (LexerException e) {
 			throw new RuntimeException("Unexpected LexerException processing macros", e);
@@ -66,5 +78,23 @@ public class JcppProcessor {
 		source = listener.collectLines() + builder;
 
 		return source;
+	}
+
+	// names used as values in #if and #elif, an empty macro there is a syntax error that optifine and lenient drivers accept as true
+	private static Set<String> conditionNames(String source) {
+		Set<String> names = new HashSet<>();
+		Matcher condition = CONDITION.matcher(source);
+
+		while (condition.find()) {
+			Matcher name = CONDITION_NAME.matcher(condition.group(1));
+
+			while (name.find()) {
+				if (name.group(1) == null) {
+					names.add(name.group(2));
+				}
+			}
+		}
+
+		return names;
 	}
 }

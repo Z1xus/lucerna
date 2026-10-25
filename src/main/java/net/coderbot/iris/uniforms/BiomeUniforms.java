@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -76,14 +77,15 @@ public class BiomeUniforms {
 
 		uniforms.uniform1i(ONCE, "PPT_NONE", () -> 0).uniform1i(ONCE, "PPT_RAIN", () -> 1).uniform1i(ONCE, "PPT_SNOW", () -> 2);
 
+		Map<String, Integer> biomes = new HashMap<>(MODERN_BIOMES);
+
 		for (Biome biome : Biome.getAll()) {
 			if (biome != null) {
-				int id = biome.id;
-				uniforms.uniform1i(ONCE, "BIOME_" + biome.name.toUpperCase(Locale.ROOT).replaceAll("[^A-Z0-9]+", "_"), () -> id);
+				biomes.putIfAbsent(biome.name.toUpperCase(Locale.ROOT).replaceAll("[^A-Z0-9]+", "_"), biome.id);
 			}
 		}
 
-		MODERN_BIOMES.forEach((name, id) -> uniforms.uniform1i(ONCE, "BIOME_" + name, () -> id));
+		biomes.forEach((name, id) -> uniforms.uniform1i(ONCE, "BIOME_" + name, () -> id));
 	}
 
 	private static Biome getBiome() {
