@@ -23,8 +23,8 @@ public final class ViewportUniforms {
 	 */
 	public static void addViewportUniforms(UniformHolder uniforms) {
 		uniforms
-			.uniform1f(PER_FRAME, "viewHeight", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().height))
-			.uniform1f(PER_FRAME, "viewWidth", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().width))
+			.uniform1f(PER_FRAME, "viewHeight", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().height))
+			.uniform1f(PER_FRAME, "viewWidth", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().width))
 			.uniform1f(PER_FRAME, "aspectRatio", ViewportUniforms::getAspectRatio);
 	}
 
