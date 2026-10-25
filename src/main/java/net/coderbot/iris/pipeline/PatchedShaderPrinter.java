@@ -1,13 +1,13 @@
 package net.coderbot.iris.pipeline;
 
+import net.coderbot.iris.Iris;
+import net.fabricmc.loader.api.FabricLoader;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
-
-import net.coderbot.iris.Iris;
-import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Static class that deals with printing the patched_shader folder.

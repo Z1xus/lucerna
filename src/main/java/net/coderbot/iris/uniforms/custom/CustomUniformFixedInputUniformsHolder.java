@@ -3,6 +3,7 @@ package net.coderbot.iris.uniforms.custom;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import kroppeb.stareval.function.Type;
+import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.uniform.FloatSupplier;
 import net.coderbot.iris.gl.uniform.UniformHolder;
 import net.coderbot.iris.gl.uniform.UniformType;
@@ -22,7 +23,6 @@ import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import net.coderbot.iris.Iris;
 
 import java.util.Collection;
 import java.util.Map;

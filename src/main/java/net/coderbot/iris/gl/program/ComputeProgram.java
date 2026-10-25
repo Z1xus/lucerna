@@ -1,14 +1,13 @@
 package net.coderbot.iris.gl.program;
 
-import org.lwjgl.opengl.GL20;
-import net.minecraft.client.render.platform.GlStateManager;
-import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.GlResource;
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
 import org.joml.Vector2f;
 import org.joml.Vector3i;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL43C;
 
 public final class ComputeProgram extends GlResource {

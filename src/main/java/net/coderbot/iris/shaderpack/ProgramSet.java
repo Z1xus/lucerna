@@ -1,12 +1,9 @@
 package net.coderbot.iris.shaderpack;
 
 import net.coderbot.iris.Iris;
-import net.coderbot.iris.gl.blending.BlendMode;
-import net.coderbot.iris.gl.blending.BlendModeFunction;
 import net.coderbot.iris.gl.blending.BlendModeOverride;
 import net.coderbot.iris.shaderpack.include.AbsolutePackPath;
 import net.coderbot.iris.shaderpack.loading.ProgramId;
-import org.joml.Vector3i;
 
 import java.util.ArrayList;
 import java.util.Arrays;

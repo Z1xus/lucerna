@@ -47,7 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ShaderPack {
 	private static final Gson GSON = new Gson();

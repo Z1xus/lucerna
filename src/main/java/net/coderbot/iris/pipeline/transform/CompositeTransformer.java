@@ -1,12 +1,12 @@
 package net.coderbot.iris.pipeline.transform;
 
-import java.util.stream.Stream;
-
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.expression.unary.FunctionCallExpression;
 import io.github.douira.glsl_transformer.ast.query.Root;
 import io.github.douira.glsl_transformer.ast.transform.ASTInjectionPoint;
 import io.github.douira.glsl_transformer.ast.transform.ASTParser;
+
+import java.util.stream.Stream;
 
 class CompositeTransformer {
 	public static void transform(

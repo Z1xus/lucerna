@@ -1,8 +1,6 @@
 package net.coderbot.iris.pipeline;
 
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.coderbot.iris.rendertarget.RenderTarget;
@@ -12,6 +10,7 @@ import net.coderbot.iris.shaderpack.PackShadowDirectives;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL21C;
 
 import java.util.ArrayList;

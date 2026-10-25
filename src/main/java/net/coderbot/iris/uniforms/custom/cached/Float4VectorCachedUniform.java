@@ -1,9 +1,9 @@
 package net.coderbot.iris.uniforms.custom.cached;
 
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
 import net.coderbot.iris.parsing.VectorType;
 import org.joml.Vector4f;
-import net.coderbot.iris.gl.IrisRenderSystem;
 
 import java.util.function.Supplier;
 

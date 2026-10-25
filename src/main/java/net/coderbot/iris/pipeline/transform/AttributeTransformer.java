@@ -1,7 +1,5 @@
 package net.coderbot.iris.pipeline.transform;
 
-import java.util.stream.Stream;
-
 import io.github.douira.glsl_transformer.ast.node.Identifier;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.basic.ASTNode;
@@ -12,6 +10,8 @@ import io.github.douira.glsl_transformer.ast.query.match.Matcher;
 import io.github.douira.glsl_transformer.ast.transform.ASTInjectionPoint;
 import io.github.douira.glsl_transformer.ast.transform.ASTParser;
 import net.coderbot.iris.gl.shader.ShaderType;
+
+import java.util.stream.Stream;
 
 /**
  * Implements AttributeShaderTransformer using glsl-transformer AST

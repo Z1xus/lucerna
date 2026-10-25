@@ -1,11 +1,11 @@
 package net.coderbot.iris.texture;
 
-import net.coderbot.iris.gl.IrisRenderSystem;
-import org.lwjgl.opengl.GL11;
-import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20C;
 
 import java.nio.IntBuffer;

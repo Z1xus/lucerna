@@ -1,9 +1,9 @@
 package net.coderbot.iris.rendertarget;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.GlResource;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.texture.DepthBufferFormat;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
 

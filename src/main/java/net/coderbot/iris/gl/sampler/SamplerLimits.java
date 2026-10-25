@@ -1,7 +1,6 @@
 package net.coderbot.iris.gl.sampler;
 
 import org.lwjgl.opengl.GL11;
-import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL20C;
 
 public class SamplerLimits {

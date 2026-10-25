@@ -1,10 +1,10 @@
 package net.coderbot.iris.uniforms.custom.cached;
 
 import kroppeb.stareval.function.FunctionReturn;
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
 import net.coderbot.iris.parsing.VectorType;
 import org.joml.Vector2i;
-import net.coderbot.iris.gl.IrisRenderSystem;
 
 import java.util.function.Supplier;
 

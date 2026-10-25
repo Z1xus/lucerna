@@ -2,9 +2,9 @@ package net.coderbot.iris.uniforms.custom.cached;
 
 import kroppeb.stareval.function.FunctionReturn;
 import kroppeb.stareval.function.Type;
+import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
 import org.jetbrains.annotations.NotNull;
-import net.coderbot.iris.Iris;
 
 import java.util.function.Supplier;
 

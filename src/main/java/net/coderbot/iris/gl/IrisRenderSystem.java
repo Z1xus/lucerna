@@ -1,9 +1,9 @@
 package net.coderbot.iris.gl;
 
-import net.minecraft.client.render.platform.GlStateManager;
-import org.joml.Vector3i;
 import net.coderbot.iris.Iris;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3i;
 import org.lwjgl.opengl.ARBDirectStateAccess;
 import org.lwjgl.opengl.EXTShaderImageLoadStore;
 import org.lwjgl.opengl.GL;
@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL40C;
-import org.lwjgl.opengl.GL42C;
 import org.lwjgl.opengl.GL45C;
 import org.lwjgl.system.MemoryUtil;
 

@@ -1,9 +1,8 @@
 package net.coderbot.iris.gl.program;
 
-import org.lwjgl.opengl.GL20;
-import net.minecraft.client.render.platform.GlStateManager;
-import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.GlResource;
+import net.coderbot.iris.gl.IrisRenderSystem;
+import org.lwjgl.opengl.GL20;
 
 public final class Program extends GlResource {
 	private final ProgramUniforms uniforms;

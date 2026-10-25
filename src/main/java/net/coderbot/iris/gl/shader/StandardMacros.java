@@ -1,7 +1,6 @@
 package net.coderbot.iris.gl.shader;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gui.option.IrisVideoSettings;
 import net.coderbot.iris.pipeline.HandRenderer;
 import net.coderbot.iris.pipeline.WorldRenderingPhase;

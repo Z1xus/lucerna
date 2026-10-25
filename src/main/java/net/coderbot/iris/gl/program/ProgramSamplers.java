@@ -1,6 +1,5 @@
 package net.coderbot.iris.gl.program;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -10,6 +9,7 @@ import net.coderbot.iris.gl.sampler.SamplerHolder;
 import net.coderbot.iris.gl.sampler.SamplerLimits;
 import net.coderbot.iris.gl.state.ValueUpdateNotifier;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL20C;
 
 import java.util.ArrayList;

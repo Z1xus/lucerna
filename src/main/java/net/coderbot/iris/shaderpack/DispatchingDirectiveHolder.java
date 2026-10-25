@@ -3,7 +3,6 @@ package net.coderbot.iris.shaderpack;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.coderbot.iris.Iris;
-import net.coderbot.iris.IrisLogging;
 import org.joml.Vector2f;
 import org.joml.Vector3i;
 import org.joml.Vector4f;

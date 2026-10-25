@@ -1,14 +1,13 @@
 package net.coderbot.iris.gl.framebuffer;
 
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL11;
-import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.coderbot.iris.gl.GlResource;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.texture.DepthBufferFormat;
 import net.coderbot.iris.texture.TextureInfoCache;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL30C;
 
 public class GlFramebuffer extends GlResource {

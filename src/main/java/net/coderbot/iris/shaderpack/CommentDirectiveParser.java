@@ -1,7 +1,6 @@
 package net.coderbot.iris.shaderpack;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Parses comment-based directives found in shader source files of the form:

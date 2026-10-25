@@ -1,17 +1,16 @@
 package net.coderbot.iris.rendertarget;
 
-import org.lwjgl.opengl.GL11;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
 import net.coderbot.iris.gl.texture.PixelFormat;
 import net.coderbot.iris.gl.texture.PixelType;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.joml.Vector2i;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 public class RenderTarget {
 	private final InternalTextureFormat internalFormat;

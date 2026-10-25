@@ -1,10 +1,10 @@
 package net.coderbot.iris.postprocess;
 
-import org.lwjgl.opengl.GL15;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20C;
 
 /**

@@ -1,11 +1,11 @@
 package net.coderbot.iris.pipeline;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.block_rendering.BlockRenderingSettings;
 import net.coderbot.iris.shaderpack.DimensionId;
 import net.coderbot.iris.uniforms.SystemTimeUniforms;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL20C;
 

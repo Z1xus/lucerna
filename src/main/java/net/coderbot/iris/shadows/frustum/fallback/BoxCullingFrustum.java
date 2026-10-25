@@ -6,7 +6,6 @@ import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
-import org.joml.Matrix4f;
 import org.joml.Vector3d;
 
 public class BoxCullingFrustum implements Culler, ViewportProvider, Frustum {

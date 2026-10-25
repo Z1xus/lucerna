@@ -1,8 +1,8 @@
 package net.coderbot.iris.uniforms;
 
-import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.state.StateUpdateNotifiers;
 import net.coderbot.iris.gl.uniform.DynamicUniformHolder;
+import net.minecraft.client.render.platform.GlStateManager;
 
 public class FogUniforms {
 	private FogUniforms() {

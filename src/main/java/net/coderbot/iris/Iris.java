@@ -23,14 +23,14 @@ import net.coderbot.iris.shaderpack.option.values.OptionValues;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.Formatting;
 import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.client.options.KeyBinding;
-import org.lwjgl.input.Keyboard;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.io.InputStream;
