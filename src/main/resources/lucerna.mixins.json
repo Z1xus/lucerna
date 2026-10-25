@@ -32,6 +32,7 @@
     "argentum.MixinArgentumRenderSectionManager",
     "argentum.MixinArgentumWorldRenderer",
     "argentum.MixinChunkBuilderMeshingTask",
+    "argentum.MixinEntityOcclusionCuller",
     "argentum.MixinInstanceShader",
     "argentum.MixinJsonOptionStorage",
     "argentum.MixinModelInstancer",
