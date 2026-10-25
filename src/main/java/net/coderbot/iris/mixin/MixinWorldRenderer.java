@@ -1,5 +1,6 @@
 package net.coderbot.iris.mixin;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.pipeline.WorldRenderingPhase;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
@@ -90,6 +91,20 @@ public class MixinWorldRenderer {
 	@Inject(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/living/player/LocalClientPlayerEntity;getEyePosition(F)Lnet/minecraft/util/math/Vec3d;"))
 	private void iris$beginVoid(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
 		iris$setPhase(WorldRenderingPhase.VOID);
+	}
+
+	@WrapWithCondition(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
+	private boolean iris$renderSun(Tesselator tesselator) {
+		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+
+		return pipeline == null || pipeline.shouldRenderSun();
+	}
+
+	@WrapWithCondition(method = RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
+	private boolean iris$renderMoon(Tesselator tesselator) {
+		WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+
+		return pipeline == null || pipeline.shouldRenderMoon();
 	}
 
 	@Inject(method = RENDER_SKY, at = @At("RETURN"))

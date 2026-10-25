@@ -4,6 +4,7 @@ import net.coderbot.iris.gl.state.ValueUpdateNotifier;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import org.joml.Vector4f;
 
 public class CapturedRenderingState {
 	public static final CapturedRenderingState INSTANCE = new CapturedRenderingState();
@@ -19,6 +20,9 @@ public class CapturedRenderingState {
 
 	private int currentRenderedEntity = -1;
 	private Runnable entityIdListener = null;
+
+	private final Vector4f currentEntityColor = new Vector4f();
+	private Runnable entityColorListener = null;
 
 	private CapturedRenderingState() {
 	}
@@ -77,6 +81,22 @@ public class CapturedRenderingState {
 		if (this.entityIdListener != null) {
 			this.entityIdListener.run();
 		}
+	}
+
+	public void setCurrentEntityColor(float red, float green, float blue, float alpha) {
+		this.currentEntityColor.set(red, green, blue, alpha);
+
+		if (this.entityColorListener != null) {
+			this.entityColorListener.run();
+		}
+	}
+
+	public Vector4f getCurrentEntityColor() {
+		return currentEntityColor;
+	}
+
+	public ValueUpdateNotifier getEntityColorNotifier() {
+		return listener -> this.entityColorListener = listener;
 	}
 
 	public ValueUpdateNotifier getEntityIdNotifier() {

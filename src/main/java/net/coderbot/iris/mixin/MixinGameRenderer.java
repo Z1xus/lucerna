@@ -125,6 +125,7 @@ public abstract class MixinGameRenderer {
 	private void iris$renderWeather(GameRenderer gameRenderer, float tickDelta, Operation<Void> original) {
 		if (!iris$deferParticlesAndWeather) {
 			iris$pipeline.setPhase(WorldRenderingPhase.RAIN_SNOW);
+			GlStateManager.depthMask(iris$pipeline.shouldWriteRainAndSnowToDepthBuffer());
 			original.call(gameRenderer, tickDelta);
 			iris$pipeline.setPhase(WorldRenderingPhase.NONE);
 		}
@@ -169,7 +170,7 @@ public abstract class MixinGameRenderer {
 		((GameRenderer) (Object) this).disableLightMap();
 
 		iris$pipeline.setPhase(WorldRenderingPhase.RAIN_SNOW);
-		GlStateManager.depthMask(false);
+		GlStateManager.depthMask(iris$pipeline.shouldWriteRainAndSnowToDepthBuffer());
 		GlStateManager.enableCull();
 		accessor.invokeRenderSnowAndRain(tickDelta);
 		GlStateManager.depthMask(true);

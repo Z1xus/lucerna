@@ -30,10 +30,8 @@ import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
-import org.joml.Vector4f;
 import org.joml.Vector4i;
 
-import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.ONCE;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_TICK;
 
@@ -95,6 +93,9 @@ public final class CommonUniforms {
 		}, StateUpdateNotifiers.blendFuncNotifier);
 
 		uniforms.uniform1i("renderStage", () -> GbufferPrograms.getCurrentPhase().ordinal(), StateUpdateNotifiers.phaseChangeNotifier);
+
+		// the hurt and creeper flash color of the entity that is being rendered
+		uniforms.uniform4f("entityColor", CapturedRenderingState.INSTANCE::getCurrentEntityColor, CapturedRenderingState.INSTANCE.getEntityColorNotifier());
 	}
 
 	public static void addNonDynamicUniforms(UniformHolder uniforms, IdMap idMap, PackDirectives directives, FrameUpdateNotifier updateNotifier) {
@@ -126,9 +127,6 @@ public final class CommonUniforms {
 			// TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
 			//       that the player is trying to turn on fullbright?
 			.uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)
-			// just a dummy value for shaders where entityColor isn't supplied through a vertex attribute (and thus is
-			// not available) - suppresses warnings. See AttributeShaderTransformer for the actual entityColor code.
-			.uniform4f(ONCE, "entityColor", Vector4f::new)
 			.uniform1f(PER_TICK, "playerMood", CommonUniforms::getPlayerMood)
 			.uniform2i(PER_FRAME, "eyeBrightness", CommonUniforms::getEyeBrightness)
 			.uniform2i(PER_FRAME, "eyeBrightnessSmooth", () -> {
