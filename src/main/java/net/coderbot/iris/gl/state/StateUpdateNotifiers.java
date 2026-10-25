@@ -12,7 +12,7 @@ public class StateUpdateNotifiers {
 	public static ValueUpdateNotifier fogDensityNotifier;
 	public static ValueUpdateNotifier blendFuncNotifier;
 	public static ValueUpdateNotifier bindTextureNotifier;
-	public static ValueUpdateNotifier normalTextureChangeNotifier;
-	public static ValueUpdateNotifier specularTextureChangeNotifier;
+	public static ValueUpdateNotifier normalTextureChangeNotifier = listener -> {};
+	public static ValueUpdateNotifier specularTextureChangeNotifier = listener -> {};
 	public static ValueUpdateNotifier phaseChangeNotifier;
 }

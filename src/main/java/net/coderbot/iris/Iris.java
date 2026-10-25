@@ -137,6 +137,7 @@ public class Iris {
 		}
 
 		IrisRenderSystem.initRenderer();
+		GLDebug.initRenderer();
 
 		setDebug(irisConfig.areDebugOptionsEnabled());
 
@@ -516,11 +517,18 @@ public class Iris {
 		// allows shaderpacks to be changed at runtime
 		irisConfig.initialize();
 
+		boolean hadPack = currentPack != null;
+
 		// Destroy all allocated resources
 		destroyEverything();
 
 		// Load the new shaderpack
 		loadShaderpack();
+
+		// Argentum's section manager only gets a shadow pass while a shader pack is loaded
+		if (hadPack != (currentPack != null) && Minecraft.getInstance().worldRenderer != null) {
+			Minecraft.getInstance().worldRenderer.reload();
+		}
 
 		// Very important - we need to re-create the pipeline straight away.
 		// https://github.com/IrisShaders/Iris/issues/1330

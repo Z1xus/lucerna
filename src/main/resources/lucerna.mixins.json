@@ -18,6 +18,7 @@
     "MixinTitleScreen",
     "MixinVertexBuffer",
     "MixinWorldRenderer",
+    "argentum.MixinArgentumRenderSectionManager",
     "entity_render_context.MixinBlockEntityRenderDispatcher",
     "entity_render_context.MixinEntityRenderDispatcher",
     "gui.MixinCeleritasVideoOptionsController",

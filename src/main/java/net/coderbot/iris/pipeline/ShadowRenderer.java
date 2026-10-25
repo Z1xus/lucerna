@@ -32,6 +32,7 @@ import net.minecraft.client.render.world.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.player.PlayerEntity;
 import net.minecraft.util.profiler.Profiler;
+import org.embeddedt.embeddium.impl.gl.device.RenderDevice;
 import org.embeddedt.embeddium.impl.render.chunk.ChunkRenderMatrices;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
@@ -305,8 +306,19 @@ public class ShadowRenderer {
 		Viewport playerViewport = ((ViewportProvider) playerCuller).sodium$createViewport();
 		Viewport shadowViewport = ((ViewportProvider) terrainFrustumHolder.getFrustum()).sodium$createViewport();
 
-		renderer.setupShadowTerrain(playerViewport, shadowViewport, ArgentumWorldRenderer.captureCameraState(tickDelta),
-			frame++, client.player.isSpectator());
+		if (!renderer.getRenderSectionManager().hasShadowPass()) {
+			// the section manager predates the shader pack, it gains a shadow pass on the next reload
+			client.worldRenderer.reload();
+		}
+
+		RenderDevice.enterManagedCode();
+
+		try {
+			renderer.setupShadowTerrain(playerViewport, shadowViewport, ArgentumWorldRenderer.captureCameraState(tickDelta),
+				frame++, client.player.isSpectator());
+		} finally {
+			RenderDevice.exitManagedCode();
+		}
 
 		profiler.swap("terrain");
 

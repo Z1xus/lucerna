@@ -111,6 +111,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 	private final FinalPassRenderer finalPassRenderer;
 	private final CustomTextureManager customTextureManager;
 	private final AbstractTexture whitePixel;
+	private final AbstractTexture defaultNormal;
+	private final AbstractTexture defaultSpecular;
 	private final FrameUpdateNotifier updateNotifier;
 	private final CenterDepthSampler centerDepthSampler;
 
@@ -206,6 +208,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		customTextureManager = new CustomTextureManager(programs.getPackDirectives(), programs.getPack().getCustomTextureDataMap(), programs.getPack().getCustomNoiseTexture());
 
 		whitePixel = new NativeImageBackedSingleColorTexture(255, 255, 255, 255);
+		defaultNormal = new NativeImageBackedSingleColorTexture(127, 127, 255, 255);
+		defaultSpecular = new NativeImageBackedSingleColorTexture(0, 0, 0, 0);
+		currentNormalTexture = defaultNormal.getGlId();
+		currentSpecularTexture = defaultSpecular.getGlId();
 
 		GlStateManager.activeTexture(GL20C.GL_TEXTURE0);
 
@@ -852,6 +858,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		// Destroy custom textures and the static samplers (normals, specular, and noise)
 		customTextureManager.destroy();
 		whitePixel.clearGlId();
+		defaultNormal.clearGlId();
+		defaultSpecular.clearGlId();
 	}
 
 	private static void destroyPasses(ProgramTable<Pass> table) {
@@ -1119,7 +1127,9 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 
 		if (current != null) {
-			throw new IllegalStateException("Called beginLevelRendering but level rendering appears to still be in progress?");
+			// the previous frame threw before finalizeLevelRendering, drop the stale pass
+			Iris.logger.warn("Called beginLevelRendering but level rendering appears to still be in progress?");
+			beginPass(null);
 		}
 
 		updateNotifier.onNewFrame();
