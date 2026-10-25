@@ -131,6 +131,8 @@ public final class CommonUniforms {
 			.uniform1f(PER_FRAME, "darknessLightFactor", () -> 0.0F)
 			// the reference of optifine's default alpha test
 			.uniform1f(ONCE, "alphaTestRef", () -> 0.1F)
+			// 1.8.9 fog is spherical, modern packs read the shape
+			.uniform1i(ONCE, "fogShape", () -> 0)
 			// TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
 			//       that the player is trying to turn on fullbright?
 			.uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)

@@ -22,6 +22,8 @@ public class ProgramSet {
 	private final ComputeSource[][] shadowCompCompute;
 	private final ProgramSource[] prepare;
 	private final ComputeSource[][] prepareCompute;
+	private final ComputeSource[][] setupCompute;
+	private final ComputeSource[][] beginCompute;
 
 	private final ProgramSource gbuffersBasic;
 	private final ProgramSource gbuffersLine;
@@ -81,6 +83,9 @@ public class ProgramSet {
 		for (int i = 0; i < shadowcomp.length; i++) {
 			this.shadowCompCompute[i] = readComputeArray(directory, sourceProvider, "shadowcomp" + ((i == 0) ? "" : i));
 		}
+
+		this.setupCompute = readComputeArrays(directory, sourceProvider, "setup");
+		this.beginCompute = readComputeArrays(directory, sourceProvider, "begin");
 
 		this.prepare = readProgramArray(directory, sourceProvider, "prepare", shaderProperties);
 		this.prepareCompute = new ComputeSource[prepare.length][];
@@ -162,6 +167,17 @@ public class ProgramSet {
 		return programs;
 	}
 
+	// setup and begin passes are compute only, setup runs once and begin before every frame
+	private ComputeSource[][] readComputeArrays(AbsolutePackPath directory, Function<AbsolutePackPath, String> sourceProvider, String name) {
+		ComputeSource[][] programs = new ComputeSource[99][];
+
+		for (int i = 0; i < programs.length; i++) {
+			programs[i] = readComputeArray(directory, sourceProvider, name + (i == 0 ? "" : i));
+		}
+
+		return programs;
+	}
+
 	private ComputeSource[] readComputeArray(AbsolutePackPath directory,
 											 Function<AbsolutePackPath, String> sourceProvider, String name) {
 		ComputeSource[] programs = new ComputeSource[27];
@@ -204,8 +220,10 @@ public class ProgramSet {
 			computes.addAll(Arrays.asList(computeSources));
 		}
 
-		for (ComputeSource[] computeSources : prepareCompute) {
-			computes.addAll(Arrays.asList(computeSources));
+		for (ComputeSource[][] stage : new ComputeSource[][][] { prepareCompute, setupCompute, beginCompute }) {
+			for (ComputeSource[] computeSources : stage) {
+				computes.addAll(Arrays.asList(computeSources));
+			}
 		}
 
 		for (ComputeSource[] computeSources : shadowCompCompute) {
@@ -393,6 +411,14 @@ public class ProgramSet {
 
 	public ComputeSource[][] getPrepareCompute() {
 		return prepareCompute;
+	}
+
+	public ComputeSource[][] getSetupCompute() {
+		return setupCompute;
+	}
+
+	public ComputeSource[][] getBeginCompute() {
+		return beginCompute;
 	}
 
 	public ComputeSource[][] getDeferredCompute() {

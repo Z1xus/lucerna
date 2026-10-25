@@ -1,8 +1,10 @@
 package net.coderbot.iris.pipeline;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.block_rendering.BlockMaterialMapping;
 import net.coderbot.iris.block_rendering.BlockRenderingSettings;
@@ -101,6 +103,9 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 	private ImmutableList<ClearPass> shadowClearPasses;
 	private ImmutableList<ClearPass> shadowClearPassesFull;
 
+	private final CompositeRenderer setupRenderer;
+	private final CompositeRenderer beginRenderer;
+	private boolean setupDone;
 	private final CompositeRenderer prepareRenderer;
 
 	@Nullable
@@ -239,6 +244,13 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		};
 
 		PatchedShaderPrinter.resetPrintState();
+
+		this.setupRenderer = new CompositeRenderer(programs.getPackDirectives(), new ProgramSource[99], programs.getSetupCompute(), renderTargets,
+				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
+				Object2ObjectMaps.emptyMap(), Map.of(), ImmutableMap.of(), customUniforms);
+		this.beginRenderer = new CompositeRenderer(programs.getPackDirectives(), new ProgramSource[99], programs.getBeginCompute(), renderTargets,
+				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
+				Object2ObjectMaps.emptyMap(), Map.of(), ImmutableMap.of(), customUniforms);
 
 		this.prepareRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getPrepare(), programs.getPrepareCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
@@ -870,6 +882,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		// Destroy the composite rendering pipeline
 		//
 		// This destroys all the loaded composite programs as well.
+		setupRenderer.destroy();
+		beginRenderer.destroy();
 		compositeRenderer.destroy();
 		deferredRenderer.destroy();
 		finalPassRenderer.destroy();
@@ -974,6 +988,13 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 		boolean changed = renderTargets.resizeIfNeeded(0, mainDepth.getTextureId(), width, height, DepthBufferFormat.DEPTH24, packDirectives);
 		renderTargets.prepareCustomResources();
+
+		if (!setupDone) {
+			setupDone = true;
+			setupRenderer.renderAll();
+		}
+
+		beginRenderer.renderAll();
 
 		if (changed) {
 			prepareRenderer.recalculateSizes();

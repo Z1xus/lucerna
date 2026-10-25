@@ -35,6 +35,7 @@ import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntSupplier;
@@ -87,7 +88,7 @@ public class CompositeRenderer {
 			ImmutableSet<Integer> flippedAtLeastOnceSnapshot = flippedAtLeastOnce.build();
 
 			if (source == null || !source.isValid()) {
-				if (computes[i] != null) {
+				if (computes[i] != null && Arrays.stream(computes[i]).anyMatch(Objects::nonNull)) {
 					ComputeOnlyPass pass = new ComputeOnlyPass();
 					pass.computes = createComputes(computes[i], flipped, flippedAtLeastOnceSnapshot, shadowTargetsSupplier);
 					passes.add(pass);
