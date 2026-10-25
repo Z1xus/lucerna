@@ -245,26 +245,6 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
 			plane = extend(edgePlaneNormal, w);
 		}
 
-		// Check and make sure our point is actually on all 3 planes.
-		// This can be removed in production but it's good to check for now while we're still testing.
-		/*{
-			float dp0 = plane.dotProduct(extend(point, 1.0F));
-			float dp1 = frontPlane4.dotProduct(extend(point, 1.0F));
-			float dp2 = backPlane4.dotProduct(extend(point, 1.0F));
-
-			if (Math.abs(dp0) > 0.0005) {
-				throw new IllegalStateException("dp0 should be zero, but was " + dp0);
-			}
-
-			if (Math.abs(dp1) > 0.0005) {
-				throw new IllegalStateException("dp1 should be zero, but was " + dp1);
-			}
-
-			if (Math.abs(dp2) > 0.0005) {
-				throw new IllegalStateException("dp2 should be zero, but was " + dp2);
-			}
-		}*/
-
 		addPlane(plane);
 	}
 

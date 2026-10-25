@@ -228,13 +228,6 @@ public class IncludeGraph {
 	}
 
 	public List<IncludeGraph> computeWeaklyConnectedComponents() {
-		//List<IncludeGraph> components = new ArrayList<>();
-
-		// TODO: WCC
-		//throw new UnsupportedOperationException();
-
-		//return components;
-
 		// TODO: This digraph might not be weakly connected
 		//       A digraph is weakly connected if its corresponding undirected
 		//       graph is connected

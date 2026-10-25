@@ -459,25 +459,6 @@ public class IrisRenderSystem {
 		}
 	}
 
-	/*
-	public static void bindTextures(int startingTexture, int[] bindings) {
-		if (hasMultibind) {
-			ARBMultiBind.glBindTextures(startingTexture, bindings);
-		} else if (dsaState != DSAState.NONE) {
-			for (int binding : bindings) {
-				ARBDirectStateAccess.glBindTextureUnit(startingTexture, binding);
-				startingTexture++;
-			}
-		} else {
-			for (int binding : bindings) {
-				GlStateManager.activeTexture(startingTexture);
-				GlStateManager.bindTexture(binding);
-				startingTexture++;
-			}
-		}
-	}
-	 */
-
 	// TODO: Proper notification of compute support
 	public static int getActiveTextureName() {
 		return GlStateManager.TEXTURES[GlStateManager.texture].texture;
