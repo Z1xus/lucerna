@@ -15,6 +15,7 @@ import net.coderbot.iris.gbuffer_overrides.matching.ProgramTable;
 import net.coderbot.iris.gbuffer_overrides.matching.RenderCondition;
 import net.coderbot.iris.gbuffer_overrides.matching.SpecialCondition;
 import net.coderbot.iris.gbuffer_overrides.state.RenderTargetStateListener;
+import net.coderbot.iris.gbuffer_overrides.state.StateTracker;
 import net.coderbot.iris.gl.blending.AlphaTestOverride;
 import net.coderbot.iris.gl.blending.BlendModeOverride;
 import net.coderbot.iris.gl.blending.BufferBlendOverride;
@@ -53,6 +54,7 @@ import net.coderbot.iris.shadows.ShadowRenderTargets;
 import net.coderbot.iris.texture.TextureInfoCache;
 import net.coderbot.iris.uniforms.CapturedRenderingState;
 import net.coderbot.iris.uniforms.CommonUniforms;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
 import org.joml.Vector3d;
 import org.joml.Vector4f;
@@ -150,6 +152,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 	private int currentNormalTexture;
 	private int currentSpecularTexture;
 	private PackDirectives packDirectives;
+	private final CustomUniforms customUniforms;
 
 	public DeferredWorldRenderingPipeline(ProgramSet programs) {
 		Objects.requireNonNull(programs);
@@ -167,6 +170,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		this.updateNotifier = new FrameUpdateNotifier();
 
 		this.packDirectives = programs.getPackDirectives();
+		this.customUniforms = programs.getPack().getCustomUniforms().build(programs.getPack().getIdMap(), programs.getPackDirectives(), updateNotifier);
 
 		RenderTarget mainTarget = Minecraft.getInstance().getRenderTarget();
 
@@ -236,25 +240,25 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		this.prepareRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getPrepare(), programs.getPrepareCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
 				customTextureManager.getCustomTextureIdMap(TextureStage.PREPARE),
-				programs.getPackDirectives().getExplicitFlips("prepare_pre"));
+				programs.getPackDirectives().getExplicitFlips("prepare_pre"), customUniforms);
 
 		flippedAfterPrepare = flipper.snapshot();
 
 		this.deferredRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getDeferred(), programs.getDeferredCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
 				customTextureManager.getCustomTextureIdMap(TextureStage.DEFERRED),
-				programs.getPackDirectives().getExplicitFlips("deferred_pre"));
+				programs.getPackDirectives().getExplicitFlips("deferred_pre"), customUniforms);
 
 		flippedAfterTranslucent = flipper.snapshot();
 
 		this.compositeRenderer = new CompositeRenderer(programs.getPackDirectives(), programs.getComposite(), programs.getCompositeCompute(), renderTargets,
 				customTextureManager.getNoiseTexture(), updateNotifier, centerDepthSampler, flipper, shadowTargetsSupplier,
 				customTextureManager.getCustomTextureIdMap(TextureStage.COMPOSITE_AND_FINAL),
-				programs.getPackDirectives().getExplicitFlips("composite_pre"));
+				programs.getPackDirectives().getExplicitFlips("composite_pre"), customUniforms);
 		this.finalPassRenderer = new FinalPassRenderer(programs, renderTargets, customTextureManager.getNoiseTexture(), updateNotifier, flipper.snapshot(),
 				centerDepthSampler, shadowTargetsSupplier,
 				customTextureManager.getCustomTextureIdMap(TextureStage.COMPOSITE_AND_FINAL),
-				this.compositeRenderer.getFlippedAtLeastOnceFinal());
+				this.compositeRenderer.getFlippedAtLeastOnceFinal(), customUniforms);
 
 		// [(textured=false,lightmap=false), (textured=true,lightmap=false), (textured=true,lightmap=true)]
 		ProgramId[] ids = new ProgramId[] {
@@ -428,7 +432,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		this.sodiumTerrainPipeline = new SodiumTerrainPipeline(this, programs, createTerrainSamplers,
 			shadowRenderer == null ? null : createShadowTerrainSamplers, createTerrainImages,
 			shadowRenderer == null ? null : createShadowTerrainImages, renderTargets, flippedAfterPrepare, flippedAfterTranslucent,
-			() -> shadowRenderTargets.createShadowFramebuffer(shadowRenderTargets.snapshot(), new int[] {0, 1}));
+			() -> shadowRenderTargets.createShadowFramebuffer(shadowRenderTargets.snapshot(), new int[] {0, 1}), customUniforms);
 	}
 
 	private record PassKey(ProgramId id, InputAvailability availability) {
@@ -630,6 +634,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 								 PackDirectives packDirectives, InputAvailability availability, boolean shadow, ProgramId id) {
 
 		CommonUniforms.addCommonUniforms(builder, map, packDirectives, updateNotifier);
+		customUniforms.assignTo(builder);
 
 		Supplier<ImmutableSet<Integer>> flipped;
 
@@ -777,6 +782,12 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 			if (program != null && !sodiumTerrainRendering) {
 				program.use();
+
+				// vanilla geometry has no extended attributes, so give the pack the values OptiFine uses for it
+				IrisRenderSystem.vertexAttrib4f(11, -1.0F, -1.0F, 0.0F, 1.0F);
+				IrisRenderSystem.vertexAttrib4f(12, 0.0F, 0.0F, 0.0F, 1.0F);
+				IrisRenderSystem.vertexAttrib4f(13, 1.0F, 0.0F, 0.0F, 1.0F);
+				IrisRenderSystem.vertexAttrib4f(14, 0.0F, 0.0F, 0.0F, 0.0F);
 			}
 
 			if (alphaTestOverride != null) {
@@ -993,6 +1004,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 				}
 
 				CommonUniforms.addCommonUniforms(builder, programSet.getPack().getIdMap(), programSet.getPackDirectives(), updateNotifier);
+				customUniforms.assignTo(builder);
 
 				Supplier<ImmutableSet<Integer>> flipped;
 
@@ -1139,6 +1151,9 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 
 		updateNotifier.onNewFrame();
+		customUniforms.update();
+		StateTracker.INSTANCE.syncWithGlState();
+		inputs = StateTracker.INSTANCE.getInputs();
 		IrisRenderSystem.invalidateFramebufferBindings();
 
 		// Get ready for world rendering

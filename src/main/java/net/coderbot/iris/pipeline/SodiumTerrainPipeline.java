@@ -18,6 +18,7 @@ import net.coderbot.iris.shaderpack.ProgramSet;
 import net.coderbot.iris.shaderpack.ProgramSource;
 import net.coderbot.iris.shaderpack.loading.ProgramId;
 import net.coderbot.iris.uniforms.CommonUniforms;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.coderbot.iris.uniforms.builtin.BuiltinReplacementUniforms;
 
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class SodiumTerrainPipeline {
 	}
 
 	private final WorldRenderingPipeline parent;
+	private final CustomUniforms customUniforms;
 	private final ProgramSet programSet;
 	private final Map<IrisTerrainPass, PassInfo> passInfoMap = new EnumMap<>(IrisTerrainPass.class);
 	private final Map<IrisTerrainPass, Optional<ProgramSource>> programSources = new EnumMap<>(IrisTerrainPass.class);
@@ -82,8 +84,10 @@ public class SodiumTerrainPipeline {
 								 IntFunction<ProgramImages> createTerrainImages,
 								 IntFunction<ProgramImages> createShadowImages,
 								 RenderTargets targets, ImmutableSet<Integer> flippedAfterPrepare,
-								 ImmutableSet<Integer> flippedAfterTranslucent, Supplier<GlFramebuffer> shadowFramebuffer) {
+								 ImmutableSet<Integer> flippedAfterTranslucent, Supplier<GlFramebuffer> shadowFramebuffer,
+								 CustomUniforms customUniforms) {
 		this.parent = Objects.requireNonNull(parent);
+		this.customUniforms = customUniforms;
 		this.programSet = programSet;
 
 		Optional<ProgramSource> terrainSource = first(programSet.getGbuffersTerrain(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
@@ -157,6 +161,7 @@ public class SodiumTerrainPipeline {
 		ProgramUniforms.Builder uniforms = ProgramUniforms.builder("<celeritas terrain>", programId);
 
 		CommonUniforms.addCommonUniforms(uniforms, programSet.getPack().getIdMap(), programSet.getPackDirectives(), parent.getFrameUpdateNotifier());
+		customUniforms.assignTo(uniforms);
 		BuiltinReplacementUniforms.addBuiltinReplacementUniforms(uniforms);
 
 		return uniforms.buildUniforms();

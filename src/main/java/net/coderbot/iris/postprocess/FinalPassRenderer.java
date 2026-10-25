@@ -29,6 +29,7 @@ import net.coderbot.iris.shaderpack.ProgramSet;
 import net.coderbot.iris.shaderpack.ProgramSource;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
 import net.coderbot.iris.uniforms.CommonUniforms;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
 import org.joml.Vector3i;
 import net.minecraft.client.Minecraft;
@@ -56,6 +57,7 @@ public class FinalPassRenderer {
 	private int lastColorTextureVersion;
 	private final IntSupplier noiseTexture;
 	private final FrameUpdateNotifier updateNotifier;
+	private final CustomUniforms customUniforms;
 	private final CenterDepthSampler centerDepthSampler;
 	private final Object2ObjectMap<String, IntSupplier> customTextureIds;
 
@@ -65,8 +67,9 @@ public class FinalPassRenderer {
 							 CenterDepthSampler centerDepthSampler,
 							 Supplier<ShadowRenderTargets> shadowTargetsSupplier,
 							 Object2ObjectMap<String, IntSupplier> customTextureIds,
-							 ImmutableSet<Integer> flippedAtLeastOnce) {
+							 ImmutableSet<Integer> flippedAtLeastOnce, CustomUniforms customUniforms) {
 		this.updateNotifier = updateNotifier;
+		this.customUniforms = customUniforms;
 		this.centerDepthSampler = centerDepthSampler;
 		this.customTextureIds = customTextureIds;
 
@@ -336,6 +339,7 @@ public class FinalPassRenderer {
 		ProgramSamplers.CustomTextureSamplerInterceptor customTextureSamplerInterceptor = ProgramSamplers.customTextureSamplerInterceptor(builder, customTextureIds, flippedAtLeastOnceSnapshot);
 
 		CommonUniforms.addCommonUniforms(builder, source.getParent().getPack().getIdMap(), source.getParent().getPackDirectives(), updateNotifier);
+		customUniforms.assignTo(builder);
 		IrisSamplers.addRenderTargetSamplers(customTextureSamplerInterceptor, () -> flipped, renderTargets, true);
 		IrisImages.addRenderTargetImages(builder, () -> flipped, renderTargets);
 		IrisSamplers.addNoiseSampler(customTextureSamplerInterceptor, noiseTexture);
@@ -373,6 +377,7 @@ public class FinalPassRenderer {
 				ProgramSamplers.CustomTextureSamplerInterceptor customTextureSamplerInterceptor = ProgramSamplers.customTextureSamplerInterceptor(builder, customTextureIds, flippedAtLeastOnceSnapshot);
 
 				CommonUniforms.addCommonUniforms(builder, source.getParent().getPack().getIdMap(), source.getParent().getPackDirectives(), updateNotifier);
+				customUniforms.assignTo(builder);
 				IrisSamplers.addRenderTargetSamplers(customTextureSamplerInterceptor, () -> flipped, renderTargets, true);
 				IrisImages.addRenderTargetImages(builder, () -> flipped, renderTargets);
 

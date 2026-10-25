@@ -83,6 +83,10 @@ public class GlFramebuffer extends GlResource {
 		return hasDepthAttachment;
 	}
 
+	public int getColorAttachmentFramebuffer() {
+		return getGlId();
+	}
+
 	public void bind() {
 		IrisRenderSystem.bindFramebuffer(GL30C.GL_FRAMEBUFFER, getGlId());
 	}
