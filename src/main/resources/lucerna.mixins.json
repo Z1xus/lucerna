@@ -37,6 +37,7 @@
     "argentum.MixinJsonOptionStorage",
     "argentum.MixinModelInstancer",
     "celeritas.MixinShaderChunkRenderer",
+    "celeritas.MixinSimpleWorldRenderer",
     "entity_render_context.MixinBlockEntityRenderDispatcher",
     "entity_render_context.MixinEntityRenderDispatcher",
     "gui.MixinCeleritasVideoOptionsController",

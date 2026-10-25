@@ -77,7 +77,6 @@ public class ShadowRenderer {
 	private String debugStringTerrain = "(unavailable)";
 	private int renderedShadowEntities = 0;
 	private int renderedShadowBlockEntities = 0;
-	private int frame = 0;
 	private final Profiler profiler;
 
 	public ShadowRenderer(ProgramSource shadow, PackDirectives directives,
@@ -316,7 +315,7 @@ public class ShadowRenderer {
 
 		try {
 			renderer.setupShadowTerrain(playerViewport, shadowViewport, ArgentumWorldRenderer.captureCameraState(tickDelta),
-				frame++, client.player.isSpectator());
+				0, client.player.isSpectator());
 		} finally {
 			RenderDevice.exitManagedCode();
 		}
