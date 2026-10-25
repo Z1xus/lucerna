@@ -5,7 +5,6 @@ import org.embeddedt.embeddium.impl.gui.framework.TextComponent;
 import org.taumc.celeritas.api.options.OptionIdentifier;
 import org.taumc.celeritas.api.options.control.ControlValueFormatter;
 import org.taumc.celeritas.api.options.control.SliderControl;
-import org.taumc.celeritas.api.options.control.TickBoxControl;
 import org.taumc.celeritas.api.options.structure.OptionGroup;
 import org.taumc.celeritas.api.options.structure.OptionImpact;
 import org.taumc.celeritas.api.options.structure.OptionImpl;
@@ -63,14 +62,6 @@ public final class IrisOptionPage {
                 .setControl(option -> new SliderControl(option, 25, 200, 5, ControlValueFormatter.percentage()))
                 .setBinding((data, value) -> IrisVideoSettings.shadowQuality = value / 100.0F, data -> Math.round(IrisVideoSettings.shadowQuality * 100.0F))
                 .setImpact(OptionImpact.HIGH)
-                .build())
-            .add(OptionImpl.createBuilder(boolean.class, STORAGE)
-                .setId(OptionIdentifier.create(Iris.MODID, "shadow_caching", boolean.class))
-                .setName(TextComponent.translatable("options.iris.shadowCaching"))
-                .setTooltip(TextComponent.translatable("options.iris.shadowCaching.tooltip"))
-                .setControl(TickBoxControl::new)
-                .setBinding((data, value) -> IrisVideoSettings.shadowCaching = value, data -> IrisVideoSettings.shadowCaching)
-                .setImpact(OptionImpact.MEDIUM)
                 .build())
             .build();
 

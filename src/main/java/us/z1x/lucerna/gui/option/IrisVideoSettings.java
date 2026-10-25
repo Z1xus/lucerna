@@ -6,7 +6,6 @@ public class IrisVideoSettings {
     public static int shadowDistance = 32;
     public static float renderQuality = 1.0F;
     public static float shadowQuality = 1.0F;
-    public static boolean shadowCaching = true;
 
     public static int scaleRenderSize(int size) {
         return Math.max(1, Math.round(size * renderQuality));

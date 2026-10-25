@@ -7,7 +7,6 @@ import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
 import us.z1x.lucerna.Iris;
 import us.z1x.lucerna.gl.IrisRenderSystem;
 import us.z1x.lucerna.gui.option.IrisVideoSettings;
-import us.z1x.lucerna.shadows.ShadowTerrainCache;
 import us.z1x.lucerna.mixin.argentum.ArgentumWorldRendererAccessor;
 import us.z1x.lucerna.shaderpack.OptionalBoolean;
 import us.z1x.lucerna.shaderpack.PackDirectives;
@@ -46,11 +45,9 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.ARBTextureSwizzle;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
-import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -61,14 +58,6 @@ public class ShadowRenderer {
     // ModelQuadFacing bits drawn by the current shadow terrain pass, all of them for sorted passes
     public static int faceMask = 0x7F;
     private static int lightFaceMask = 0x7F;
-    // set when opaque terrain meshes change, so the cached shadow terrain is drawn again
-    public static boolean terrainChanged = true;
-    // true while the cached shadow terrain is reused, so last frame's shadow search still holds
-    public static boolean reusingTerrain;
-    // the shadow view drifts with the sun, refresh once it turned about half a shadow texel at the far edge
-    private static final float MAX_ROTATION_DRIFT = 5.0E-4F;
-    // waving foliage animates in the shadow pass, so the cache is refreshed at least this often
-    private static final long MAX_CACHE_AGE = 50_000_000L;
     private final float halfPlaneLength;
     private final float renderDistanceMultiplier;
     private final float entityShadowDistanceMultiplier;
@@ -93,14 +82,6 @@ public class ShadowRenderer {
     private int renderedShadowEntities = 0;
     private int renderedShadowBlockEntities = 0;
     private final Profiler profiler;
-    @Nullable
-    private final ShadowTerrainCache terrainCache;
-    private final Matrix4f cachedView = new Matrix4f();
-    private final Matrix4f inverseView = new Matrix4f();
-    private final Vector3f viewOrigin = new Vector3f();
-    private final Vector3d cachedOrigin = new Vector3d();
-    private long cachedAt;
-    private boolean cacheValid;
 
     public ShadowRenderer(ProgramSource shadow, PackDirectives directives,
                           ShadowRenderTargets shadowRenderTargets) {
@@ -138,8 +119,6 @@ public class ShadowRenderer {
         }
 
         this.sunPathRotation = directives.getSunPathRotation();
-        this.terrainCache = GL.getCapabilities().glCopyImageSubData != MemoryUtil.NULL
-            ? new ShadowTerrainCache(shadowRenderTargets, shadow != null ? shadow.getDirectives().getDrawBuffers() : new int[0]) : null;
 
         configureSamplingSettings(shadowDirectives);
     }
@@ -307,43 +286,6 @@ public class ShadowRenderer {
         return mask;
     }
 
-    // the shadow view is snapped to a grid cell, so the opaque terrain in the shadow map stays the same while the cell,
-    // the light direction and the terrain stay the same, even though the camera relative view moves inside the cell
-    private boolean reuseTerrain(Matrix4f modelView, Vector3d camera) {
-        modelView.invert(inverseView).getTranslation(viewOrigin);
-        double x = camera.x + viewOrigin.x;
-        double y = camera.y + viewOrigin.y;
-        double z = camera.z + viewOrigin.z;
-        long now = System.nanoTime();
-
-        boolean reuse = cacheValid && !terrainChanged && now - cachedAt < MAX_CACHE_AGE
-            && cachedOrigin.distanceSquared(x, y, z) < 1.0E-4 && sameRotation(cachedView, modelView);
-
-        if (!reuse) {
-            cachedView.set(modelView);
-            cachedOrigin.set(x, y, z);
-            cachedAt = now;
-            terrainChanged = false;
-            cacheValid = terrainCache != null && IrisVideoSettings.shadowCaching;
-        }
-
-        return reuse;
-    }
-
-    private static boolean sameRotation(Matrix4f a, Matrix4f b) {
-        return Math.abs(a.m00() - b.m00()) < MAX_ROTATION_DRIFT && Math.abs(a.m01() - b.m01()) < MAX_ROTATION_DRIFT
-            && Math.abs(a.m02() - b.m02()) < MAX_ROTATION_DRIFT && Math.abs(a.m10() - b.m10()) < MAX_ROTATION_DRIFT
-            && Math.abs(a.m11() - b.m11()) < MAX_ROTATION_DRIFT && Math.abs(a.m12() - b.m12()) < MAX_ROTATION_DRIFT
-            && Math.abs(a.m20() - b.m20()) < MAX_ROTATION_DRIFT && Math.abs(a.m21() - b.m21()) < MAX_ROTATION_DRIFT
-            && Math.abs(a.m22() - b.m22()) < MAX_ROTATION_DRIFT;
-    }
-
-    public void destroy() {
-        if (terrainCache != null) {
-            terrainCache.destroy();
-        }
-    }
-
     public static void beginTerrainPass(boolean sorted) {
         faceMask = sorted ? 0x7F : lightFaceMask;
     }
@@ -364,8 +306,6 @@ public class ShadowRenderer {
 
         Matrix4f modelView = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
         lightFaceMask = facesTowardLight(-modelView.m20(), -modelView.m21(), -modelView.m22());
-        boolean reuseTerrain = reuseTerrain(modelView, CameraUniforms.getUnshiftedCameraPosition());
-        reusingTerrain = reuseTerrain;
 
         profiler.push("terrain_setup");
 
@@ -411,16 +351,10 @@ public class ShadowRenderer {
         // no backface culling so mountains with a hidden front face still cast shadows, this only partly stops cave light leaks
         GlStateManager.disableCull();
 
-        if (shouldRenderTerrain && reuseTerrain) {
-            terrainCache.restore();
-        } else if (shouldRenderTerrain) {
+        if (shouldRenderTerrain) {
             worldRenderer.render(BlockLayer.SOLID, tickDelta, 0, camera);
             worldRenderer.render(BlockLayer.CUTOUT_MIPPED, tickDelta, 0, camera);
             worldRenderer.render(BlockLayer.CUTOUT, tickDelta, 0, camera);
-
-            if (cacheValid) {
-                terrainCache.store();
-            }
         }
 
         // reset the viewport in case argentum changed it

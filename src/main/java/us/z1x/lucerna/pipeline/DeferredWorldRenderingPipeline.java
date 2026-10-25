@@ -891,10 +891,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             shadowRenderTargets.destroy();
         }
 
-        if (shadowRenderer != null) {
-            shadowRenderer.destroy();
-        }
-
         customTextureManager.destroy();
         whitePixel.clearGlId();
         defaultNormal.clearGlId();

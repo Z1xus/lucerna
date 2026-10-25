@@ -46,5 +46,3 @@ options.iris.renderQuality=Render Quality
 options.iris.renderQuality.tooltip=Resolution the shader pack renders at, relative to the window. Lower is faster.
 options.iris.shadowQuality=Shadow Quality
 options.iris.shadowQuality.tooltip=Resolution of the shadow map, relative to the shader pack setting. Lower is faster.
-options.iris.shadowCaching=Shadow Caching
-options.iris.shadowCaching.tooltip=Reuses terrain shadows while the sun and camera barely move. Faster, but waving plants cast shadows that update less often.
