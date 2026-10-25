@@ -7,7 +7,6 @@ import dev.rdh.argentum.impl.config.ArgentumConfig;
 public final class ArgentumCompat {
 	private static boolean applied;
 	private static boolean entityInstancing;
-	private static boolean nameTagBatching;
 	private static boolean fasterClouds;
 	private static boolean fasterWeather;
 	private static boolean fasterEndPortals;
@@ -45,12 +44,10 @@ public final class ArgentumCompat {
 
 	private static void disable(ArgentumConfig config) {
 		entityInstancing = config.entityInstancing;
-		nameTagBatching = config.nameTagBatching;
 		fasterClouds = config.fasterClouds;
 		fasterWeather = config.fasterWeather;
 		fasterEndPortals = config.fasterEndPortals;
 		config.entityInstancing = false;
-		config.nameTagBatching = false;
 		config.fasterClouds = false;
 		config.fasterWeather = false;
 		config.fasterEndPortals = false;
@@ -58,7 +55,6 @@ public final class ArgentumCompat {
 
 	private static void restore(ArgentumConfig config) {
 		config.entityInstancing = entityInstancing;
-		config.nameTagBatching = nameTagBatching;
 		config.fasterClouds = fasterClouds;
 		config.fasterWeather = fasterWeather;
 		config.fasterEndPortals = fasterEndPortals;
