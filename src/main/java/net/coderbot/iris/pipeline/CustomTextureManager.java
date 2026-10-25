@@ -159,7 +159,7 @@ public class CustomTextureManager {
 	}
 
 	// 2d binds go through GlStateManager so its cached binding stays correct
-	private static void bind(int target, int texture) {
+	public static void bind(int target, int texture) {
 		if (target == GL11C.GL_TEXTURE_2D) {
 			GlStateManager.bindTexture(texture);
 		} else {

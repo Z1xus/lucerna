@@ -1,6 +1,7 @@
 package net.coderbot.iris.samplers;
 
 import com.google.common.collect.ImmutableSet;
+import net.coderbot.iris.gl.image.CustomImage;
 import net.coderbot.iris.gl.image.ImageHolder;
 import net.coderbot.iris.gl.texture.InternalTextureFormat;
 import net.coderbot.iris.rendertarget.RenderTarget;
@@ -32,6 +33,10 @@ public class IrisImages {
 			final String name = "colorimg" + i;
 
 			images.addTextureImage(textureID, internalFormat, name);
+		}
+
+		for (CustomImage image : renderTargets.getCustomImages()) {
+			images.addTextureImage(image::getTexture, image.getInfo().internalFormat(), image.getInfo().name());
 		}
 	}
 

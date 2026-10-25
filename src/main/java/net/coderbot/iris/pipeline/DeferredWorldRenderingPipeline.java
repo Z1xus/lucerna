@@ -973,6 +973,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 
 		boolean changed = renderTargets.resizeIfNeeded(0, mainDepth.getTextureId(), width, height, DepthBufferFormat.DEPTH24, packDirectives);
+		renderTargets.prepareCustomResources();
 
 		if (changed) {
 			prepareRenderer.recalculateSizes();
@@ -1027,7 +1028,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 				ProgramBuilder builder;
 
 				try {
-					builder = ProgramBuilder.beginCompute(source.getName(), source.getSource().orElse(null), IrisSamplers.WORLD_RESERVED_TEXTURE_UNITS);
+					builder = ProgramBuilder.beginCompute(source.getName(), TransformPatcher.patchCompute(source.getSource().get(), programSet.getPack().getCustomTexturePatching(TextureStage.SHADOWCOMP)), IrisSamplers.WORLD_RESERVED_TEXTURE_UNITS);
 				} catch (RuntimeException e) {
 					// TODO: Better error handling
 					throw new RuntimeException("Shader compilation failed!", e);

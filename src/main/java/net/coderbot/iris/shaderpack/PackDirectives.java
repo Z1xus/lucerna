@@ -1,6 +1,8 @@
 package net.coderbot.iris.shaderpack;
 
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -9,6 +11,7 @@ import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.texture.TextureScaleOverride;
 import org.joml.Vector2i;
 
+import java.util.List;
 import java.util.Set;
 
 public class PackDirectives {
@@ -33,6 +36,8 @@ public class PackDirectives {
 	private boolean prepareBeforeShadow;
 	private Object2ObjectMap<String, Object2BooleanMap<String>> explicitFlips = new Object2ObjectOpenHashMap<>();
 	private Object2ObjectMap<String, TextureScaleOverride> scaleOverrides = new Object2ObjectOpenHashMap<>();
+	private List<ImageInformation> images = List.of();
+	private Int2ObjectMap<ShaderStorageInfo> bufferObjects = Int2ObjectMaps.emptyMap();
 
 	private final PackRenderTargetDirectives renderTargetDirectives;
 	private final PackShadowDirectives shadowDirectives;
@@ -63,6 +68,8 @@ public class PackDirectives {
 		oldHandLight = properties.getOldHandLight().orElse(true);
 		explicitFlips = properties.getExplicitFlips();
 		scaleOverrides = properties.getTextureScaleOverrides();
+		images = properties.getImages();
+		bufferObjects = properties.getBufferObjects();
 		particlesBeforeDeferred = properties.getParticlesBeforeDeferred().orElse(false);
 		prepareBeforeShadow = properties.getPrepareBeforeShadow().orElse(false);
 	}
@@ -75,8 +82,18 @@ public class PackDirectives {
 		concurrentCompute = directives.concurrentCompute;
 		explicitFlips = directives.explicitFlips;
 		scaleOverrides = directives.scaleOverrides;
+		images = directives.images;
+		bufferObjects = directives.bufferObjects;
 		particlesBeforeDeferred = directives.particlesBeforeDeferred;
 		prepareBeforeShadow = directives.prepareBeforeShadow;
+	}
+
+	public List<ImageInformation> getImages() {
+		return images;
+	}
+
+	public Int2ObjectMap<ShaderStorageInfo> getBufferObjects() {
+		return bufferObjects;
 	}
 
 	public int getNoiseTextureResolution() {

@@ -61,6 +61,9 @@ public class CompatibilityTransformer {
 		{ "projectionMatrix", "gl_ProjectionMatrix" }, { "projectionMatrixInverse", "gl_ProjectionMatrixInverse" }, { "normalMatrix", "gl_NormalMatrix" },
 		{ "textureMatrix", "gl_TextureMatrix[0]" }, { "chunkOffset", "vec3(0.0)" } };
 
+	private static final String[][] IMPLICIT_UNIFORMS = { { "int", "entityId" }, { "int", "blockEntityId" }, { "int", "currentRenderedItemId" },
+		{ "ivec2", "eyeBrightnessSmooth" }, { "float", "alphaTestRef" } };
+
 	private static StorageQualifier getConstQualifier(TypeQualifier qualifier) {
 		if (qualifier == null) {
 			return null;
@@ -160,10 +163,12 @@ public class CompatibilityTransformer {
 		}
 
 		// iris provides these as uniforms even when a pack does not declare them or declares them as vertex attributes
-		for (String id : new String[] { "entityId", "blockEntityId", "currentRenderedItemId" }) {
+		for (String[] uniform : IMPLICIT_UNIFORMS) {
+			String id = uniform[1];
+
 			if (root.identifierIndex.has(id) && root.identifierIndex.getStream(id).noneMatch(identifier -> identifier.getParent() instanceof DeclarationMember)) {
-				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform int " + id + ";");
-			} else if (parameters.type == PatchShaderType.VERTEX) {
+				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform " + uniform[0] + " " + id + ";");
+			} else if (parameters.type == PatchShaderType.VERTEX && uniform[0].equals("int")) {
 				for (Identifier identifier : root.identifierIndex.get(id)) {
 					TypeAndInitDeclaration declaration = identifier.getAncestor(TypeAndInitDeclaration.class);
 

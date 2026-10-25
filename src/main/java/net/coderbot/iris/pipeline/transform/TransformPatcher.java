@@ -204,9 +204,14 @@ public class TransformPatcher {
 		if (result == null) {
 			transformer.setPrintType(PatchedShaderPrinter.PRETTY_PRINT_SHADERS ? PrintType.INDENTED : PrintType.SIMPLE);
 			EnumMap<PatchShaderType, String> inputs = new EnumMap<>(PatchShaderType.class);
-			inputs.put(PatchShaderType.VERTEX, vertex);
-			inputs.put(PatchShaderType.GEOMETRY, geometry);
-			inputs.put(PatchShaderType.FRAGMENT, fragment);
+			// a compute source travels in the vertex slot
+			if (parameters.patch == Patch.COMPUTE) {
+				inputs.put(PatchShaderType.COMPUTE, vertex);
+			} else {
+				inputs.put(PatchShaderType.VERTEX, vertex);
+				inputs.put(PatchShaderType.GEOMETRY, geometry);
+				inputs.put(PatchShaderType.FRAGMENT, fragment);
+			}
 			result = transformer.transform(inputs, parameters);
 			if (USE_CACHE) {
 				cache.put(key, result);
@@ -230,6 +235,10 @@ public class TransformPatcher {
 
 	public static Map<PatchShaderType, String> patchComposite(String vertex, String geometry, String fragment, Map<String, String> textureRenames) {
 		return transform(vertex, geometry, fragment, withRenames(new Parameters(Patch.COMPOSITE), textureRenames));
+	}
+
+	public static String patchCompute(String compute, Map<String, String> textureRenames) {
+		return transform(compute, null, null, withRenames(new Parameters(Patch.COMPUTE), textureRenames)).get(PatchShaderType.COMPUTE);
 	}
 
 	private static Parameters withRenames(Parameters parameters, Map<String, String> textureRenames) {

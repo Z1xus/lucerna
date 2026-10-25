@@ -1,16 +1,25 @@
 package net.coderbot.iris.rendertarget;
 
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
+import net.coderbot.iris.gl.image.CustomImage;
 import net.coderbot.iris.gl.texture.DepthBufferFormat;
 import net.coderbot.iris.gl.texture.DepthCopyStrategy;
 import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
+import net.coderbot.iris.shaderpack.ShaderStorageInfo;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.joml.Vector2i;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL30C;
+import org.lwjgl.opengl.GL43C;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,6 +49,11 @@ public class RenderTargets {
 
 	private int cachedDepthBufferVersion;
 
+	private final List<CustomImage> customImages = new ArrayList<>();
+	private final List<ShaderStorageInfo> bufferInfos = new ArrayList<>();
+	private final IntList bufferIndices = new IntArrayList();
+	private final IntList buffers = new IntArrayList();
+
 	public RenderTargets(int width, int height, int depthTexture, int depthBufferVersion, DepthBufferFormat depthFormat, Map<Integer, PackRenderTargetDirectives.RenderTargetSettings> renderTargets, PackDirectives packDirectives) {
 		targets = new RenderTarget[renderTargets.size()];
 
@@ -58,6 +72,14 @@ public class RenderTargets {
 		this.cachedWidth = width;
 		this.cachedHeight = height;
 		this.cachedDepthBufferVersion = depthBufferVersion;
+
+		packDirectives.getImages().forEach(info -> customImages.add(new CustomImage(info, width, height)));
+		packDirectives.getBufferObjects().forEach((index, info) -> {
+			bufferIndices.add((int) index);
+			bufferInfos.add(info);
+			buffers.add(GL15C.glGenBuffers());
+		});
+		allocateBuffers(false);
 
 		this.ownedFramebuffers = new ArrayList<>();
 
@@ -91,6 +113,39 @@ public class RenderTargets {
 
 		noTranslucents.destroy();
 		noHand.destroy();
+
+		customImages.forEach(CustomImage::destroy);
+		buffers.forEach(GL15C::glDeleteBuffers);
+	}
+
+	public List<CustomImage> getCustomImages() {
+		return customImages;
+	}
+
+	// pack images marked for clearing start every frame empty, and the storage buffers keep fixed binding points
+	public void prepareCustomResources() {
+		customImages.forEach(CustomImage::clearIfNeeded);
+
+		for (int i = 0; i < buffers.size(); i++) {
+			GL30C.glBindBufferBase(GL43C.GL_SHADER_STORAGE_BUFFER, bufferIndices.getInt(i), buffers.getInt(i));
+		}
+	}
+
+	private void allocateBuffers(boolean onlyRelative) {
+		for (int i = 0; i < buffers.size(); i++) {
+			ShaderStorageInfo info = bufferInfos.get(i);
+
+			if (onlyRelative && !info.relative()) {
+				continue;
+			}
+
+			long size = info.relative() ? info.size() * (long) Math.ceil(cachedWidth * info.scaleX()) * (long) Math.ceil(cachedHeight * info.scaleY()) : info.size();
+			GL15C.glBindBuffer(GL43C.GL_SHADER_STORAGE_BUFFER, buffers.getInt(i));
+			GL15C.glBufferData(GL43C.GL_SHADER_STORAGE_BUFFER, size, GL15C.GL_DYNAMIC_DRAW);
+			GL43C.glClearBufferData(GL43C.GL_SHADER_STORAGE_BUFFER, GL30C.GL_R8, GL11C.GL_RED, GL11C.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+		}
+
+		GL15C.glBindBuffer(GL43C.GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	public int getRenderTargetCount() {
@@ -170,6 +225,9 @@ public class RenderTargets {
 			for (int i = 0; i < targets.length; i++) {
 				targets[i].resize(packDirectives.getTextureScaleOverride(i, newWidth, newHeight));
 			}
+
+			customImages.stream().filter(image -> image.getInfo().relative()).forEach(image -> image.resize(newWidth, newHeight));
+			allocateBuffers(true);
 
 			fullClearRequired = true;
 		}

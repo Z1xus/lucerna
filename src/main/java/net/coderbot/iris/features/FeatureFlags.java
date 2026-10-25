@@ -12,6 +12,8 @@ public enum FeatureFlags {
 	PER_BUFFER_BLENDING(() -> true, IrisRenderSystem::supportsBufferBlending),
 	COMPUTE_SHADERS(() -> true, IrisRenderSystem::supportsCompute),
 	ENTITY_TRANSLUCENT(() -> true, () -> true),
+	CUSTOM_IMAGES(() -> true, IrisRenderSystem::supportsCompute),
+	SSBO(() -> true, IrisRenderSystem::supportsCompute),
 	UNKNOWN(() -> false, () -> false);
 
 	private final BooleanSupplier irisRequirement;

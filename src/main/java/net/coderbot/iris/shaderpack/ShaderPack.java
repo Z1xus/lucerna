@@ -49,6 +49,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ShaderPack {
 	private static final Gson GSON = new Gson();
@@ -139,12 +140,14 @@ public class ShaderPack {
 			throw new IllegalStateException("The shader pack needs unsupported features: " + String.join(", ", invalidFeatureFlags));
 		}
 
-		List<String> optionalFeatureFlags = shaderProperties.getOptionalFeatureFlags().stream().filter(flag -> !FeatureFlags.isInvalid(flag)).collect(Collectors.toList());
+		// required flags are all usable at this point
+		List<String> featureFlags = Stream.concat(shaderProperties.getRequiredFeatureFlags().stream(), shaderProperties.getOptionalFeatureFlags().stream())
+			.filter(flag -> !FeatureFlags.isInvalid(flag)).distinct().collect(Collectors.toList());
 
-		if (!optionalFeatureFlags.isEmpty()) {
+		if (!featureFlags.isEmpty()) {
 			List<StringPair> newEnvDefines = new ArrayList<>();
 			environmentDefines.forEach(newEnvDefines::add);
-			optionalFeatureFlags.forEach(flag -> newEnvDefines.add(new StringPair("IRIS_FEATURE_" + flag, "")));
+			featureFlags.forEach(flag -> newEnvDefines.add(new StringPair("IRIS_FEATURE_" + flag, "")));
 			environmentDefines = ImmutableList.copyOf(newEnvDefines);
 		}
 

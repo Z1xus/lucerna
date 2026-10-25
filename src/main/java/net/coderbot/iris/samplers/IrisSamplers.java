@@ -3,6 +3,7 @@ package net.coderbot.iris.samplers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
+import net.coderbot.iris.gl.image.CustomImage;
 import net.coderbot.iris.gl.sampler.SamplerHolder;
 import net.coderbot.iris.gl.state.StateUpdateNotifiers;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
@@ -65,6 +66,12 @@ public class IrisSamplers {
 				}
 			} else {
 				samplers.addDynamicSampler(sampler, name);
+			}
+		}
+
+		for (CustomImage image : renderTargets.getCustomImages()) {
+			if (image.getInfo().samplerName() != null) {
+				samplers.addDynamicSampler(image::getTexture, image.getInfo().samplerName());
 			}
 		}
 	}

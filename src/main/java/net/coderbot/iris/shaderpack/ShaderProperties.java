@@ -1,6 +1,8 @@
 package net.coderbot.iris.shaderpack;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
@@ -17,11 +19,16 @@ import net.coderbot.iris.gl.blending.BlendMode;
 import net.coderbot.iris.gl.blending.BlendModeFunction;
 import net.coderbot.iris.gl.blending.BlendModeOverride;
 import net.coderbot.iris.gl.blending.BufferBlendInformation;
+import net.coderbot.iris.gl.texture.InternalTextureFormat;
+import net.coderbot.iris.gl.texture.PixelFormat;
+import net.coderbot.iris.gl.texture.PixelType;
 import net.coderbot.iris.gl.texture.TextureScaleOverride;
 import net.coderbot.iris.shaderpack.option.ShaderPackOptions;
 import net.coderbot.iris.shaderpack.preprocessor.PropertiesPreprocessor;
 import net.coderbot.iris.shaderpack.texture.TextureStage;
 import net.coderbot.iris.uniforms.custom.CustomUniforms;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL12C;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -31,6 +38,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -85,6 +93,8 @@ public class ShaderProperties {
 	private final EnumMap<TextureStage, Object2ObjectMap<String, String>> customTextures = new EnumMap<>(TextureStage.class);
 	private final EnumMap<TextureStage, Object2ObjectMap<String, String>> customTexturePatching = new EnumMap<>(TextureStage.class);
 	private int customTextureCount;
+	private final List<ImageInformation> images = new ArrayList<>();
+	private final Int2ObjectMap<ShaderStorageInfo> bufferObjects = new Int2ObjectArrayMap<>();
 	private final Object2ObjectMap<String, Object2BooleanMap<String>> explicitFlips = new Object2ObjectOpenHashMap<>();
 	private String noiseTexturePath = null;
 	private Object2ObjectMap<String, String> conditionallyEnabledPrograms = new Object2ObjectOpenHashMap<>();
@@ -335,6 +345,50 @@ public class ShaderProperties {
 
 			handleWhitespacedListDirective(key, value, "iris.features.required", options -> requiredFeatureFlags = options);
 			handleWhitespacedListDirective(key, value, "iris.features.optional", options -> optionalFeatureFlags = options);
+
+			handlePassDirective("image.", key, value, name -> {
+				String[] parts = value.trim().split("\\s+");
+				Optional<PixelFormat> format = parts.length > 1 ? PixelFormat.fromString(parts[1].toUpperCase(Locale.ROOT)) : Optional.empty();
+				Optional<InternalTextureFormat> internalFormat = parts.length > 2 ? InternalTextureFormat.fromString(parts[2].toUpperCase(Locale.ROOT)) : Optional.empty();
+				Optional<PixelType> type = parts.length > 3 ? PixelType.fromString(parts[3].toUpperCase(Locale.ROOT)) : Optional.empty();
+
+				if (parts.length < 7 || !format.isPresent() || !internalFormat.isPresent() || !type.isPresent()) {
+					Iris.logger.error("Unable to parse image directive " + key + ": " + value);
+					return;
+				}
+
+				String samplerName = parts[0].equals("none") ? null : parts[0];
+				boolean clear = Boolean.parseBoolean(parts[4]);
+
+				try {
+					if (Boolean.parseBoolean(parts[5])) {
+						images.add(new ImageInformation(name, samplerName, GL11C.GL_TEXTURE_2D, format.get(), internalFormat.get(), type.get(), 0, 0, 0, clear,
+							true, Float.parseFloat(parts[6]), Float.parseFloat(parts[7])));
+					} else {
+						int target = parts.length == 7 ? GL11C.GL_TEXTURE_1D : parts.length == 8 ? GL11C.GL_TEXTURE_2D : GL12C.GL_TEXTURE_3D;
+						images.add(new ImageInformation(name, samplerName, target, format.get(), internalFormat.get(), type.get(), Integer.parseInt(parts[6]),
+							parts.length > 7 ? Integer.parseInt(parts[7]) : 1, parts.length > 8 ? Integer.parseInt(parts[8]) : 1, clear, false, 0, 0));
+					}
+				} catch (RuntimeException e) {
+					Iris.logger.error("Unable to parse image directive " + key + ": " + value);
+				}
+			});
+
+			handlePassDirective("bufferObject.", key, value, index -> {
+				String[] parts = value.trim().split("\\s+");
+
+				try {
+					long size = Long.parseLong(parts[0]);
+
+					if (size > 0) {
+						bufferObjects.put(Integer.parseInt(index), parts.length > 3
+							? new ShaderStorageInfo(size, Boolean.parseBoolean(parts[1]), Float.parseFloat(parts[2]), Float.parseFloat(parts[3]))
+							: new ShaderStorageInfo(size, false, 0.0F, 0.0F));
+					}
+				} catch (NumberFormatException e) {
+					Iris.logger.error("Unable to parse buffer object directive " + key + ": " + value);
+				}
+			});
 
 			// TODO: Buffer size directives
 			// TODO: Conditional program enabling directives
@@ -643,6 +697,14 @@ public class ShaderProperties {
 
 	public Object2ObjectMap<String, Object2BooleanMap<String>> getExplicitFlips() {
 		return explicitFlips;
+	}
+
+	public List<ImageInformation> getImages() {
+		return images;
+	}
+
+	public Int2ObjectMap<ShaderStorageInfo> getBufferObjects() {
+		return bufferObjects;
 	}
 
 	public List<String> getRequiredFeatureFlags() {

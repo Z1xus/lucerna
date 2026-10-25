@@ -5,7 +5,8 @@ import net.coderbot.iris.gl.shader.ShaderType;
 public enum PatchShaderType {
 	VERTEX(ShaderType.VERTEX),
 	GEOMETRY(ShaderType.GEOMETRY),
-	FRAGMENT(ShaderType.FRAGMENT);
+	FRAGMENT(ShaderType.FRAGMENT),
+	COMPUTE(ShaderType.COMPUTE);
 
 	public final ShaderType glShaderType;
 
@@ -21,6 +22,8 @@ public enum PatchShaderType {
 				return new PatchShaderType[] { GEOMETRY };
 			case FRAGMENT:
 				return new PatchShaderType[] { FRAGMENT };
+			case COMPUTE:
+				return new PatchShaderType[] { COMPUTE };
 			default:
 				throw new IllegalArgumentException("Unknown shader type: " + glShaderType);
 		}

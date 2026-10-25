@@ -19,6 +19,6 @@ public class ImageBinding {
 	public void update() {
 		// We can assume that image bindings are supported here as either the EXT extension or 4.2 core, as otherwise ImageLimits
 		// would report that zero image units are supported.
-		IrisRenderSystem.bindImageTexture(imageUnit, textureID.getAsInt(), 0, false, 0, GL42C.GL_READ_WRITE, internalFormat);
+		IrisRenderSystem.bindImageTexture(imageUnit, textureID.getAsInt(), 0, true, 0, GL42C.GL_READ_WRITE, internalFormat);
 	}
 }
