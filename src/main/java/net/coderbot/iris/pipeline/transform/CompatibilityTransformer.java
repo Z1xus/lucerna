@@ -159,10 +159,24 @@ public class CompatibilityTransformer {
 			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "#extension GL_EXT_gpu_shader4 : enable\n");
 		}
 
-		// iris provides these even when a pack uses them without declaring them
+		// iris provides these as uniforms even when a pack does not declare them or declares them as vertex attributes
 		for (String id : new String[] { "entityId", "blockEntityId", "currentRenderedItemId" }) {
 			if (root.identifierIndex.has(id) && root.identifierIndex.getStream(id).noneMatch(identifier -> identifier.getParent() instanceof DeclarationMember)) {
 				tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform int " + id + ";");
+			} else if (parameters.type == PatchShaderType.VERTEX) {
+				for (Identifier identifier : root.identifierIndex.get(id)) {
+					TypeAndInitDeclaration declaration = identifier.getAncestor(TypeAndInitDeclaration.class);
+
+					if (declaration == null || declaration.getType().getTypeQualifier() == null || identifier.getAncestor(FunctionDefinition.class) != null) {
+						continue;
+					}
+
+					for (TypeQualifierPart part : declaration.getType().getTypeQualifier().getChildren()) {
+						if (part instanceof StorageQualifier storage && (storage.storageType == StorageType.ATTRIBUTE || storage.storageType == StorageType.IN)) {
+							storage.storageType = StorageType.UNIFORM;
+						}
+					}
+				}
 			}
 		}
 

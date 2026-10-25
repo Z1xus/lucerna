@@ -118,6 +118,10 @@ public class IrisFunctions {
 				IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC2, Vector2f::mul);
 				IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC3, Vector3f::mul);
 				IrisFunctions.addBinaryOpJOML("multiply", VectorType.VEC4, Vector4f::mul);
+
+				IrisFunctions.<Vector2f>addScalarOpJOML("multiply", VectorType.VEC2, Vector2f::mul, true);
+				IrisFunctions.<Vector3f>addScalarOpJOML("multiply", VectorType.VEC3, Vector3f::mul, true);
+				IrisFunctions.<Vector4f>addScalarOpJOML("multiply", VectorType.VEC4, Vector4f::mul, true);
 			}
 
 			{
@@ -127,6 +131,10 @@ public class IrisFunctions {
 				IrisFunctions.addBinaryOpJOML("divide", VectorType.VEC2, Vector2f::div);
 				IrisFunctions.addBinaryOpJOML("divide", VectorType.VEC3, Vector3f::div);
 				IrisFunctions.addBinaryOpJOML("divide", VectorType.VEC4, Vector4f::div);
+
+				IrisFunctions.<Vector2f>addScalarOpJOML("divide", VectorType.VEC2, Vector2f::div, false);
+				IrisFunctions.<Vector3f>addScalarOpJOML("divide", VectorType.VEC3, Vector3f::div, false);
+				IrisFunctions.<Vector4f>addScalarOpJOML("divide", VectorType.VEC4, Vector4f::div, false);
 			}
 
 			{
@@ -1108,6 +1116,41 @@ public class IrisFunctions {
 		});
 	}
 
+	// vector with scalar, and scalar with vector when the operation commutes
+	static <T> void addScalarOpJOML(String name, VectorType.JOMLVector<T> type, ScalarOp<T> function, boolean commutes) {
+		builder.add(name, new AbstractTypedFunction(type, new Type[]{type, Type.Float}) {
+			final private T vector = type.create();
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void evaluateTo(Expression[] params, FunctionContext context, FunctionReturn functionReturn) {
+				params[1].evaluateTo(context, functionReturn);
+				float b = functionReturn.floatReturn;
+
+				params[0].evaluateTo(context, functionReturn);
+				function.accept((T) functionReturn.objectReturn, b, this.vector);
+				functionReturn.objectReturn = this.vector;
+			}
+		});
+
+		if (commutes) {
+			builder.add(name, new AbstractTypedFunction(type, new Type[]{Type.Float, type}) {
+				final private T vector = type.create();
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public void evaluateTo(Expression[] params, FunctionContext context, FunctionReturn functionReturn) {
+					params[0].evaluateTo(context, functionReturn);
+					float a = functionReturn.floatReturn;
+
+					params[1].evaluateTo(context, functionReturn);
+					function.accept((T) functionReturn.objectReturn, a, this.vector);
+					functionReturn.objectReturn = this.vector;
+				}
+			});
+		}
+	}
+
 	static <T> void addTernaryOpJOML(String name, VectorType.JOMLVector<T> type, QuadConsumer<T, T, T, T> function) {
 		builder.add(name, new AbstractTypedFunction(
 			type,
@@ -1191,6 +1234,10 @@ public class IrisFunctions {
 
 	interface ObjectObject2BooleanFunction<T, U> {
 		boolean apply(T t, U u);
+	}
+
+	interface ScalarOp<T> {
+		void accept(T vector, float scalar, T dest);
 	}
 
 	interface TriConsumer<T, U, V> {
