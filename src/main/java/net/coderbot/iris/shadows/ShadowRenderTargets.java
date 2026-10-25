@@ -16,7 +16,10 @@ import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ShadowRenderTargets {
 	private final RenderTarget[] targets;
@@ -27,6 +30,7 @@ public class ShadowRenderTargets {
 	private final boolean[] flipped;
 
 	private final List<GlFramebuffer> ownedFramebuffers;
+	private final Map<String, GlFramebuffer> shadowFramebuffers = new HashMap<>();
 	private final int resolution;
 
 	private boolean fullClearRequired;
@@ -182,11 +186,14 @@ public class ShadowRenderTargets {
 
 		ImmutableSet<Integer> stageWritesToMain = invert(stageWritesToAlt, drawBuffers);
 
-		GlFramebuffer framebuffer =  createColorFramebuffer(stageWritesToMain, drawBuffers);
+		// shadow programs that write the same targets share one framebuffer, so switching programs does not rebind it
+		return shadowFramebuffers.computeIfAbsent(Arrays.toString(drawBuffers) + stageWritesToMain, key -> {
+			GlFramebuffer framebuffer = createColorFramebuffer(stageWritesToMain, drawBuffers);
 
-		framebuffer.addDepthAttachment(mainDepth.getTextureId());
+			framebuffer.addDepthAttachment(mainDepth.getTextureId());
 
-		return framebuffer;
+			return framebuffer;
+		});
 	}
 
 	private GlFramebuffer createFullFramebuffer(boolean clearsAlt, int[] drawBuffers) {
