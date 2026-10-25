@@ -742,6 +742,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 	}
 
+	private static boolean usesAttribute(@Nullable Program program, String name) {
+		return program != null && GL20C.glGetAttribLocation(program.getProgramId(), name) != -1;
+	}
+
 	private final class Pass {
 		@Nullable
 		private final Program program;
@@ -754,7 +758,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		@Nullable
 		private final List<BufferBlendOverride> bufferBlendOverrides;
 		private final boolean shadowViewport;
-		private final boolean usesExtendedVertexAttributes;
+		private final boolean usesEntity;
+		private final boolean usesMidTexCoord;
+		private final boolean usesTangent;
+		private final boolean usesMidBlock;
 
 		private Pass(@Nullable Program program, GlFramebuffer framebufferBeforeTranslucents, GlFramebuffer framebufferAfterTranslucents,
 					 @Nullable AlphaTestOverride alphaTestOverride, @Nullable BlendModeOverride blendModeOverride, @Nullable List<BufferBlendOverride> bufferBlendOverrides, boolean shadowViewport) {
@@ -765,9 +772,14 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			this.blendModeOverride = blendModeOverride;
 			this.bufferBlendOverrides = bufferBlendOverrides;
 			this.shadowViewport = shadowViewport;
-			this.usesExtendedVertexAttributes = program != null
-				&& (GL20C.glGetAttribLocation(program.getProgramId(), "mc_midTexCoord") != -1
-				|| GL20C.glGetAttribLocation(program.getProgramId(), "at_tangent") != -1);
+			this.usesEntity = usesAttribute(program, "mc_Entity");
+			this.usesMidTexCoord = usesAttribute(program, "mc_midTexCoord");
+			this.usesTangent = usesAttribute(program, "at_tangent");
+			this.usesMidBlock = usesAttribute(program, "at_midBlock");
+		}
+
+		private boolean usesExtendedVertexAttributes() {
+			return usesMidTexCoord || usesTangent;
 		}
 
 		public void use() {
@@ -787,10 +799,21 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 				program.use();
 
 				// vanilla geometry has no extended attributes, so give the pack the values OptiFine uses for it
-				IrisRenderSystem.vertexAttrib4f(11, -1.0F, -1.0F, 0.0F, 1.0F);
-				IrisRenderSystem.vertexAttrib4f(12, 0.0F, 0.0F, 0.0F, 1.0F);
-				IrisRenderSystem.vertexAttrib4f(13, 1.0F, 0.0F, 0.0F, 1.0F);
-				IrisRenderSystem.vertexAttrib4f(14, 0.0F, 0.0F, 0.0F, 0.0F);
+				if (usesEntity) {
+					IrisRenderSystem.vertexAttrib4f(11, -1.0F, -1.0F, 0.0F, 1.0F);
+				}
+
+				if (usesMidTexCoord) {
+					IrisRenderSystem.vertexAttrib4f(12, 0.0F, 0.0F, 0.0F, 1.0F);
+				}
+
+				if (usesTangent) {
+					IrisRenderSystem.vertexAttrib4f(13, 1.0F, 0.0F, 0.0F, 1.0F);
+				}
+
+				if (usesMidBlock) {
+					IrisRenderSystem.vertexAttrib4f(14, 0.0F, 0.0F, 0.0F, 0.0F);
+				}
 			}
 
 			if (alphaTestOverride != null) {
@@ -1237,7 +1260,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 	@Override
 	public boolean usesExtendedVertexAttributes() {
-		return current != null && current.usesExtendedVertexAttributes;
+		return current != null && current.usesExtendedVertexAttributes();
 	}
 
 	@Override
