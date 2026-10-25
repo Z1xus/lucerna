@@ -26,6 +26,8 @@ public class IrisRenderSystem {
 	private static DSAAccess dsaState;
 	private static boolean hasMultibind;
 	private static boolean supportsCompute;
+	private static int drawFramebuffer = -1;
+	private static int readFramebuffer = -1;
 
 	public static void initRenderer() {
 		if (GL.getCapabilities().OpenGL45) {
@@ -390,13 +392,13 @@ public class IrisRenderSystem {
 
 		@Override
 		public void readBuffer(int framebuffer, int buffer) {
-			GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
+			bindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
 			GL30C.glReadBuffer(buffer);
 		}
 
 		@Override
 		public void drawBuffers(int framebuffer, int[] buffers) {
-			GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
+			bindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
 			GL30C.glDrawBuffers(buffers);
 		}
 
@@ -432,21 +434,21 @@ public class IrisRenderSystem {
 
 		@Override
 		public void blitFramebuffer(int source, int dest, int offsetX, int offsetY, int width, int height, int offsetX2, int offsetY2, int width2, int height2, int bufferChoice, int filter) {
-			GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, source);
-			GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, dest);
+			bindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, source);
+			bindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, dest);
 			GL30C.glBlitFramebuffer(offsetX, offsetY, width, height, offsetX2, offsetY2, width2, height2, bufferChoice, filter);
 		}
 
 		@Override
 		public void framebufferTexture2D(int fb, int fbtarget, int attachment, int target, int texture, int levels) {
-			GL30C.glBindFramebuffer(fbtarget, fb);
+			bindFramebuffer(fbtarget, fb);
 			GL30C.glFramebufferTexture2D(fbtarget, attachment, target, texture, levels);
 		}
 
 		@Override
 		public int createFramebuffer() {
 			int framebuffer = GL30C.glGenFramebuffers();
-			GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
+			bindFramebuffer(GL30C.GL_FRAMEBUFFER, framebuffer);
 			return framebuffer;
 		}
 
@@ -483,7 +485,45 @@ public class IrisRenderSystem {
 	}
 
 	public static void bindFramebuffer(int target, int framebuffer) {
+		if (target == GL30C.GL_FRAMEBUFFER) {
+			if (drawFramebuffer == framebuffer && readFramebuffer == framebuffer) {
+				return;
+			}
+
+			drawFramebuffer = framebuffer;
+			readFramebuffer = framebuffer;
+		} else if (target == GL30C.GL_DRAW_FRAMEBUFFER) {
+			if (drawFramebuffer == framebuffer) {
+				return;
+			}
+
+			drawFramebuffer = framebuffer;
+		} else if (target == GL30C.GL_READ_FRAMEBUFFER) {
+			if (readFramebuffer == framebuffer) {
+				return;
+			}
+
+			readFramebuffer = framebuffer;
+		}
+
 		GL30C.glBindFramebuffer(target, framebuffer);
+	}
+
+	public static void onFramebufferBound(int target, int framebuffer) {
+		if (target == GL30C.GL_FRAMEBUFFER) {
+			drawFramebuffer = framebuffer;
+			readFramebuffer = framebuffer;
+		} else if (target == GL30C.GL_DRAW_FRAMEBUFFER) {
+			drawFramebuffer = framebuffer;
+		} else if (target == GL30C.GL_READ_FRAMEBUFFER) {
+			readFramebuffer = framebuffer;
+		}
+	}
+
+	// other mods may bind framebuffers directly, so the tracked bindings are dropped once per frame
+	public static void invalidateFramebufferBindings() {
+		drawFramebuffer = -1;
+		readFramebuffer = -1;
 	}
 
 	public static void useProgram(int program) {

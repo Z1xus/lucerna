@@ -12,6 +12,8 @@ import org.joml.Vector2i;
 import org.lwjgl.opengl.GL20C;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ public class RenderTargets {
 	private DepthCopyStrategy copyStrategy;
 
 	private final List<GlFramebuffer> ownedFramebuffers;
+	private final Map<String, GlFramebuffer> gbufferFramebuffers = new HashMap<>();
 
 	private int cachedWidth;
 	private int cachedHeight;
@@ -96,6 +99,10 @@ public class RenderTargets {
 
 	public RenderTarget get(int index) {
 		return targets[index];
+	}
+
+	public GlFramebuffer getDepthSourceFb() {
+		return depthSourceFb;
 	}
 
 	public int getDepthTexture() {
@@ -253,11 +260,14 @@ public class RenderTargets {
 
 		ImmutableSet<Integer> stageWritesToMain = invert(stageWritesToAlt, drawBuffers);
 
-		GlFramebuffer framebuffer =  createColorFramebuffer(stageWritesToMain, drawBuffers);
+		// gbuffer programs that write the same targets share one framebuffer, so switching programs does not rebind it
+		return gbufferFramebuffers.computeIfAbsent(Arrays.toString(drawBuffers) + stageWritesToMain, key -> {
+			GlFramebuffer framebuffer = createColorFramebuffer(stageWritesToMain, drawBuffers);
 
-		framebuffer.addDepthAttachment(currentDepthTexture);
+			framebuffer.addDepthAttachment(currentDepthTexture);
 
-		return framebuffer;
+			return framebuffer;
+		});
 	}
 
 	private GlFramebuffer createFullFramebuffer(boolean clearsAlt, int[] drawBuffers) {
@@ -321,6 +331,7 @@ public class RenderTargets {
 	public void destroyFramebuffer(GlFramebuffer framebuffer) {
 		framebuffer.destroy();
 		ownedFramebuffers.remove(framebuffer);
+		gbufferFramebuffers.values().remove(framebuffer);
 	}
 
 	public int getCurrentWidth() {

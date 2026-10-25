@@ -1,14 +1,7 @@
 package net.coderbot.iris.pipeline.transform;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.github.douira.glsl_transformer.ast.node.Identifier;
 import io.github.douira.glsl_transformer.ast.node.TranslationUnit;
 import io.github.douira.glsl_transformer.ast.node.expression.Expression;
-import io.github.douira.glsl_transformer.ast.node.expression.binary.DivisionExpression;
-import io.github.douira.glsl_transformer.ast.node.expression.binary.MultiplicationExpression;
-import io.github.douira.glsl_transformer.ast.node.expression.unary.MemberAccessExpression;
 import io.github.douira.glsl_transformer.ast.query.Root;
 import io.github.douira.glsl_transformer.ast.query.match.AutoHintedMatcher;
 import io.github.douira.glsl_transformer.ast.query.match.Matcher;
@@ -16,7 +9,7 @@ import io.github.douira.glsl_transformer.ast.transform.ASTInjectionPoint;
 import io.github.douira.glsl_transformer.ast.transform.ASTParser;
 
 /**
- * Does the sodium terrain transformations using glsl-transformer AST.
+ * Patches terrain programs to read the Celeritas chunk vertices that Argentum draws, using glsl-transformer AST.
  */
 class SodiumTerrainTransformer {
 	public static void transform(
@@ -27,8 +20,10 @@ class SodiumTerrainTransformer {
 		switch (parameters.type) {
 			// For Sodium patching, treat fragment and geometry the same
 			case FRAGMENT:
-			case GEOMETRY:
 				transformFragment(t, tree, root, parameters);
+				break;
+			case GEOMETRY:
+				transformShared(t, tree, root, parameters);
 				break;
 			case VERTEX:
 				transformVertex(t, tree, root, parameters);
@@ -40,6 +35,8 @@ class SodiumTerrainTransformer {
 
 	private static final AutoHintedMatcher<Expression> glTextureMatrix0 = new AutoHintedMatcher<>(
 			"gl_TextureMatrix[0]", Matcher.expressionPattern);
+	private static final AutoHintedMatcher<Expression> glTextureMatrix1 = new AutoHintedMatcher<>(
+			"gl_TextureMatrix[1]", Matcher.expressionPattern);
 
 	/**
 	 * Transforms vertex shaders.
@@ -49,48 +46,58 @@ class SodiumTerrainTransformer {
 			TranslationUnit tree,
 			Root root,
 			Parameters parameters) {
+		String in = tree.getVersionStatement().version.number >= 130 ? "in" : "attribute";
+
 		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_DECLARATIONS,
-				"attribute vec3 iris_Pos;",
-				"attribute vec4 iris_Color;",
-				"attribute vec2 iris_TexCoord;",
-				"attribute vec2 iris_LightCoord;",
-				"attribute vec3 iris_Normal;", // some are shared
-				"uniform vec3 u_ModelScale;",
-				"uniform vec2 u_TextureScale;",
-				"attribute vec4 iris_ModelOffset;",
-				"vec4 iris_LightTexCoord = vec4(iris_LightCoord, 0, 1);",
+				in + " vec3 a_PosId;",
+				in + " vec4 a_Color;",
+				in + " vec2 a_TexCoord;",
+				in + " vec2 iris_LightCoord;",
+				in + " vec4 iris_DrawParams;",
+				in + " vec3 iris_Normal;",
+				"uniform vec3 u_RegionOffset;");
+		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_FUNCTIONS,
+				// the draw id packs the section position inside its region as x << 5 | z << 2 | y
+				"vec4 iris_getVertexPosition() { float id = iris_DrawParams.x; return vec4(a_PosId + u_RegionOffset + vec3(mod(floor(id / 32.0), 8.0), mod(id, 4.0), mod(floor(id / 4.0), 8.0)) * 16.0, 1.0); }",
 				"vec4 ftransform() { return gl_ModelViewProjectionMatrix * gl_Vertex; }");
 
 		transformShared(t, tree, root, parameters);
 
-		root.replaceReferenceExpressions(t, "gl_Vertex",
-				"vec4((iris_Pos * u_ModelScale) + iris_ModelOffset.xyz, 1.0)");
-		root.replaceReferenceExpressions(t, "gl_MultiTexCoord0",
-				"vec4(iris_TexCoord * u_TextureScale, 0.0, 1.0)");
-		root.replaceReferenceExpressions(t, "gl_MultiTexCoord1",
-				"iris_LightTexCoord");
-		root.replaceReferenceExpressions(t, "gl_MultiTexCoord2",
-				"iris_LightTexCoord");
-		root.rename("gl_Color", "iris_Color");
+		root.replaceReferenceExpressions(t, "gl_Vertex", "iris_getVertexPosition()");
+		root.replaceReferenceExpressions(t, "gl_MultiTexCoord0", "vec4(a_TexCoord, 0.0, 1.0)");
+		root.replaceReferenceExpressions(t, "gl_MultiTexCoord1", "vec4(iris_LightCoord, 0.0, 1.0)");
+		root.replaceReferenceExpressions(t, "gl_MultiTexCoord2", "vec4(iris_LightCoord, 0.0, 1.0)");
+		root.rename("gl_Color", "a_Color");
 		root.rename("gl_Normal", "iris_Normal");
 		root.rename("ftransform", "iris_ftransform");
 	}
 
 	/**
-	 * Transforms fragment shaders. The fragment shader does only the shared things
-	 * from the vertex shader.
+	 * Transforms fragment shaders, applying the cutout alpha test that the fixed function pipeline would do.
 	 */
 	public static void transformFragment(
 			ASTParser t,
 			TranslationUnit tree,
 			Root root,
 			Parameters parameters) {
-		// interestingly there is nothing that isn't shared
 		transformShared(t, tree, root, parameters);
+
+		String output = null;
+
+		if (root.identifierIndex.getOne("gl_FragData") != null) {
+			output = "gl_FragData[0]";
+		} else if (root.identifierIndex.getOne("gl_FragColor") != null) {
+			output = "gl_FragColor";
+		}
+
+		if (output != null) {
+			tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS, "uniform float iris_currentAlphaTest;");
+			tree.appendMain(t, "if (" + output + ".a < iris_currentAlphaTest) discard;");
+		}
 	}
 
 	/**
-	 * Does the things that transformVertex and transformFragment have in common.
+	 * Does the things that every stage needs.
 	 */
 	private static void transformShared(
 			ASTParser t,
@@ -99,21 +106,19 @@ class SodiumTerrainTransformer {
 			Parameters parameters) {
 		tree.parseAndInjectNodes(t, ASTInjectionPoint.BEFORE_DECLARATIONS,
 				"uniform mat4 iris_ModelViewMatrix;",
-				"uniform mat4 u_ModelViewProjectionMatrix;",
-				"uniform mat4 iris_NormalMatrix;",
+				"uniform mat4 iris_ModelViewMatrixInverse;",
+				"uniform mat4 iris_ProjectionMatrix;",
+				"uniform mat4 iris_ProjectionMatrixInverse;",
+				"uniform mat3 iris_NormalMatrix;",
 				"uniform mat4 iris_LightmapTextureMatrix;");
 		root.rename("gl_ModelViewMatrix", "iris_ModelViewMatrix");
-		root.rename("gl_ModelViewProjectionMatrix", "u_ModelViewProjectionMatrix");
-		root.replaceReferenceExpressions(t,
-				"gl_NormalMatrix", "mat3(iris_NormalMatrix)");
+		root.rename("gl_ModelViewMatrixInverse", "iris_ModelViewMatrixInverse");
+		root.rename("gl_ProjectionMatrix", "iris_ProjectionMatrix");
+		root.rename("gl_ProjectionMatrixInverse", "iris_ProjectionMatrixInverse");
+		root.replaceReferenceExpressions(t, "gl_ModelViewProjectionMatrix", "(iris_ProjectionMatrix * iris_ModelViewMatrix)");
+		root.rename("gl_NormalMatrix", "iris_NormalMatrix");
 
-		root.replaceExpressionMatches(
-				t,
-				glTextureMatrix0,
-				"mat4(1.0)");
+		root.replaceExpressionMatches(t, glTextureMatrix0, "mat4(1.0)");
 		root.replaceExpressionMatches(t, glTextureMatrix1, "iris_LightmapTextureMatrix");
 	}
-	private static final String lightmapCoordsExpression = "iris_LightCoord";
-	private static final AutoHintedMatcher<Expression> glTextureMatrix1 = new AutoHintedMatcher<>(
-			"gl_TextureMatrix[1]", Matcher.expressionPattern);
 }

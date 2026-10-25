@@ -9,6 +9,10 @@ public class AlphaTestOverride {
 		this.alphaTest = alphaTest;
 	}
 
+	public AlphaTest getAlphaTest() {
+		return alphaTest;
+	}
+
 	public void apply() {
 		AlphaTestStorage.overrideAlphaTest(this.alphaTest);
 	}

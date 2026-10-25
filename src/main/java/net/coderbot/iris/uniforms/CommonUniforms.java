@@ -98,7 +98,7 @@ public final class CommonUniforms {
 	}
 
 	public static void generalCommonUniforms(UniformHolder uniforms, FrameUpdateNotifier updateNotifier, PackDirectives directives) {
-		ExternallyManagedUniforms.addExternallyManagedUniforms116(uniforms);
+		ExternallyManagedUniforms.addExternallyManagedUniforms(uniforms);
 
 		SmoothedVec2f eyeBrightnessSmooth = new SmoothedVec2f(directives.getEyeBrightnessHalfLife(), directives.getEyeBrightnessHalfLife(), CommonUniforms::getEyeBrightness, updateNotifier);
 

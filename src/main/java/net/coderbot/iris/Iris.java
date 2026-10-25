@@ -1,6 +1,7 @@
 package net.coderbot.iris;
 
 import com.google.common.base.Throwables;
+import net.coderbot.iris.compat.argentum.ArgentumCompat;
 import net.coderbot.iris.config.IrisConfig;
 import net.coderbot.iris.gl.GLDebug;
 import net.coderbot.iris.gl.IrisRenderSystem;
@@ -329,6 +330,7 @@ public class Iris {
 
 		fallback = false;
 		currentPackName = name;
+		ArgentumCompat.setShadersActive(true);
 
 		logger.info("Using shaderpack: " + name);
 
@@ -364,6 +366,7 @@ public class Iris {
 
 	private static void setShadersDisabled() {
 		currentPack = null;
+		ArgentumCompat.setShadersActive(false);
 		fallback = false;
 		currentPackName = "(off)";
 

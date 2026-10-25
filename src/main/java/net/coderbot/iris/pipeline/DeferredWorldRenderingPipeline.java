@@ -427,7 +427,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
 		this.sodiumTerrainPipeline = new SodiumTerrainPipeline(this, programs, createTerrainSamplers,
 			shadowRenderer == null ? null : createShadowTerrainSamplers, createTerrainImages,
-			shadowRenderer == null ? null : createShadowTerrainImages);
+			shadowRenderer == null ? null : createShadowTerrainImages, renderTargets, flippedAfterPrepare, flippedAfterTranslucent,
+			() -> shadowRenderTargets.createShadowFramebuffer(shadowRenderTargets.snapshot(), new int[] {0, 1}));
 	}
 
 	private record PassKey(ProgramId id, InputAvailability availability) {
@@ -966,6 +967,11 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			clearPass.execute(fogColor);
 		}
 
+		// vanilla only clears the depth of its own framebuffer, the gbuffers have a depth texture of their own
+		renderTargets.getDepthSourceFb().bind();
+		GlStateManager.depthMask(true);
+		GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+
 		// Reset framebuffer and viewport
 		Minecraft.getInstance().getRenderTarget().bindWrite(true);
 	}
@@ -1133,6 +1139,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		}
 
 		updateNotifier.onNewFrame();
+		IrisRenderSystem.invalidateFramebufferBindings();
 
 		// Get ready for world rendering
 		prepareRenderTargets();

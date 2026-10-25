@@ -1,0 +1,19 @@
+package net.coderbot.iris.mixin;
+
+import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.platform.GLX;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+/**
+ * Keeps the framebuffer bindings that Iris tracks in sync with the ones that vanilla makes.
+ */
+@Mixin(GLX.class)
+public class MixinGLX {
+	@Inject(method = "bindFramebuffer", at = @At("RETURN"))
+	private static void iris$onBindFramebuffer(int target, int framebuffer, CallbackInfo ci) {
+		IrisRenderSystem.onFramebufferBound(target, framebuffer);
+	}
+}

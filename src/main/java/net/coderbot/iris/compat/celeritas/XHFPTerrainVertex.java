@@ -11,15 +11,14 @@ import org.lwjgl.system.MemoryUtil;
 import static net.coderbot.iris.compat.celeritas.XHFPModelVertexType.STRIDE;
 
 public class XHFPTerrainVertex implements ChunkVertexEncoder {
-	private static final int MID_TEX_OFFSET = XHFPModelVertexType.VERTEX_FORMAT.getAttribute("mc_midTexCoord").getPointer();
-	private static final int MC_ENTITY_OFFSET = XHFPModelVertexType.VERTEX_FORMAT.getAttribute("mc_Entity").getPointer();
-	private static final int MID_BLOCK_OFFSET = XHFPModelVertexType.VERTEX_FORMAT.getAttribute("at_midBlock").getPointer();
-	private static final int NORMAL_OFFSET = XHFPModelVertexType.VERTEX_FORMAT.getAttribute("iris_Normal").getPointer();
-	private static final int TANGENT_OFFSET = XHFPModelVertexType.VERTEX_FORMAT.getAttribute("at_tangent").getPointer();
+	private static final int MID_TEX_OFFSET = 32;
+	private static final int TANGENT_OFFSET = 36;
+	private static final int NORMAL_OFFSET = 40;
+	private static final int MC_ENTITY_OFFSET = 44;
+	private static final int MID_BLOCK_OFFSET = 48;
 
 	private final QuadViewTerrain.QuadViewTerrainUnsafe quad = new QuadViewTerrain.QuadViewTerrainUnsafe();
 	private final Vector3f normal = new Vector3f();
-	private final ChunkVertexEncoder baseEncoder = XHFPModelVertexType.BASE_VERTEX_TYPE.createEncoder();
 
 	private TerrainBlockContext context;
 	private int vertexCount;
@@ -41,8 +40,15 @@ public class XHFPTerrainVertex implements ChunkVertexEncoder {
 		vSum += vertex.v;
 		vertexCount++;
 
-		vertex.rdhFactor = 0;
-		this.baseEncoder.write(ptr, material, vertex, chunkId);
+		MemoryUtil.memPutFloat(ptr, vertex.x);
+		MemoryUtil.memPutFloat(ptr + 4, vertex.y);
+		MemoryUtil.memPutFloat(ptr + 8, vertex.z);
+		MemoryUtil.memPutInt(ptr + 12, vertex.color);
+		MemoryUtil.memPutFloat(ptr + 16, Math.min(0.99999997F, vertex.u));
+		MemoryUtil.memPutFloat(ptr + 20, Math.min(0.99999997F, vertex.v));
+		MemoryUtil.memPutShort(ptr + 24, (short) (vertex.light & 0xFF));
+		MemoryUtil.memPutShort(ptr + 26, (short) ((vertex.light >> 16) & 0xFF));
+		MemoryUtil.memPutInt(ptr + 28, (chunkId & 0xFF) | ((material.bits() & 0xFF) << 8));
 
 		MemoryUtil.memPutShort(ptr + MC_ENTITY_OFFSET + 2, context.renderType);
 		MemoryUtil.memPutInt(ptr + MID_BLOCK_OFFSET, ExtendedDataHelper.computeMidBlock(vertex.x, vertex.y, vertex.z, context.localPosX, context.localPosY, context.localPosZ));
