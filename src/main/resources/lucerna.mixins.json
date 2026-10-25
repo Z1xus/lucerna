@@ -23,6 +23,7 @@
     "MixinMinecraft",
     "MixinModelPart",
     "MixinRenderTarget",
+    "MixinShadowNameTags",
     "MixinSpecialConditions",
     "MixinTitleScreen",
     "MixinVertexBuffer",
