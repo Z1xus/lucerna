@@ -63,6 +63,8 @@ public class ShadowRenderer {
 	private static int lightFaceMask = 0x7F;
 	// set when opaque terrain meshes change, so the cached shadow terrain is drawn again
 	public static boolean terrainChanged = true;
+	// true while the cached shadow terrain is reused, so last frame's shadow search still holds
+	public static boolean reusingTerrain;
 	// the shadow view drifts with the sun, refresh once it turned about half a shadow texel at the far edge
 	private static final float MAX_ROTATION_DRIFT = 5.0E-4F;
 	// waving foliage animates in the shadow pass, so the cache is refreshed at least this often
@@ -368,6 +370,7 @@ public class ShadowRenderer {
 		Matrix4f modelView = ShadowMatrices.createShadowModelView(this.sunPathRotation, this.intervalSize);
 		lightFaceMask = facesTowardLight(-modelView.m20(), -modelView.m21(), -modelView.m22());
 		boolean reuseTerrain = reuseTerrain(modelView, CameraUniforms.getUnshiftedCameraPosition());
+		reusingTerrain = reuseTerrain;
 
 		profiler.push("terrain_setup");
 

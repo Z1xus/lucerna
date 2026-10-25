@@ -39,6 +39,7 @@
     "celeritas.MixinShaderChunkRenderer",
     "celeritas.MixinShadowBatchCache",
     "celeritas.MixinShadowFaceMask",
+    "celeritas.MixinShadowSearchGate",
     "celeritas.MixinShadowTerrainChanges",
     "celeritas.MixinSimpleWorldRenderer",
     "entity_render_context.MixinBlockEntityRenderDispatcher",
