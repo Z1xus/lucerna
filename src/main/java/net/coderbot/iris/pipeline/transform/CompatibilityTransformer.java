@@ -62,7 +62,7 @@ public class CompatibilityTransformer {
 		{ "textureMatrix", "gl_TextureMatrix[0]" }, { "chunkOffset", "vec3(0.0)" } };
 
 	private static final String[][] IMPLICIT_UNIFORMS = { { "int", "entityId" }, { "int", "blockEntityId" }, { "int", "currentRenderedItemId" },
-		{ "ivec2", "eyeBrightnessSmooth" }, { "float", "alphaTestRef" } };
+		{ "ivec2", "eyeBrightnessSmooth" }, { "float", "alphaTestRef" }, { "int", "isEyeInWater" } };
 
 	private static StorageQualifier getConstQualifier(TypeQualifier qualifier) {
 		if (qualifier == null) {
