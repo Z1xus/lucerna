@@ -11,8 +11,6 @@ public class CullEverythingFrustum implements Culler, ViewportProvider, Frustum 
     public CullEverythingFrustum() {
     }
 
-    // For Immersive Portals
-    // We return false here since isVisible is going to return false anyways.
     public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         return false;
     }

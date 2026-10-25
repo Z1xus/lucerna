@@ -26,11 +26,8 @@ public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBool
     public void init(ShaderPackScreen screen, NavigationController navigation) {
         super.init(screen, navigation);
 
-        // The value currently in use by the shader pack
         this.appliedValue = this.element.getAppliedOptionValues().getBooleanValueOrDefault(this.option.getName());
 
-        // The yet-to-be-applied value that has been queued (if that is the case)
-        // Might be equal to the applied value
         this.value = this.element.getPendingOptionValues().getBooleanValueOrDefault(this.option.getName());
 
         this.defaultValue = this.element.getAppliedOptionValues().getOptionSet().getBooleanOptions()
@@ -51,16 +48,7 @@ public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBool
     protected String createValueLabel() {
         String text = I18n.translate(this.value ? "label.iris.true" : "label.iris.false");
 
-        // UX: Do not use color if the value is set to default.
-        //
-        // This is because the red color for "Off" and green color of "On"
-        // was causing people to want to change options to On when that was
-        // unnecessary due to red having a bad association.
-        //
-        // This was changed on request of Emin, since people kept on changing
-        // Compatibility Mode to "On" when not needed. Now we use white for
-        // default to avoid giving a positive or negative connotation to a
-        // default value.
+        // default values get no color, red off and green on made people switch options on for no reason
         if (this.value == this.defaultValue) {
             return text;
         }

@@ -25,22 +25,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * The transform patcher (triforce 2) uses glsl-transformer's ASTTransformer to
- * do shader transformation.
- * 
- * The TransformPatcher does caching on the source string and associated
- * parameters. For this to work, all objects contained in a parameter must have
- * an equals method and they must never be changed after having been used for
- * patching. Since the cache also contains the source string, it doesn't need to
- * be disabled when developing shaderpacks. However, when changes are made to
- * the patcher, the cache should be disabled with {@link #USE_CACHE}.
- *
- * NOTE: This patcher expects (and ensures) that the string doesn't contain any
- * (!) preprocessor directives. The only allowed ones are #extension and #pragma
- * as they are considered "parsed" directives. If any other directive appears in
- * the string, it will throw.
- */
+// caches on source and parameters, so parameter objects need equals and must not change after use
+// the source must have no preprocessor directives except #extension and #pragma
 public class TransformPatcher {
     private static EnumASTTransformer<Parameters, PatchShaderType> transformer;
     private static final boolean USE_CACHE = true;
@@ -103,9 +89,6 @@ public class TransformPatcher {
         }
     }
 
-    // TODO: Only do the NewLines patches if the source code isn't from
-    // gbuffers_lines (what does this mean?)
-
     static TokenFilter<Parameters> parseTokenFilter = new ChannelFilter<Parameters>(TokenChannel.PREPROCESSOR) {
         @Override
         public boolean isTokenAllowed(Token token) {
@@ -121,8 +104,7 @@ public class TransformPatcher {
         transformer = new EnumASTTransformer<Parameters, PatchShaderType>(PatchShaderType.class) {
             @Override
             public TranslationUnit parseTranslationUnit(String input) throws RecognitionException {
-                // parse #version directive using an efficient regex before parsing so that the
-                // parser can be set to the correct version
+                // parse #version with a regex first so the parser uses the right version
                 Matcher matcher = VERSION_PATTERN.matcher(input);
                 if (!matcher.find()) {
                     throw new IllegalArgumentException("No #version directive found in source code! See debugging.md for more information.");
@@ -144,7 +126,7 @@ public class TransformPatcher {
                 parameters.type = type;
                 Root root = tree.getRoot();
 
-                // check for illegal references to internal Iris shader interfaces
+                // check for illegal references to internal iris shader interfaces
                 Optional<Identifier> violation = root.identifierIndex.prefixQueryFlat("iris_").findAny();
                 if (!violation.isPresent()) {
                     violation = root.identifierIndex.prefixQueryFlat("irisMain").findAny();
@@ -185,12 +167,10 @@ public class TransformPatcher {
     private static final Pattern VERSION_PATTERN = Pattern.compile("^.*#version\\s+(\\d+)", Pattern.DOTALL);
 
     private static Map<PatchShaderType, String> transform(String vertex, String geometry, String fragment, Parameters parameters) {
-        // stop if all are null
         if (vertex == null && geometry == null && fragment == null) {
             return null;
         }
 
-        // check if this has been cached
         CacheKey key;
         Map<PatchShaderType, String> result = null;
         if (USE_CACHE) {
@@ -200,7 +180,6 @@ public class TransformPatcher {
             }
         }
 
-        // if there is no cache result, transform the shaders
         if (result == null) {
             transformer.setPrintType(PatchedShaderPrinter.PRETTY_PRINT_SHADERS ? PrintType.INDENTED : PrintType.SIMPLE);
             EnumMap<PatchShaderType, String> inputs = new EnumMap<>(PatchShaderType.class);

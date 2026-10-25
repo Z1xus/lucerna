@@ -25,7 +25,6 @@ public class MergedBooleanOption {
 
         BooleanOption option;
 
-        // TODO: Collect all known comments
         if (this.option.getComment().isPresent()) {
             option = this.option;
         } else {

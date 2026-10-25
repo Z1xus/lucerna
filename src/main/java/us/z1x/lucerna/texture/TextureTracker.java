@@ -48,7 +48,6 @@ public class TextureTracker {
             if (pipeline != null) {
                 pipeline.onBindTexture(id);
             }
-            // Reset texture state
             IrisRenderSystem.bindTextureToUnit(0, id);
             lockBindCallback = false;
         }

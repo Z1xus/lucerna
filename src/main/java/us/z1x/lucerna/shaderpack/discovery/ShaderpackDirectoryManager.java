@@ -21,17 +21,11 @@ public class ShaderpackDirectoryManager {
     public void copyPackIntoDirectory(String name, Path source) throws IOException {
         Path target = Iris.getShaderpacksDirectory().resolve(name);
 
-        // Copy the pack file into the shaderpacks folder.
         Files.copy(source, target);
-        // Zip or other archive files will be copied without issue,
-        // however normal folders will require additional handling below.
 
-        // Manually copy the contents of the pack if it is a folder
         if (Files.isDirectory(source)) {
-            // Use for loops instead of forEach due to createDirectory throwing an IOException
-            // which requires additional handling when used in a lambda
-
-            // Copy all sub folders, collected as a list in order to prevent issues with non-ordered sets
+            // plain loops since createDirectory throws IOException
+            // collect to a list to keep walk order, parents before children
             try (Stream<Path> stream = Files.walk(source)) {
                 for (Path p : stream.filter(Files::isDirectory).collect(Collectors.toList())) {
                     Path folder = source.relativize(p);
@@ -44,7 +38,6 @@ public class ShaderpackDirectoryManager {
                 }
             }
 
-            // Copy all non-folder files
             try (Stream<Path> stream = Files.walk(source)) {
                 for (Path p : stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toSet())) {
                     Path file = source.relativize(p);
@@ -56,12 +49,8 @@ public class ShaderpackDirectoryManager {
     }
 
     public Collection<String> enumerate() throws IOException {
-        // Make sure the list is sorted since not all OSes sort the list of files in the directory.
-        // Case-insensitive sorting is the most intuitive for the user, but we then sort naturally
-        // afterwards so that we don't alternate cases weirdly in the sorted list.
-        //
-        // We also ignore chat formatting characters when sorting - some shader packs include chat
-        // formatting in the file name so that they have fancy text when displayed in the shaders list.
+        // not all systems sort directory listings, sort case-insensitively then naturally
+        // chat formatting is ignored since some packs use it in their file names
         Comparator<String> baseComparator = String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder());
         Comparator<String> comparator = (a, b) -> {
             a = removeFormatting(a);
@@ -77,16 +66,12 @@ public class ShaderpackDirectoryManager {
         }
     }
 
-    /**
-     * Straightforward method to use section-sign based chat formatting from a String
-     */
     private static String removeFormatting(String formatted) {
         char[] original = formatted.toCharArray();
         char[] cleaned = new char[original.length];
         int c = 0;
 
         for (int i = 0; i < original.length; i++) {
-            // check if it's a section sign
             if (original[i] == '\u00a7') {
                 i++;
             } else {

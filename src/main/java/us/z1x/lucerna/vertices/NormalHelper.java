@@ -25,12 +25,7 @@ public abstract class NormalHelper {
     private NormalHelper() {
     }
 
-    /**
-     * Computes the face normal of the given quad and saves it in the provided non-null vector.
-     *
-     * <p>Assumes counter-clockwise winding order, which is the norm.
-     * Expects convex quads with all points co-planar.
-     */
+    // assumes counter-clockwise winding and convex quads with co-planar points
     public static void computeFaceNormal(@NotNull Vector3f saveTo, QuadView q) {
         final float x0 = q.x(0);
         final float y0 = q.y(0);
@@ -68,7 +63,6 @@ public abstract class NormalHelper {
     }
 
     public static int computeTangent(float normalX, float normalY, float normalZ, TriView t) {
-        // Capture all of the relevant vertex positions
         float x0 = t.x(0);
         float y0 = t.y(0);
         float z0 = t.z(0);
@@ -128,15 +122,7 @@ public abstract class NormalHelper {
         bitangenty *= bitcoeff;
         bitangentz *= bitcoeff;
 
-        // predicted bitangent = tangent × normal
-        // Compute the determinant of the following matrix to get the cross product
-        //  i  j  k
-        // tx ty tz
-        // nx ny nz
-
-        // Be very careful when writing out complex multi-step calculations
-        // such as vector cross products! The calculation for pbitangentz
-        // used to be broken because it multiplied values in the wrong order.
+        // predicted bitangent = tangent x normal
 
         float pbitangentx = tangenty * normalZ - tangentz * normalY;
         float pbitangenty = tangentz * normalX - tangentx * normalZ;
@@ -195,15 +181,7 @@ public abstract class NormalHelper {
         bitangenty *= bitcoeff;
         bitangentz *= bitcoeff;
 
-        // predicted bitangent = tangent × normal
-        // Compute the determinant of the following matrix to get the cross product
-        //  i  j  k
-        // tx ty tz
-        // nx ny nz
-
-        // Be very careful when writing out complex multi-step calculations
-        // such as vector cross products! The calculation for pbitangentz
-        // used to be broken because it multiplied values in the wrong order.
+        // predicted bitangent = tangent x normal
 
         float pbitangentx = tangenty * normalZ - tangentz * normalY;
         float pbitangenty = tangentz * normalX - tangentx * normalZ;
@@ -223,8 +201,7 @@ public abstract class NormalHelper {
 
     private static float rsqrt(float value) {
         if (value == 0.0f) {
-            // You heard it here first, folks: 1 divided by 0 equals 1
-            // In actuality, this is a workaround for normalizing a zero length vector (leaving it as zero length)
+            // 1 / 0 counts as 1 so zero length vectors stay zero length
             return 1.0f;
         } else {
             return (float) (1.0 / Math.sqrt(value));

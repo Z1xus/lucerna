@@ -2,7 +2,6 @@ package net.irisshaders.iris.api.v0;
 
 import us.z1x.lucerna.apiimpl.IrisApiV0Impl;
 
-
 /**
  * The entry point to the Iris API, major version 0. This is currently the latest
  * version of the API.

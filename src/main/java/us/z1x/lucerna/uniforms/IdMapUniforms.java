@@ -30,10 +30,7 @@ public final class IdMapUniforms {
             .uniform1i(PER_FRAME, "heldBlockLightValue2", () -> 0);
     }
 
-    /**
-     * Provides the currently held item, and it's light value, as a uniform. Uses the item.properties ID map to map the item
-     * to an integer. 1.8.9 has no offhand, so the offhand uniforms are constant.
-     */
+    // 1.8.9 has no offhand, so the offhand uniforms are constant
     private static class HeldItemSupplier {
         private final Object2IntFunction<NamespacedId> itemIdMap;
         private int intID;

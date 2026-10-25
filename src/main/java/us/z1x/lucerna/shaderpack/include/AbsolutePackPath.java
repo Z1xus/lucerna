@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-// TODO: Write tests for this
 public class AbsolutePackPath {
     private final String path;
 

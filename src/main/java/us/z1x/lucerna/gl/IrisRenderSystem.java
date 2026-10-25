@@ -18,9 +18,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-/**
- * This class is responsible for abstracting calls to OpenGL and asserting that calls are run on the render thread.
- */
 public class IrisRenderSystem {
     private static DSAAccess dsaState;
     private static boolean hasMultibind;
@@ -238,8 +235,6 @@ public class IrisRenderSystem {
         dsaState.bindTextureToUnit(unit, texture);
     }
 
-    // These functions are deprecated and unavailable in the core profile.
-
     @Deprecated
     public static void setupProjectionMatrix(float[] matrix) {
         GlStateManager.matrixMode(GL11.GL_PROJECTION);
@@ -295,7 +290,6 @@ public class IrisRenderSystem {
     }
 
     public static class DSACore extends DSAARB {
-
     }
 
     public static class DSAARB extends DSAUnsupported {
@@ -305,7 +299,6 @@ public class IrisRenderSystem {
             ARBDirectStateAccess.glBindTextureUnit(unit, texture);
             GlStateManager.TEXTURES[unit].texture = texture;
         }
-
 
         @Override
         public void generateMipmaps(int texture, int target) {
@@ -470,7 +463,6 @@ public class IrisRenderSystem {
         }
     }
 
-    // TODO: Proper notification of compute support
     public static int getActiveTextureName() {
         return GlStateManager.TEXTURES[GlStateManager.texture].texture;
     }

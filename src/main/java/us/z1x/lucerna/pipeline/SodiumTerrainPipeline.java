@@ -34,10 +34,7 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
-/**
- * Patches the terrain programs of a shader pack so that they read Celeritas chunk vertices, for Argentum's terrain
- * renderer.
- */
+// patches pack terrain programs to read celeritas chunk vertices for argentum's terrain renderer
 public class SodiumTerrainPipeline {
     private static final float CUTOUT_ALPHA_REFERENCE = 0.1F;
 

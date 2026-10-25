@@ -17,7 +17,7 @@ public class IrisImages {
         for (int i = 0; i < renderTargets.getRenderTargetCount(); i++) {
             final int index = i;
 
-            // Note: image bindings *are* impacted by buffer flips.
+            // image bindings are affected by buffer flips
             IntSupplier textureID = () -> {
                 ImmutableSet<Integer> flippedBuffers = flipped.get();
                 RenderTarget target = renderTargets.get(index);
@@ -41,7 +41,6 @@ public class IrisImages {
     }
 
     public static boolean hasShadowImages(ImageHolder images) {
-        // TODO: Generalize
         return images.hasImage("shadowcolorimg0") || images.hasImage("shadowcolorimg1");
     }
 

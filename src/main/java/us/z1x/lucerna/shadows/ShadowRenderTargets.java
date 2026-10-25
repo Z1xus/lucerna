@@ -65,8 +65,7 @@ public class ShadowRenderTargets {
 
         this.ownedFramebuffers = new ArrayList<>();
 
-        // NB: Make sure all buffers are cleared so that they don't contain undefined
-        // data. Otherwise very weird things can happen.
+        // clear every buffer so none holds undefined data
         fullClearRequired = true;
 
         this.depthSourceFb = createFramebufferWritingToMain(new int[] {0});
@@ -77,7 +76,6 @@ public class ShadowRenderTargets {
         this.translucentDepthDirty = true;
     }
 
-    // TODO: Actually flip. This is required for shadow composites!
     public void flip(int target) {
         flipped[target] = !flipped[target];
     }
@@ -169,8 +167,7 @@ public class ShadowRenderTargets {
 
         framebuffer.addDepthAttachment(mainDepth.getTextureId());
 
-        // NB: Before OpenGL 3.0, all framebuffers are required to have a color
-        // attachment no matter what.
+        // before opengl 3.0 every framebuffer needs a color attachment
         framebuffer.addColorAttachment(0, get(0).getMainTexture());
         framebuffer.noDrawBuffers();
 
@@ -230,7 +227,6 @@ public class ShadowRenderTargets {
             actualDrawBuffers[i] = i;
 
             if (drawBuffers[i] >= getRenderTargetCount()) {
-                // TODO: This causes resource leaks, also we should really verify this in the shaderpack parser...
                 throw new IllegalStateException("Render target with index " + drawBuffers[i] + " is not supported, only "
                     + getRenderTargetCount() + " render targets are supported.");
             }

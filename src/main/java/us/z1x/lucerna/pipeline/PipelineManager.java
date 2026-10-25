@@ -57,30 +57,13 @@ public class PipelineManager {
         return Optional.ofNullable(pipeline);
     }
 
-    /**
-     * In IrisChunkProgramOverrides#getProgramOverride,
-     * it uses version counter to check whether to reload sodium shaders.
-     * This fixes a compat issue with Immersive Portals(#1188).
-     * Immersive Portals may load multiple client dimensions at the same time,
-     * and every dimension corresponds to a IrisChunkProgramOverrides object.
-     * Multiple dimensions (mod dimensions that fallback to overworld shaders) may use the same pipeline.
-     * This ensures that the sodium shader for each dimension will get properly reloaded.
-     */
+    // bumped on each destroy so cached chunk and entity programs know to reload
     public int getVersionCounterForSodiumShaderReload() {
         return versionCounterForSodiumShaderReload;
     }
 
-    /**
-     * Destroys all the current pipelines.
-     *
-     * <p>This method is <b>EXTREMELY DANGEROUS!</b> It is a huge potential source of hard-to-trace inconsistencies
-     * in program state. You must make sure that you <i>immediately</i> re-prepare the pipeline after destroying
-     * it to prevent the program from falling into an inconsistent state.</p>
-     *
-     * <p>In particular, </p>
-     *
-     * @see <a href="https://github.com/IrisShaders/Iris/issues/1330">this GitHub issue</a>
-     */
+    // re-prepare the pipeline right after this or the program state becomes inconsistent
+    // see https://github.com/IrisShaders/Iris/issues/1330
     public void destroyPipeline() {
         pipelinesPerDimension.forEach((dimensionId, pipeline) -> {
             Iris.logger.info("Destroying pipeline {}", dimensionId);
@@ -94,21 +77,13 @@ public class PipelineManager {
     }
 
     private void resetTextureState() {
-        // Unbind all textures
-        //
-        // This is necessary because we don't want destroyed render target textures to remain bound to certain texture
-        // units. Vanilla appears to properly rebind all textures as needed, and we do so too, so this does not cause
-        // issues elsewhere.
-        //
-        // Without this code, there will be weird issues when reloading certain shaderpacks.
+        // unbind all units so destroyed render target textures do not stay bound, which breaks some pack reloads
         for (int i = 0; i < 16; i++) {
             GlStateManager.activeTexture(GL20C.GL_TEXTURE0 + i);
             GlStateManager.bindTexture(0);
         }
 
-        // Set the active texture unit to unit 0
-        //
-        // This seems to be what most code expects. It's a sane default in any case.
+        // most code expects unit 0 to be active
         GlStateManager.activeTexture(GL20C.GL_TEXTURE0);
     }
 }

@@ -1,9 +1,5 @@
 package us.z1x.lucerna.gui.screen;
 
-/**
- * Screens implementing this will hide the player hand and HUD
- *
- * Only used for instanceof checks
- */
+// screens implementing this hide the hand and the hud
 public interface HudHideable {
 }

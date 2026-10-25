@@ -29,9 +29,6 @@ public final class ParserOptions {
         return this.binaryOpResolvers.get(c);
     }
 
-    /**
-     * Defines a set of rules that allows the tokenizer to identify tokens within a string.
-     */
     public interface TokenRules {
         TokenRules DEFAULT = new TokenRules() {
         };

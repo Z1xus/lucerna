@@ -44,8 +44,7 @@ public class ProgramSamplers {
             initializer = null;
         }
 
-        // We need to keep the active texture intact, since if we mess it up
-        // in the middle of RenderType setup, bad things will happen.
+        // the active texture must stay intact, changing it during render setup breaks rendering
         int activeTexture = GlStateManager.texture;
 
         for (SamplerBinding samplerBinding : samplerBindings) {
@@ -126,11 +125,9 @@ public class ProgramSamplers {
                 int location = IrisRenderSystem.getUniformLocation(program, name);
 
                 if (location == -1) {
-                    // There's no active sampler with this particular name in the program.
                     continue;
                 }
 
-                // Set up this sampler uniform to use this particular texture unit.
                 calls.add(new GlUniform1iCall(location, textureUnit));
             }
         }
@@ -143,26 +140,17 @@ public class ProgramSamplers {
         @Override
         public boolean addDefaultSampler(IntSupplier sampler, String... names) {
             if (nextUnit != 0) {
-                // TODO: Relax this restriction!
                 throw new IllegalStateException("Texture unit 0 is already used.");
             }
 
             return addDynamicSampler(sampler, true, null, names);
         }
 
-        /**
-         * Adds a sampler
-         * @return false if this sampler is not active, true if at least one of the names referred to an active sampler
-         */
         @Override
         public boolean addDynamicSampler(IntSupplier sampler, String... names) {
             return addDynamicSampler(sampler, false, null, names);
         }
 
-        /**
-         * Adds a sampler
-         * @return false if this sampler is not active, true if at least one of the names referred to an active sampler
-         */
         @Override
         public boolean addDynamicSampler(IntSupplier sampler, ValueUpdateNotifier notifier, String... names) {
             notifiersToReset.add(notifier);
@@ -174,19 +162,15 @@ public class ProgramSamplers {
                 int location = IrisRenderSystem.getUniformLocation(program, name);
 
                 if (location == -1) {
-                    // There's no active sampler with this particular name in the program.
                     continue;
                 }
 
-                // Make sure that we aren't out of texture units.
                 if (remainingUnits <= 0) {
                     throw new IllegalStateException("No more available texture units while activating sampler " + name);
                 }
 
-                // Set up this sampler uniform to use this particular texture unit.
                 calls.add(new GlUniform1iCall(location, nextUnit));
 
-                // And mark this texture unit as used.
                 used = true;
             }
 

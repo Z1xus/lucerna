@@ -82,7 +82,7 @@ public class ProgramImages {
             }
 
             if (internalFormat == InternalTextureFormat.RGBA) {
-                // Internal detail of Optifine: Set RGBA8 if RGBA is selected, as RGBA is not valid for images.
+                // rgba is not valid for images, optifine uses rgba8 instead
                 internalFormat = InternalTextureFormat.RGBA8;
             }
 

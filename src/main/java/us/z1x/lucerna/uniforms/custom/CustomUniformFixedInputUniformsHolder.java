@@ -172,7 +172,6 @@ public class CustomUniformFixedInputUniformsHolder {
 
         @Override
         public UniformHolder externallyManagedUniform(String name, UniformType type) {
-            // TODO: what is this function for?
             return this;
         }
 

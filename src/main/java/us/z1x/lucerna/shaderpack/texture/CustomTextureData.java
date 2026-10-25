@@ -6,7 +6,6 @@ import us.z1x.lucerna.gl.texture.PixelType;
 
 public abstract class CustomTextureData {
     private CustomTextureData() {
-
     }
 
     public static final class PngData extends CustomTextureData {
@@ -48,18 +47,12 @@ public abstract class CustomTextureData {
             this.location = location;
         }
 
-        /**
-         * @return The namespace of the texture. The caller is responsible for checking whether this is actually
-         *         a valid namespace.
-         */
+        // not validated, the caller must check it
         public String getNamespace() {
             return namespace;
         }
 
-        /**
-         * @return The path / location of the texture. The caller is responsible for checking whether this is actually
-         *         a valid path.
-         */
+        // not validated, the caller must check it
         public String getLocation() {
             return location;
         }

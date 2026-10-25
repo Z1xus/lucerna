@@ -228,7 +228,7 @@ public class PackDirectives {
                 try {
                     index = Integer.parseInt(id);
                 } catch (NumberFormatException e) {
-                    // fall through to index == null check for unknown buffer.
+                    // falls through to the unknown buffer check
                 }
             }
 
@@ -245,8 +245,6 @@ public class PackDirectives {
 
     public Vector2i getTextureScaleOverride(int index, int dimensionX, int dimensionY) {
         final String name = "colortex" + index;
-
-        // TODO: How do custom textures interact with aliases?
 
         Vector2i scale = new Vector2i();
 

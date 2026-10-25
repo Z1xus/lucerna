@@ -43,13 +43,7 @@ public class ProgramDirectives {
 
     ProgramDirectives(ProgramSource source, ShaderProperties properties, Set<Integer> supportedRenderTargets,
                       @Nullable BlendModeOverride defaultBlendOverride) {
-        // DRAWBUFFERS is only detected in the fragment shader source code (.fsh).
-        // If there's no explicit declaration, then by default /* DRAWBUFFERS:0 */ is inferred.
-        // For SEUS v08 and SEUS v10 to work, this will need to be set to 01234567. However, doing this causes
-        // TAA to break on Sildur's Vibrant Shaders, since gbuffers_skybasic lacks a DRAWBUFFERS directive, causing
-        // undefined data to be written to colortex7.
-        //
-        // TODO: Figure out how to infer the DRAWBUFFERS directive when it is missing.
+        // DRAWBUFFERS comes from the .fsh only and defaults to 0, 01234567 fixes seus v08 and v10 but breaks sildurs taa
         Optional<CommentDirective> optionalDrawbuffersDirective = findDrawbuffersDirective(source.getFragmentSource());
         Optional<CommentDirective> optionalRendertargetsDirective = findRendertargetsDirective(source.getFragmentSource());
 

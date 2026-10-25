@@ -26,19 +26,16 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 
     @Override
     public void beginLevelRendering() {
-        // Use the default Minecraft framebuffer and ensure that no programs are in use
         Minecraft.getInstance().getRenderTarget().bindWrite(true);
         IrisRenderSystem.useProgram(0);
     }
 
     @Override
     public void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller) {
-        // stub: nothing to do here
     }
 
     @Override
     public void addDebugText(List<String> messages) {
-        // stub: nothing to do here
     }
 
     @Override
@@ -53,37 +50,30 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 
     @Override
     public void beginSodiumTerrainRendering() {
-
     }
 
     @Override
     public void endSodiumTerrainRendering() {
-
     }
 
     @Override
     public void setOverridePhase(WorldRenderingPhase phase) {
-
     }
 
     @Override
     public void setPhase(WorldRenderingPhase phase) {
-
     }
 
     @Override
     public void setInputs(InputAvailability availability) {
-
     }
 
     @Override
     public void setSpecialCondition(SpecialCondition special) {
-
     }
 
     @Override
     public void syncProgram() {
-
     }
 
     @Override
@@ -108,38 +98,31 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 
     @Override
     public void onBindTexture(int id) {
-
     }
 
     @Override
     public void beginHand() {
-        // stub: nothing to do here
     }
 
     @Override
     public void beginTranslucents() {
-        // stub: nothing to do here
     }
 
     @Override
     public void finalizeLevelRendering() {
-        // stub: nothing to do here
     }
 
     @Override
     public void destroy() {
-        // stub: nothing to do here
     }
 
     @Override
     public SodiumTerrainPipeline getSodiumTerrainPipeline() {
-        // no shaders to override
         return null;
     }
 
     @Override
     public FrameUpdateNotifier getFrameUpdateNotifier() {
-        // return a dummy notifier
         return new FrameUpdateNotifier();
     }
 
@@ -195,7 +178,6 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 
     @Override
     public float getSunPathRotation() {
-        // No sun tilt
         return 0;
     }
 }

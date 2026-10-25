@@ -2,9 +2,7 @@ package us.z1x.lucerna.vertices;
 
 public final class ExtendedDataHelper {
     public static final short BLOCK_RENDER_TYPE = -1;
-    /**
-     * All fluids have a ShadersMod render type of 1, to match behavior of Minecraft 1.7 and earlier.
-     */
+    // fluids use shadersmod render type 1, matching minecraft 1.7 and earlier
     public static final short FLUID_RENDER_TYPE = 1;
 
     public static int packMidBlock(float x, float y, float z) {

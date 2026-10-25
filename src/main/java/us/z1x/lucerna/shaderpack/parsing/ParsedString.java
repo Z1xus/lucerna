@@ -24,7 +24,6 @@ public class ParsedString {
             return false;
         }
 
-        // TODO: We do a double sided trim
         text = text.trim();
 
         return true;
@@ -35,10 +34,8 @@ public class ParsedString {
             return false;
         }
 
-        // Remove the initial two comment slashes
         text = text.substring(2);
 
-        // Remove any additional comment slashes
         while (text.startsWith("/")) {
             text = text.substring(1);
         }
@@ -62,7 +59,6 @@ public class ParsedString {
         String result = text.substring(0, numChars);
         text = text.substring(numChars);
 
-        // TODO: Audit substring calls...
         return result;
     }
 

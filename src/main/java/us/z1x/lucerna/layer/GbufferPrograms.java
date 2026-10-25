@@ -109,6 +109,6 @@ public class GbufferPrograms {
     }
 
     public static void init() {
-        // Empty initializer to run static
+        // empty, calling it runs the static initializer
     }
 }

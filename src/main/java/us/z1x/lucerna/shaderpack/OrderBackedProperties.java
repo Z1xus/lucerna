@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 
-/**
- * Properties backed by a {@link java.util.LinkedHashMap}, in order to preserve iteration order
- */
 public class OrderBackedProperties extends Properties {
     private transient final Map<Object, Object> backing = Object2ObjectMaps.synchronize(new Object2ObjectLinkedOpenHashMap<>());
 

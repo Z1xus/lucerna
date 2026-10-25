@@ -43,10 +43,8 @@ public final class CommonUniforms {
     private static final Vector3d ZERO_VECTOR_3d = new Vector3d();
 
     private CommonUniforms() {
-        // no construction allowed
     }
 
-    // Needs to use a LocationalUniformHolder as we need it for the common uniforms
     public static void addCommonUniforms(DynamicUniformHolder uniforms, IdMap idMap, PackDirectives directives, FrameUpdateNotifier updateNotifier) {
         CommonUniforms.addNonDynamicUniforms(uniforms, idMap, directives, updateNotifier);
         CommonUniforms.addDynamicUniforms(uniforms);
@@ -64,8 +62,6 @@ public final class CommonUniforms {
         uniforms.uniform1i("blockEntityId", CapturedRenderingState.INSTANCE::getCurrentRenderedBlockEntity,
                 CapturedRenderingState.INSTANCE.getBlockEntityIdNotifier());
 
-        // TODO: OptiFine doesn't think that atlasSize is a "dynamic" uniform,
-        //       but we do. How will custom uniforms depending on atlasSize work?
         uniforms.uniform2i("atlasSize", () -> {
             int glId = GlStateManager.TEXTURES[0].texture;
 
@@ -129,12 +125,10 @@ public final class CommonUniforms {
             // 1.8.9 has no darkness effect
             .uniform1f(PER_FRAME, "darknessFactor", () -> 0.0F)
             .uniform1f(PER_FRAME, "darknessLightFactor", () -> 0.0F)
-            // the reference of optifine's default alpha test
+            // optifine's default alpha test reference
             .uniform1f(ONCE, "alphaTestRef", () -> 0.1F)
             // 1.8.9 fog is spherical, modern packs read the shape
             .uniform1i(ONCE, "fogShape", () -> 0)
-            // TODO: Do we need to clamp this to avoid fullbright breaking shaders? Or should shaders be able to detect
-            //       that the player is trying to turn on fullbright?
             .uniform1f(PER_FRAME, "screenBrightness", () -> client.options.gamma)
             .uniform1f(PER_TICK, "playerMood", CommonUniforms::getPlayerMood)
             .uniform2i(PER_FRAME, "eyeBrightness", CommonUniforms::getEyeBrightness)

@@ -21,7 +21,6 @@ public class IrisExclusiveUniforms {
     public static void addIrisExclusiveUniforms(UniformHolder uniforms) {
         WorldInfoUniforms.addWorldInfoUniforms(uniforms);
 
-        //All Iris-exclusive uniforms (uniforms which do not exist in either OptiFine or ShadersMod) should be registered here.
         uniforms.uniform1f(UniformUpdateFrequency.PER_FRAME, "thunderStrength", IrisExclusiveUniforms::getThunderStrength);
         uniforms.uniform1f(UniformUpdateFrequency.PER_TICK, "currentPlayerHealth", IrisExclusiveUniforms::getCurrentHealth);
         uniforms.uniform1f(UniformUpdateFrequency.PER_TICK, "maxPlayerHealth", IrisExclusiveUniforms::getMaxHealth);
@@ -59,7 +58,7 @@ public class IrisExclusiveUniforms {
     }
 
     private static float getThunderStrength() {
-        // Note: Ensure this is in the range of 0 to 1 - some custom servers send out of range values.
+        // some custom servers send values out of the 0 to 1 range
         return Math.clamp(0.0F, 1.0F,
             Minecraft.getInstance().world.getThunder(CapturedRenderingState.INSTANCE.getTickDelta()));
     }

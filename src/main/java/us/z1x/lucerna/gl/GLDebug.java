@@ -21,19 +21,13 @@ import java.io.PrintStream;
 import java.util.function.Consumer;
 
 public final class GLDebug {
-    /**
-     * Sets up debug callbacks
-     * @return 0 for failure, 1 for success, 2 for restart required.
-     */
+    // returns 0 for failure, 1 for success, 2 if a restart is required
     public static int setupDebugMessageCallback() {
         return setupDebugMessageCallback(APIUtil.DEBUG_STREAM);
     }
 
     private static void trace(Consumer<String> output) {
-        /*
-         * We can not just use a fixed stacktrace element offset, because some methods
-         * are intercepted and some are not. So, check the package name.
-         */
+        // a fixed stack offset fails because only some methods are intercepted, so check the package name
         StackTraceElement[] elems = filterStackTrace(new Throwable(), 4).getStackTrace();
         for (StackTraceElement ste : elems) {
             output.accept(ste.toString());

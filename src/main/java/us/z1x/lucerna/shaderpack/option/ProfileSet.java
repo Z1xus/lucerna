@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class ProfileSet {
-    private final LinkedHashMap<String, Profile> orderedProfiles; // The order that profiles should cycle through
-    private final List<Profile> sortedProfiles; // The order that profiles should be scanned through
+    private final LinkedHashMap<String, Profile> orderedProfiles; // cycle order
+    private final List<Profile> sortedProfiles; // match order
 
     public ProfileSet(LinkedHashMap<String, Profile> orderedProfiles) {
         List<Profile> sorted = new ArrayList<>(orderedProfiles.values());
@@ -22,9 +22,7 @@ public class ProfileSet {
         Comparator<Profile> lowToHigh = Comparator.comparing(p -> p.precedence);
         Comparator<Profile> highToLow = lowToHigh.reversed();
 
-        // Compare profiles with many constraints (high precedence) first before comparing ones with
-        // few constraints, needed for accurate matching when one profile contains an additional constraint
-        // to another profile but is otherwise the same;
+        // most constrained profiles first, so a profile with one extra constraint matches before its base
         sorted.sort(highToLow);
 
         this.sortedProfiles = sorted;
@@ -51,7 +49,7 @@ public class ProfileSet {
             }
         }
 
-        // Default return if no profiles matched
+        // fallback when no profile matches
         Profile next = sortedProfiles.get(0);
         Profile prev = sortedProfiles.get(sortedProfiles.size() - 1);
 

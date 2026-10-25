@@ -127,31 +127,25 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
 
         @Override
         public void render(int index, int x, int y, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered) {
-            // Draw dividing line
             fill(x - 3, (y + entryHeight) - 2, x + entryWidth, (y + entryHeight) - 1, 0x66BEBEBE);
 
             TextRenderer font = Minecraft.getInstance().textRenderer;
 
-            // Draw header text
             drawCenteredString(font, text, x + (int)(entryWidth * 0.5), y + 5, 0xFFFFFF);
 
             GuiUtil.bindIrisWidgetsTexture();
 
-            // Draw back button if present
             if (this.backButton != null) {
                 backButton.render(x, y, BUTTON_HEIGHT, mouseX, mouseY, hovered);
             }
 
             boolean shiftDown = Screen.isShiftDown();
 
-            // Set the appearance of the reset button
             this.resetButton.disabled = !shiftDown;
             this.resetButton.text = shiftDown ? resetButtonTextActive : resetButtonTextInactive;
 
-            // Draw the utility buttons
             this.utilityButtons.renderRightAligned((x + entryWidth) - 3, y, BUTTON_HEIGHT, mouseX, mouseY, hovered);
 
-            // Draw the reset button's tooltip
             if (this.resetButton.isHovered()) {
                 String tooltip = shiftDown ? resetTooltip : resetHoldShiftTooltip;
                 queueBottomRightAnchoredTooltip(mouseX, mouseY, font, tooltip);
@@ -212,12 +206,10 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
             this.cachedWidth = entryWidth;
             this.cachedPosX = x;
 
-            // The amount of space widgets will occupy, excluding margins. Will be divided up between widgets.
             int totalWidthWithoutMargins = entryWidth - (2 * (widgets.size() - 1));
 
             totalWidthWithoutMargins -= 3; // Centers it for some reason
 
-            // Width of a single widget
             float singleWidgetWidth = (float) totalWidthWithoutMargins / widgets.size();
 
             for (int i = 0; i < widgets.size(); i++) {

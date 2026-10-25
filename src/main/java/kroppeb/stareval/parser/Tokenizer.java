@@ -14,7 +14,6 @@ class Tokenizer {
     }
 
     static ExpressionElement parseInternal(StringReader input, ParserOptions options) throws ParseException {
-        // parser stack
         final Parser stack = new Parser();
         ParserOptions.TokenRules tokenRules = options.getTokenRules();
 
@@ -46,7 +45,6 @@ class Tokenizer {
                     throw new UnexpectedEndingException("An expression can't end with '.'");
                 }
             } else if (tokenRules.isNumberStart(c)) {
-                // start parsing a number
                 final String numberString = readWhile(input, tokenRules::isNumberPart);
                 stack.visitNumber(numberString);
             } else if (c == '(') {
@@ -57,7 +55,6 @@ class Tokenizer {
                 stack.visitClosingParenthesis(input.getCurrentIndex());
             } else {
                 if (stack.canReadBinaryOp()) {
-                    // maybe binary operator
                     OpResolver<? extends BinaryOp> resolver = options.getBinaryOpResolver(c);
 
                     if (resolver != null) {
@@ -65,7 +62,6 @@ class Tokenizer {
                         continue;
                     }
                 } else {
-                    // maybe unary operator
                     OpResolver<? extends UnaryOp> resolver = options.getUnaryOpResolver(c);
 
                     if (resolver != null) {
@@ -81,9 +77,7 @@ class Tokenizer {
         return stack.getFinal(input.getCurrentIndex());
     }
 
-    /**
-     * The returned value includes the last value btw;
-     */
+    // the result includes the last value
     private static String readWhile(StringReader input, CharPredicate predicate) {
         input.mark();
 
@@ -92,7 +86,7 @@ class Tokenizer {
                 break;
             }
 
-            // NB: Do not skip whitespace here implicitly.
+            // do not skip whitespace here implicitly
             input.skipOneCharacter();
         }
 
@@ -103,5 +97,4 @@ class Tokenizer {
         boolean test(char c);
     }
 }
-
 

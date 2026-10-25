@@ -55,7 +55,6 @@ public class ProgramSet {
     private final ProgramSource compositeFinal;
     private final ComputeSource[] finalCompute;
 
-
     private final ShaderPack pack;
 
     public ProgramSet(AbsolutePackPath directory, Function<AbsolutePackPath, String> sourceProvider,
@@ -63,16 +62,8 @@ public class ProgramSet {
         this.packDirectives = new PackDirectives(PackRenderTargetDirectives.BASELINE_SUPPORTED_RENDER_TARGETS, shaderProperties);
         this.pack = pack;
 
-        // Note: Ensure that blending is properly overridden during the shadow pass. By default, blending is disabled
-        //       in the shadow pass. Shader packs expect this for colored shadows from stained glass and nether portals
-        //       to work properly.
-        //
-        // Note: Enabling blending in the shadow pass results in weird results since translucency sorting happens
-        //       relative to the player camera, not the shadow camera, so we can't rely on chunks being properly
-        //       sorted in the shadow pass.
-        //
-        // - https://github.com/IrisShaders/Iris/issues/483
-        // - https://github.com/IrisShaders/Iris/issues/987
+        // blending stays off in the shadow pass, packs expect it for colored shadows and sorting is camera relative
+        // see https://github.com/IrisShaders/Iris/issues/483 and https://github.com/IrisShaders/Iris/issues/987
         this.shadow = readProgramSource(directory, sourceProvider, "shadow", this, shaderProperties,
                 BlendModeOverride.OFF);
         this.shadowCompute = readComputeArray(directory, sourceProvider, "shadow");
@@ -132,9 +123,7 @@ public class ProgramSet {
         locateDirectives();
 
         if (!gbuffersDamagedBlock.isValid()) {
-            // Special behavior inherited by OptiFine & Iris from old ShadersMod
-            // Presumably this was added before DRAWBUFFERS was a thing? Or just a hardcoded hacky fix for some
-            // shader packs - in any case, Sildurs Vibrant Shaders and other packs rely on it.
+            // shadersmod behavior kept by optifine and iris, sildurs vibrant shaders and other packs rely on it
             first(getGbuffersTerrain(), getGbuffersTexturedLit(), getGbuffersTextured(), getGbuffersBasic()).ifPresent(src -> {
                 ProgramDirectives overrideDirectives = src.getDirectives().withOverriddenDrawBuffers(new int[] { 0 });
                 this.gbuffersDamagedBlock = src.withDirectiveOverride(overrideDirectives);

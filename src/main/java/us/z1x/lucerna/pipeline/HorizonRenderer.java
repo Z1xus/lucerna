@@ -10,36 +10,16 @@ import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 
-/**
- * Renders the sky horizon. Vanilla Minecraft simply uses the "clear color" for its horizon, and then draws a plane
- * above the player. This class extends the sky rendering so that an octagonal prism is drawn around the player instead,
- * allowing shaders to perform more advanced sky rendering.
- * <p>
- * However, the horizon rendering is designed so that when sky shaders are not being used, it looks almost exactly the
- * same as vanilla sky rendering, except a few almost entirely imperceptible differences where the walls
- * of the octagonal prism intersect the top plane.
- */
+// draws an octagonal prism around the player instead of the vanilla clear color horizon so packs can do advanced skies
+// without sky shaders it looks almost the same as vanilla
 public class HorizonRenderer {
-    /**
-     * The Y coordinate of the top skybox plane. Acts as the upper bound for the horizon prism, since the prism lies
-     * between the bottom and top skybox planes.
-     */
+    // the horizon prism lies between the bottom and top skybox planes
     private static final float TOP = 16.0F;
 
-    /**
-     * The Y coordinate of the bottom skybox plane. Acts as the lower bound for the horizon prism, since the prism lies
-     * between the bottom and top skybox planes.
-     */
     private static final float BOTTOM = -16.0F;
 
-    /**
-     * Cosine of 22.5 degrees.
-     */
     private static final double COS_22_5 = Math.cos(Math.toRadians(22.5));
 
-    /**
-     * Sine of 22.5 degrees.
-     */
     private static final double SIN_22_5 = Math.sin(Math.toRadians(22.5));
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private int buffer;
@@ -57,7 +37,6 @@ public class HorizonRenderer {
             GL15.glDeleteBuffers(this.buffer);
         }
 
-        // Build the horizon quads into a buffer
         FloatArrayList vertices = new FloatArrayList();
         buildHorizon(currentRenderDistance * 16, vertices);
         this.vertexCount = vertices.size() / 3;
@@ -87,9 +66,7 @@ public class HorizonRenderer {
             opposite = -opposite;
         }
 
-        // NB: Make sure that these vertices are being specified in counterclockwise order!
-        // Otherwise back face culling will remove your quads, and you'll be wondering why there's a hole in your horizon.
-        // Don't poke holes in the horizon. Specify vertices in counterclockwise order.
+        // vertices must be counterclockwise or back face culling removes the quads
 
         // +X,-Z face
         buildQuad(consumer, adjacent, -opposite, opposite, -adjacent);
@@ -101,12 +78,6 @@ public class HorizonRenderer {
         buildQuad(consumer, -opposite, adjacent, opposite, adjacent);
     }
 
-    /**
-     * @param adjacent the adjacent side length of the a triangle with a hypotenuse extending from the center of the
-     *                 octagon to a given vertex on the perimeter.
-     * @param opposite the opposite side length of the a triangle with a hypotenuse extending from the center of the
-     *                 octagon to a given vertex on the perimeter.
-     */
     private void buildOctagonalPrism(FloatArrayList consumer, double adjacent, double opposite) {
         buildHalf(consumer, adjacent, opposite, false);
         buildHalf(consumer, adjacent, opposite, true);
@@ -128,9 +99,7 @@ public class HorizonRenderer {
     }
 
     private void buildTopPlane(FloatArrayList consumer, int radius) {
-        // You might be tempted to try to combine this with buildBottomPlane to avoid code duplication,
-        // but that won't work since the winding order has to be reversed or else one of the planes will be
-        // discarded by back face culling.
+        // do not merge with buildBottomPlane, the winding order must be reversed or back face culling drops one plane
         for (int x = -radius; x <= radius; x += 64) {
             for (int z = -radius; z <= radius; z += 64) {
                 vertex(consumer, x + 64, TOP, z);
@@ -143,18 +112,16 @@ public class HorizonRenderer {
 
     private void buildHorizon(int radius, FloatArrayList consumer) {
         if (radius > 256) {
-            // Prevent the prism from getting too large, this causes issues on some shader packs that modify the vanilla
-            // sky if we don't do this.
+            // cap the prism size, some packs that modify the vanilla sky break otherwise
             radius = 256;
         }
 
         buildRegularOctagonalPrism(consumer, radius);
 
-        // Replicate the vanilla top plane since we can't assume that it'll be rendered.
-        // TODO: Remove vanilla top plane
+        // replicate the vanilla top plane since it may not be rendered
         buildTopPlane(consumer, 384);
 
-        // Always make the bottom plane have a radius of 384, to match the top plane.
+        // the bottom plane always has a radius of 384 to match the top plane
         buildBottomPlane(consumer, 384);
     }
 

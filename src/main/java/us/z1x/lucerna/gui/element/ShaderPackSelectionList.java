@@ -45,9 +45,7 @@ public class ShaderPackSelectionList extends IrisObjectSelectionList<ShaderPackS
         } catch (Throwable e) {
             Iris.logger.error("Error reading files while constructing selection UI", e);
 
-            // Not translating this since it's going to be seen very rarely,
-            // We're just trying to get more information on a seemingly untraceable bug:
-            // - https://github.com/IrisShaders/Iris/issues/785
+            // untranslated on purpose, it only shows for https://github.com/IrisShaders/Iris/issues/785
             this.addLabelEntries(
                     "",
                     Formatting.RED + "" + Formatting.BOLD + "There was an error reading your shaderpacks directory",
@@ -65,8 +63,6 @@ public class ShaderPackSelectionList extends IrisObjectSelectionList<ShaderPackS
 
         this.addEntry(topButtonRow);
 
-        // Only allow the enable/disable shaders button if the user has
-        // added a shader pack. Otherwise, the button will be disabled.
         topButtonRow.allowEnableShadersButton = names.size() > 0;
 
         int index = 0;
@@ -164,18 +160,13 @@ public class ShaderPackSelectionList extends IrisObjectSelectionList<ShaderPackS
 
         @Override
         public boolean mouseClicked(int mouseX, int mouseY, int button) {
-            // Only do anything on left-click
             if (button != 0) {
                 return false;
             }
 
             boolean didAnything = false;
 
-            // UX: If shaders are disabled, then clicking a shader in the list will also
-            //     enable shaders on apply. Previously, it was not possible to select
-            //     a pack when shaders were disabled, but this was a source of confusion
-            //     - people did not realize that they needed to enable shaders before
-            //     selecting a shader pack.
+            // with shaders disabled, picking a pack also enables shaders on apply
             if (!list.getTopButtonRow().shadersEnabled) {
                 list.getTopButtonRow().setShadersEnabled(true);
                 didAnything = true;
@@ -275,7 +266,7 @@ public class ShaderPackSelectionList extends IrisObjectSelectionList<ShaderPackS
             return this.buttons.mouseClicked(mouseX, mouseY, button);
         }
 
-        // Renders the label at an offset as to not look misaligned with the rest of the menu
+        // offset so the label lines up with the rest of the menu
         public static class EnableShadersButtonElement extends IrisElementRow.TextButtonElement {
             private int centerX;
 

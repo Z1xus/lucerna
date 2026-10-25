@@ -17,75 +17,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * This class encapsulates the source code of a single shader source file along with the
- * corresponding configurable options within the source file.
- * <p>
- * The shader configuration system revolves around a carefully defined way of directly editing
- * shader source files in order to change configuration options. This class handles the first
- * step of that process—discovering configurable options from shader source files—as well as
- * the final step of that process—editing shader source files to apply the modified values
- * of valid configuration options.
- * <p>
- * Intermediate steps of that process include considering the annotated source for all shader
- * source files within a shader pack in order to deduplicate options that are common to multiple
- * source files, and discarding options that are ambiguous between source files. In addition,
- * another step includes loading changed option values from on-disk configuration files.
- * <p>
- * The name "OptionAnnotatedSource" is based on the fact that this class simultaneously
- * stores a snapshot of the shader source code at the time of option discovery, as well
- * as data for each line ("annotations") about the relevant option represented by that
- * line, or alternatively an optional diagnostic message for that line saying why a potential
- * option was not parsed as a valid shader option.
- * <p>
- * Note that for the most part, each line of the file is parsed in isolation from every
- * other line. This means that option conflicts can arise even within the same source file,
- * where option declarations have the same name and type but different default values.
- * The only exception to this isolation is
- * {@link OptionAnnotatedSource#getBooleanDefineReferences() boolean define reference tracking},
- * which is nevertheless still relatively context-free.
- * <p>
- * The data stored within this class is immutable. This ensures that once you have discovered
- * options from a given shader source file, that you may then apply any changed option values
- * without having to re-parse the shader source code for options, and without risking having
- * the shader source code fall out of sync with the annotations.
- */
 public final class OptionAnnotatedSource {
-    /**
-     * The content of each line within this shader source file.
-     */
     private final ImmutableList<String> lines;
 
     private final ImmutableMap<Integer, BooleanOption> booleanOptions;
     private final ImmutableMap<Integer, StringOption> stringOptions;
 
-    /**
-     * Optional diagnostic messages for each line. The parser may notice that though a shader pack
-     * author may have intended for a line to be a valid option, Iris might have ignored it due to
-     * a syntax error or some other issue.
-     *
-     * These diagnostic messages provide reasons for why Iris decided to ignore a plausible option
-     * line, as well as hints for how an invalid option line can be modified to be a valid one.
-     */
     private final ImmutableMap<Integer, String> diagnostics;
 
-    /**
-     * Keeps track of references to boolean #define options. Correlates the name of the #define
-     * option to one of the lines it was referenced on.
-     *
-     * References to boolean #define options that happen in plain #if directives are not analyzed
-     * for the purposes of determining whether a boolean #define option is referenced or not, to
-     * match OptiFine behavior. Though this might have originally been an oversight, shader packs
-     * now anticipate this behavior, so it must be replicated here. Since it would be complex to
-     * fully parse #if directives, this also makes the code simpler.
-     *
-     * Note that for the purposes of "confirming" a boolean #define option, it does not matter
-     * where the reference occurs in a given file - only that it is used at least once in the
-     * same "logical file" (that is, a file after all #includes have been processed) as it is
-     * defined. This is because shader config options are parsed as if all #include directives
-     * have already been substituted for the relevant file.
-     */
-    // TODO: Use an immutable list type
+    // plain #if references are ignored to match optifine, shader packs rely on this
+    // a reference anywhere in the logical file (after includes) confirms a boolean define
     private final ImmutableMap<String, IntList> booleanDefineReferences;
 
     private static final ImmutableSet<String> VALID_CONST_OPTION_NAMES = ImmutableSet.of(
@@ -128,14 +69,9 @@ public final class OptionAnnotatedSource {
     );
 
     public OptionAnnotatedSource(final String source) {
-        // Match any valid newline sequence
-        // https://stackoverflow.com/a/31060125
         this(ImmutableList.copyOf(source.split("\\R")));
     }
 
-    /**
-     * Parses the lines of a shader source file in order to locate valid options from it.
-     */
     public OptionAnnotatedSource(final ImmutableList<String> lines) {
         this.lines = lines;
 
@@ -153,24 +89,16 @@ public final class OptionAnnotatedSource {
     }
 
     private static void parseLine(AnnotationsBuilder builder, int index, String lineText) {
-        // Check to see if this line contains anything of interest before we try to parse it.
         if (!lineText.contains("#define")
                 && !lineText.contains("const")
                 && !lineText.contains("#ifdef")
                 && !lineText.contains("#ifndef")) {
-            // Nothing of interest.
             return;
         }
 
-        // Parse the trimmed form of the line to ignore indentation and trailing whitespace.
         ParsedString line = new ParsedString(lineText.trim());
 
         if (line.takeLiteral("#ifdef") || line.takeLiteral("#ifndef")) {
-            // The presence of #ifdef and #ifndef directives is used to determine whether a given
-            // boolean option should be recognized as a configurable option.
-            //
-            // As noted above, #if and #elif directives are not checked even though they may also
-            // contain references.
             parseIfdef(builder, index, line);
         } else if (line.takeLiteral("const")) {
             parseConst(builder, index, line);
@@ -197,8 +125,6 @@ public final class OptionAnnotatedSource {
     }
 
     private static void parseConst(AnnotationsBuilder builder, int index, ParsedString line) {
-        // const is already taken.
-
         if (!line.takeSomeWhitespace()) {
             builder.diagnostics.put(index, "Expected whitespace after const and before type declaration");
             return;
@@ -306,10 +232,8 @@ public final class OptionAnnotatedSource {
     }
 
     private static void parseDefineOption(AnnotationsBuilder builder, int index, ParsedString line) {
-        // Remove the leading comment for processing.
         boolean hasLeadingComment = line.takeComments();
 
-        // allow but do not require whitespace between comments and #define
         line.takeSomeWhitespace();
 
         if (!line.takeLiteral("#define")) {
@@ -335,25 +259,19 @@ public final class OptionAnnotatedSource {
             return;
         }
 
-        // Maybe take some whitespace
         boolean tookWhitespace = line.takeSomeWhitespace();
 
         if (line.isEnd()) {
-            // Plain define directive without a comment.
             builder.booleanOptions.put(index, new BooleanOption(OptionType.DEFINE, name, null, !hasLeadingComment));
             return;
         }
 
         if (line.takeComments()) {
-            // Note that this is a bare comment, we don't need to look for the allowed values part.
-            // Obviously that part isn't necessary since boolean options only have two possible
-            // values (true and false)
             String comment = line.takeRest().trim();
 
             builder.booleanOptions.put(index, new BooleanOption(OptionType.DEFINE, name, comment, !hasLeadingComment));
             return;
         } else if (!tookWhitespace) {
-            // Invalid syntax.
             builder.diagnostics.put(index,
                     "Invalid syntax after #define directive. Only alphanumeric or underscore " +
                             "characters are allowed in option names.");
@@ -407,19 +325,6 @@ public final class OptionAnnotatedSource {
         }
 
         builder.stringOptions.put(index, option);
-
-        /*
-        //#define   SHADOWS // Whether shadows are enabled
-        SHADOWS // Whether shadows are enabled
-        // Whether shadows are enabled
-        Whether shadows are enabled
-
-
-
-        #define OPTION 0.5 // A test option
-        OPTION 0.5 // A test option
-        0.5 // A test option
-        */
     }
 
     public ImmutableMap<Integer, BooleanOption> getBooleanOptions() {
@@ -472,7 +377,6 @@ public final class OptionAnnotatedSource {
     }
 
     private String edit(OptionValues values, int index, String existing) {
-        // See if it's a boolean option
         BooleanOption booleanOption = booleanOptions.get(index);
 
         if (booleanOption != null) {
@@ -481,7 +385,7 @@ public final class OptionAnnotatedSource {
                 return setBooleanDefineValue(existing, value, booleanOption.getDefaultValue());
             } else if (booleanOption.getType() == OptionType.CONST) {
                 if (value != OptionalBoolean.DEFAULT) {
-                    // Value will never be default here, but we're using orElse just to get a normal boolean out of it.
+                    // value is never default here, orElse only unwraps it
                     return editConst(existing, Boolean.toString(booleanOption.getDefaultValue()), Boolean.toString(value.orElse(booleanOption.getDefaultValue())));
                 } else {
                     return existing;
@@ -512,7 +416,6 @@ public final class OptionAnnotatedSource {
         int equalsIndex = line.indexOf('=');
 
         if (equalsIndex == -1) {
-            // This shouldn't be possible.
             throw new IllegalStateException();
         }
 

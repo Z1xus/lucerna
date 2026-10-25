@@ -2,9 +2,6 @@ package us.z1x.lucerna.shaderpack.option;
 
 import us.z1x.lucerna.shaderpack.include.AbsolutePackPath;
 
-/**
- * Encapsulates a single location of an option.
- */
 public class OptionLocation {
     private final AbsolutePackPath filePath;
     private final int lineIndex;
@@ -18,11 +15,7 @@ public class OptionLocation {
         return filePath;
     }
 
-    /**
-     * Gets the index of the line this option is on.
-     * Note that this is the index - so the first line is
-     * 0, the second is 1, etc.
-     */
+    // zero-based
     public int getLineIndex() {
         return lineIndex;
     }

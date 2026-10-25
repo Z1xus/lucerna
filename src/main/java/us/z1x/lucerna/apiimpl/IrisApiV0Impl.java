@@ -9,7 +9,6 @@ import net.irisshaders.iris.api.v0.IrisApi;
 import net.irisshaders.iris.api.v0.IrisApiConfig;
 import net.minecraft.client.gui.screen.Screen;
 
-
 public class IrisApiV0Impl implements IrisApi {
     public static final IrisApiV0Impl INSTANCE = new IrisApiV0Impl();
     private static final IrisApiV0ConfigImpl CONFIG = new IrisApiV0ConfigImpl();

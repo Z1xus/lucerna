@@ -16,7 +16,6 @@ public class BlendModeStorage {
 
     public static void overrideBlend(BlendMode override) {
         if (!blendLocked) {
-            // Only save the previous state if the blend mode wasn't already locked
             GlStateManager.Blend blendState = GlStateManager.BLEND;
 
             originalBlendEnable = blendState.state.enabled;
@@ -37,7 +36,6 @@ public class BlendModeStorage {
 
     public static void overrideBufferBlend(int index, BlendMode override) {
         if (!blendLocked) {
-            // Only save the previous state if the blend mode wasn't already locked
             GlStateManager.Blend blendState = GlStateManager.BLEND;
 
             originalBlendEnable = blendState.state.enabled;

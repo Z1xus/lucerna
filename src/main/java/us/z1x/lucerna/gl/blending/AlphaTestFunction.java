@@ -45,11 +45,7 @@ public enum AlphaTestFunction {
 
     public static Optional<AlphaTestFunction> fromString(String name) {
         if ("GL_ALWAYS".equals(name)) {
-            // shaders.properties states that GL_ALWAYS is the name to use, but I haven't verified that this actually
-            // matches the implementation... All of the other names do not have the GL_ prefix.
-            //
-            // We'll support it here just to be safe, even though just a plain ALWAYS seems more likely to be what it
-            // parses.
+            // shaders.properties documents GL_ALWAYS though the other names have no GL_ prefix
             return Optional.of(AlphaTestFunction.ALWAYS);
         }
 

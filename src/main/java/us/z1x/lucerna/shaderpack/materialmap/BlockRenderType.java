@@ -2,31 +2,15 @@ package us.z1x.lucerna.shaderpack.materialmap;
 
 import java.util.Optional;
 
-/**
- * Defines the possible render types for blocks.
- *
- * @see <a href="https://github.com/sp614x/optifine/blob/9ea6d9b7f57f20babae64f3807b00a6ca6e1d44a/OptiFineDoc/doc/shaders.txt#L662-L681">
- *     the corresponding OptiFine documentation.</a>
- */
+// see https://github.com/sp614x/optifine/blob/9ea6d9b7f57f20babae64f3807b00a6ca6e1d44a/OptiFineDoc/doc/shaders.txt#L662-L681
 public enum BlockRenderType {
-    /**
-     * Alpha test disabled, blending disabled, mipmaps enabled.
-     */
+    // alpha test off, blending off, mipmaps on
     SOLID,
-    /**
-     * Alpha test enabled, blending disabled, mipmaps disabled.
-     * Used for tall grass, normal glass, etc.
-     */
+    // alpha test on, blending off, mipmaps off, for tall grass and glass
     CUTOUT,
-    /**
-     * Alpha test enabled, blending disabled, mipmaps enabled.
-     * Used for leaves.
-     */
+    // alpha test on, blending off, mipmaps on, for leaves
     CUTOUT_MIPPED,
-    /**
-     * Alpha test enabled (w/ low cutoff), blending enabled, mipmaps enabled.
-     * Used for stained glass, nether portals, and water.
-     */
+    // alpha test on with a low cutoff, blending on, mipmaps on, for stained glass, portals, and water
     TRANSLUCENT;
 
     public static Optional<BlockRenderType> fromString(String name) {

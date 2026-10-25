@@ -53,11 +53,6 @@ import java.util.zip.ZipException;
 public class Iris {
     public static final String MODID = "lucerna";
 
-    /**
-     * The user-facing name of the mod. Moved into a constant to facilitate
-     * easy branding changes (for forks). You'll still need to change this
-     * separately in mixin plugin classes & the language files.
-     */
     public static final String MODNAME = "Lucerna";
 
     public static final IrisLogging logger = new IrisLogging(MODNAME);
@@ -77,23 +72,13 @@ public class Iris {
     private static KeyBinding shaderpackScreenKeybind;
 
     private static final Map<String, String> shaderPackOptionQueue = new HashMap<>();
-    // Flag variable used when reloading
-    // Used in favor of queueDefaultShaderPackOptionValues() for resetting as the
-    // behavior is more concrete and therefore is more likely to repair a user's issues
+    // forces default option values on the next reload, more reliable than queueing the defaults for repairing a broken config
     private static boolean resetShaderPackOptions = false;
 
     private static Version irisVersion;
     private static boolean fallback;
 
-    /**
-     * Called very early on in Minecraft initialization. At this point we *cannot* safely access OpenGL, but we can do
-     * some very basic setup, config loading, and environment checks.
-     *
-     * <p>This is roughly equivalent to Fabric Loader's ClientModInitializer#onInitializeClient entrypoint, except
-     * it's entirely cross platform & we get to decide its exact semantics.</p>
-     *
-     * <p>This is called right before options are loaded, so we can add key bindings here.</p>
-     */
+    // called right before the options load, so key bindings can be added here, opengl is not available yet
     public static KeyBinding[] onEarlyInitialize() {
         ModContainer iris = FabricLoader.getInstance().getModContainer(MODID)
                 .orElseThrow(() -> new IllegalStateException("Couldn't find the mod container for Iris"));
@@ -127,9 +112,6 @@ public class Iris {
         return new KeyBinding[] { reloadKeybind, toggleShadersKeybind, shaderpackScreenKeybind };
     }
 
-    /**
-     * Called once RenderSystem#initRenderer has completed. This means that we can safely access OpenGL.
-     */
     public static void onRenderSystemInit() {
         if (!initialized) {
             Iris.logger.warn("Iris::onRenderSystemInit was called, but Iris::onEarlyInitialize was not called." +
@@ -142,13 +124,10 @@ public class Iris {
 
         setDebug(irisConfig.areDebugOptionsEnabled());
 
-        // Only load the shader pack when we can access OpenGL
+        // only load the shader pack once opengl is available
         loadShaderpack();
     }
 
-    /**
-     * Called when the title screen is initialized for the first time.
-     */
     public static void onLoadingComplete() {
         if (!initialized) {
             Iris.logger.warn("Iris::onLoadingComplete was called, but Iris::onEarlyInitialize was not called." +
@@ -156,9 +135,8 @@ public class Iris {
             return;
         }
 
-        // Initialize the pipeline now so that we don't increase world loading time. Just going to guess that
-        // the player is in the overworld.
-        // See: https://github.com/IrisShaders/Iris/issues/323
+        // prepare the pipeline here so world loading is not slower, guessing the overworld
+        // https://github.com/IrisShaders/Iris/issues/323
         lastDimension = DimensionId.OVERWORLD;
         Iris.getPipelineManager().preparePipeline(DimensionId.OVERWORLD);
     }
@@ -224,7 +202,6 @@ public class Iris {
             return;
         }
 
-        // Attempt to load an external shaderpack if it is available
         Optional<String> externalName = irisConfig.getShaderPackName();
 
         if (!externalName.isPresent()) {
@@ -289,7 +266,6 @@ public class Iris {
                 return false;
             }
 
-            // If it's a folder-based shaderpack, just use the shaders subdirectory
             shaderPackPath = shaderPackRoot.resolve("shaders");
         }
 
@@ -315,7 +291,6 @@ public class Iris {
 
             MutableOptionValues changedConfigsValues = currentPack.getShaderPackOptions().getOptionValues().mutableCopy();
 
-            // Store changed values from those currently in use by the shader pack
             Properties configsToSave = new Properties();
             changedConfigsValues.getBooleanValues().forEach((k, v) -> configsToSave.setProperty(k, Boolean.toString(v)));
             changedConfigsValues.getStringValues().forEach(configsToSave::setProperty);
@@ -341,21 +316,15 @@ public class Iris {
         FileSystem zipSystem = FileSystems.newFileSystem(shaderpackPath, Iris.class.getClassLoader());
         zipFileSystem = zipSystem;
 
-        // Should only be one root directory for a zip shaderpack
         Path root = zipSystem.getRootDirectories().iterator().next();
 
         Path potentialShaderDir = zipSystem.getPath("shaders");
 
-        // If the shaders dir was immediately found return it
-        // Otherwise, manually search through each directory path until it ends with "shaders"
         if (Files.exists(potentialShaderDir)) {
             return Optional.of(potentialShaderDir);
         }
 
-        // Sometimes shaderpacks have their shaders directory within another folder in the shaderpack
-        // For example Sildurs-Vibrant-Shaders.zip/shaders
-        // While other packs have Trippy-Shaderpack-master.zip/Trippy-Shaderpack-master/shaders
-        // This makes it hard to determine what is the actual shaders dir
+        // some packs nest the shaders directory in another folder, for example Trippy-Shaderpack-master.zip/Trippy-Shaderpack-master/shaders
         try (Stream<Path> stream = Files.walk(root)) {
             return stream
                     .filter(Files::isDirectory)
@@ -397,11 +366,9 @@ public class Iris {
 
         if (Files.exists(path)) {
             try (InputStream is = Files.newInputStream(path)) {
-                // NB: config properties are specified to be encoded with ISO-8859-1 by OptiFine,
-                //     so we don't need to do the UTF-8 workaround here.
+                // optifine specifies iso-8859-1 for config properties, so no utf-8 workaround is needed
                 properties.load(is);
             } catch (IOException e) {
-                // TODO: Better error handling
                 return Optional.empty();
             }
         }
@@ -412,7 +379,6 @@ public class Iris {
     private static void tryUpdateConfigPropertiesFile(Path path, Properties properties) {
         try {
             if (properties.isEmpty()) {
-                // Delete the file or don't create it if there are no changed configs
                 if (Files.exists(path)) {
                     Files.delete(path);
                 }
@@ -424,28 +390,22 @@ public class Iris {
                 properties.store(out, null);
             }
         } catch (IOException e) {
-            // TODO: Better error handling
         }
     }
 
     public static boolean isValidShaderpack(Path pack) {
         if (Files.isDirectory(pack)) {
-            // Sometimes the shaderpack directory itself can be
-            // identified as a shader pack due to it containing
-            // folders which contain "shaders" folders, this is
-            // necessary to check against that
+            // the shaderpacks directory itself contains folders with "shaders" folders
             if (pack.equals(getShaderpacksDirectory())) {
                 return false;
             }
             try (Stream<Path> stream = Files.walk(pack)) {
                 return stream
                         .filter(Files::isDirectory)
-                        // Prevent a pack simply named "shaders" from being
-                        // identified as a valid pack
+                        // a pack named "shaders" is not valid
                         .filter(path -> !path.equals(pack))
                         .anyMatch(path -> path.endsWith("shaders"));
             } catch (IOException ignored) {
-                // ignored, not a valid shader pack.
             }
         }
 
@@ -458,10 +418,9 @@ public class Iris {
                             .anyMatch(path -> path.endsWith("shaders"));
                 }
             } catch (ZipError zipError) {
-                // Java 8 seems to throw a ZipError instead of a subclass of IOException
+                // java 8 throws ZipError instead of an IOException subclass
                 Iris.logger.warn("The ZIP at " + pack + " is corrupt");
             } catch (IOException ignored) {
-                // ignored, not a valid shader pack.
             }
         }
 
@@ -483,7 +442,7 @@ public class Iris {
                 getShaderPackOptionQueue().put(key, properties.getProperty(key)));
     }
 
-    // Used in favor of resetShaderPackOptions as the aforementioned requires the pack to be reloaded
+    // unlike resetShaderPackOptions, this does not need a pack reload
     public static void queueDefaultShaderPackOptionValues() {
         clearShaderPackOptionQueue();
 
@@ -517,41 +476,31 @@ public class Iris {
     }
 
     public static void reload() throws IOException {
-        // allows shaderpacks to be changed at runtime
         irisConfig.initialize();
 
         boolean hadPack = isShaderPackActive();
 
-        // Destroy all allocated resources
         destroyEverything();
 
-        // Load the new shaderpack
         loadShaderpack();
 
-        // Argentum's section manager only gets a shadow pass while a shader pack is loaded
+        // argentum's section manager only gets a shadow pass while a shader pack is loaded
         if (hadPack != isShaderPackActive() && Minecraft.getInstance().worldRenderer != null) {
             Minecraft.getInstance().worldRenderer.reload();
         }
 
-        // Very important - we need to re-create the pipeline straight away.
-        // https://github.com/IrisShaders/Iris/issues/1330
+        // the pipeline must be created again right away, see https://github.com/IrisShaders/Iris/issues/1330
         if (Minecraft.getInstance().world != null) {
             Iris.getPipelineManager().preparePipeline(Iris.getCurrentDimension());
         }
     }
 
-
-    /**
-     * Destroys and deallocates all created OpenGL resources. Useful as part of a reload.
-     */
     private static void destroyEverything() {
         currentPack = null;
 
         getPipelineManager().destroyPipeline();
 
-        // Close the zip filesystem that the shaderpack was loaded from
-        //
-        // This prevents a FileSystemAlreadyExistsException when reloading shaderpacks.
+        // prevents a FileSystemAlreadyExistsException when reloading shader packs
         if (zipFileSystem != null) {
             try {
                 zipFileSystem.close();
@@ -578,16 +527,13 @@ public class Iris {
                     return DimensionId.OVERWORLD;
             }
         } else {
-            // This prevents us from reloading the shaderpack unless we need to. Otherwise, if the player is in the
-            // nether and quits the game, we might end up reloading the shaders on exit and on entry to the level
-            // because the code thinks that the dimension changed.
+            // keep the last dimension, or quitting from the nether reloads the shaders on exit and on entry
             return lastDimension;
         }
     }
 
     private static WorldRenderingPipeline createPipeline(DimensionId dimensionId) {
         if (currentPack == null) {
-            // Completely disables shader-based rendering
             return new FixedFunctionWorldRenderingPipeline();
         }
 
@@ -597,7 +543,6 @@ public class Iris {
             return new DeferredWorldRenderingPipeline(programs);
         } catch (Exception e) {
             logger.error("Failed to create shader rendering pipeline, disabling shaders!", e);
-            // TODO: This should be reverted if a dimension change causes shaders to compile again
             fallback = true;
             ArgentumCompat.setShadersActive(false);
 

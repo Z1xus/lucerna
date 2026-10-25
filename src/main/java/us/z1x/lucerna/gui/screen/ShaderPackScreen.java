@@ -28,9 +28,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class ShaderPackScreen extends Screen implements HudHideable {
-    /**
-     * Queue rendering to happen on top of all elements. Useful for tooltips or dialogs.
-     */
     public static final Set<Runnable> TOP_LAYER_RENDER_QUEUE = new HashSet<>();
 
     private static final int COMMENT_PANEL_WIDTH = 314;
@@ -101,15 +98,11 @@ public class ShaderPackScreen extends Screen implements HudHideable {
 
             drawCenteredString(this.textRenderer, Formatting.GRAY + "" + Formatting.ITALIC + subtitle, (int) (this.width * 0.5), 21, 0xFFFFFF);
 
-            // Draw the comment panel
             if (this.isDisplayingComment()) {
-                // Determine panel height and position
                 int panelHeight = Math.max(50, 18 + (this.hoveredElementCommentBody.size() * 10));
                 int x = (int) (0.5 * this.width) - 157;
                 int y = this.height - (panelHeight + 4);
-                // Draw panel
                 GuiUtil.drawPanel(x, y, COMMENT_PANEL_WIDTH, panelHeight);
-                // Draw text
                 this.textRenderer.drawWithShadow(this.hoveredElementCommentTitle.orElse(""), x + 4, y + 4, 0xFFFFFF);
                 for (int i = 0; i < this.hoveredElementCommentBody.size(); i++) {
                     this.textRenderer.drawWithShadow(this.hoveredElementCommentBody.get(i), x + 4, (y + 16) + (i * 10), 0xFFFFFF);
@@ -130,7 +123,6 @@ public class ShaderPackScreen extends Screen implements HudHideable {
             this.textRenderer.drawWithShadow(irisText, 2, this.height - 10, 0xFFFFFF);
         }
 
-        // Render everything queued to render last
         for (Runnable render : TOP_LAYER_RENDER_QUEUE) {
             render.run();
         }
@@ -215,8 +207,7 @@ public class ShaderPackScreen extends Screen implements HudHideable {
             this.buttons.add(this.hideGuiButton);
         }
 
-        // NB: Don't let comment remain when exiting options screen
-        // https://github.com/IrisShaders/Iris/issues/1494
+        // clear the comment when leaving the options screen, see https://github.com/IrisShaders/Iris/issues/1494
         this.hoveredElement = null;
         this.hoveredElementCommentTimer = 0;
     }
@@ -247,11 +238,7 @@ public class ShaderPackScreen extends Screen implements HudHideable {
             case SCREEN_SWITCH_BUTTON:
                 this.optionMenuOpen = !this.optionMenuOpen;
 
-                // UX: Apply changes before switching screens to avoid unintuitive behavior
-                //
-                // Not doing this leads to unintuitive behavior, since selecting a pack in the
-                // list (but not applying) would open the settings for the previous pack, rather
-                // than opening the settings for the selected (but not applied) pack.
+                // apply before switching screens, otherwise picking a pack without applying opens the previous pack's settings
                 this.applyChanges();
 
                 this.init();
@@ -375,8 +362,7 @@ public class ShaderPackScreen extends Screen implements HudHideable {
 
         String name = entry.getPackName();
 
-        // If the pack is being changed, clear pending options from the previous pack to
-        // avoid possible undefined behavior from applying one pack's options to another pack
+        // a different pack drops the pending options so they never apply to the wrong pack
         if (!name.equals(Iris.getCurrentPackName())) {
             Iris.clearShaderPackOptionQueue();
         }
@@ -386,7 +372,6 @@ public class ShaderPackScreen extends Screen implements HudHideable {
         String previousPackName = Iris.getIrisConfig().getShaderPackName().orElse(null);
         boolean previousShadersEnabled = Iris.getIrisConfig().areShadersEnabled();
 
-        // Only reload if the pack would be different from before, or shaders were toggled, or options were changed, or if we're about to reset options.
         if (!name.equals(previousPackName) || enabled != previousShadersEnabled || !Iris.getShaderPackOptionQueue().isEmpty() || Iris.shouldResetShaderPackOptionsOnNextReload()) {
             Iris.getIrisConfig().setShaderPackName(name);
             IrisApi.getInstance().getConfig().setShadersEnabledAndApply(enabled);
@@ -403,7 +388,6 @@ public class ShaderPackScreen extends Screen implements HudHideable {
         Sys.openURL(Iris.getShaderpacksDirectoryManager().getDirectoryUri().toString());
     }
 
-    // Let the screen know if an element is hovered or not, allowing for accurately updating which element is hovered
     public void setElementHoveredStatus(AbstractElementWidget<?> widget, boolean hovered) {
         if (hovered && widget != this.hoveredElement) {
             this.hoveredElement = widget;
@@ -417,11 +401,9 @@ public class ShaderPackScreen extends Screen implements HudHideable {
                 } else {
                     String rawCommentBody = commentBody.get();
 
-                    // Strip any trailing "."s
                     if (rawCommentBody.endsWith(".")) {
                         rawCommentBody = rawCommentBody.substring(0, rawCommentBody.length() - 1);
                     }
-                    // Split comment body into lines by separator ". " and line wrap
                     this.hoveredElementCommentBody = new ArrayList<>();
                     for (String text : rawCommentBody.split("\\. [ ]*")) {
                         this.hoveredElementCommentBody.addAll(this.textRenderer.split(text, COMMENT_PANEL_WIDTH - 8));

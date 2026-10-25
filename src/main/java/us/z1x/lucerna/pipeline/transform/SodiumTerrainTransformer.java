@@ -13,9 +13,7 @@ import io.github.douira.glsl_transformer.ast.transform.ASTInjectionPoint;
 import io.github.douira.glsl_transformer.ast.transform.ASTParser;
 import io.github.douira.glsl_transformer.util.Type;
 
-/**
- * Patches terrain programs to read the Celeritas chunk vertices that Argentum draws, using glsl-transformer AST.
- */
+// patches terrain programs to read the celeritas chunk vertices that argentum draws
 class SodiumTerrainTransformer {
     public static void transform(
             ASTParser t,
@@ -23,7 +21,6 @@ class SodiumTerrainTransformer {
             Root root,
             Parameters parameters) {
         switch (parameters.type) {
-            // For Sodium patching, treat fragment and geometry the same
             case FRAGMENT:
                 transformFragment(t, tree, root, parameters);
                 break;
@@ -43,9 +40,6 @@ class SodiumTerrainTransformer {
     private static final AutoHintedMatcher<Expression> glTextureMatrix1 = new AutoHintedMatcher<>(
             "gl_TextureMatrix[1]", Matcher.expressionPattern);
 
-    /**
-     * Transforms vertex shaders.
-     */
     public static void transformVertex(
             ASTParser t,
             TranslationUnit tree,
@@ -77,9 +71,7 @@ class SodiumTerrainTransformer {
         root.rename("ftransform", "iris_ftransform");
     }
 
-    /**
-     * Transforms fragment shaders, applying the cutout alpha test that the fixed function pipeline would do.
-     */
+    // applies the cutout alpha test that the fixed function pipeline would do
     public static void transformFragment(
             ASTParser t,
             TranslationUnit tree,
@@ -115,9 +107,6 @@ class SodiumTerrainTransformer {
         return null;
     }
 
-    /**
-     * Does the things that every stage needs.
-     */
     private static void transformShared(
             ASTParser t,
             TranslationUnit tree,

@@ -43,8 +43,7 @@ public final class ComputeProgram extends GlResource {
             if (this.absoluteWorkGroups != null) {
                 this.cachedWorkGroups = this.absoluteWorkGroups;
             } else if (relativeWorkGroups != null) {
-                // TODO: This is my best guess at what Optifine does. Can this be confirmed?
-                // Do not use actual localSize here, apparently that's not what we want.
+                // best guess at optifine's behavior, the actual localSize is not wanted here
                 this.cachedWorkGroups = new Vector3i((int) Math.ceil(Math.ceil((width * relativeWorkGroups.x)) / localSize[0]), (int) Math.ceil(Math.ceil((height * relativeWorkGroups.y)) / localSize[1]), 1);
             } else {
                 this.cachedWorkGroups = new Vector3i((int) Math.ceil(width / localSize[0]), (int) Math.ceil(height / localSize[1]), 1);
@@ -76,10 +75,6 @@ public final class ComputeProgram extends GlResource {
         GL20.glDeleteProgram(getGlId());
     }
 
-    /**
-     * @return the OpenGL ID of this program.
-     * @deprecated this should be encapsulated eventually
-     */
     @Deprecated
     public int getProgramId() {
         return getGlId();

@@ -22,20 +22,9 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
-/**
- * Contains a workaround for a crash in nglShaderSource on some AMD drivers. Copied from the following Canvas commit:
- * https://github.com/grondag/canvas/commit/820bf754092ccaf8d0c169620c2ff575722d7d96
- */
+// from canvas https://github.com/grondag/canvas/commit/820bf754092ccaf8d0c169620c2ff575722d7d96
 public class ShaderWorkarounds {
-    /**
-     * Identical in function to {@link GL20C#glShaderSource(int, CharSequence)} but
-     * passes a null pointer for string length to force the driver to rely on the null
-     * terminator for string length.  This is a workaround for an apparent flaw with some
-     * AMD drivers that don't receive or interpret the length correctly, resulting in
-     * an access violation when the driver tries to read past the string memory.
-     *
-     * <p>Hat tip to fewizz for the find and the fix.
-     */
+    // passes a null length so the driver reads up to the terminator, some amd drivers misread the length and crash
     public static void safeShaderSource(int glId, CharSequence source) {
         final MemoryStack stack = MemoryStack.stackGet();
         final int stackPointer = stack.getPointer();

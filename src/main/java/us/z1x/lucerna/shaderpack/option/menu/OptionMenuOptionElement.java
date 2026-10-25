@@ -19,17 +19,10 @@ public abstract class OptionMenuOptionElement extends OptionMenuElement {
         this.packAppliedValues = packAppliedValues;
     }
 
-    /**
-     * @return the {@link OptionValues} currently in use by the shader pack
-     */
     public OptionValues getAppliedOptionValues() {
         return packAppliedValues;
     }
 
-    /**
-     * @return an {@link OptionValues} that also contains values currently
-     * pending application.
-     */
     public OptionValues getPendingOptionValues() {
         MutableOptionValues values = getAppliedOptionValues().mutableCopy();
         values.addAll(Iris.getShaderPackOptionQueue());

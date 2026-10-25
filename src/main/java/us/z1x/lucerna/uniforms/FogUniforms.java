@@ -6,7 +6,6 @@ import net.minecraft.client.render.platform.GlStateManager;
 
 public class FogUniforms {
     private FogUniforms() {
-        // no construction
     }
 
     public static void addFogUniforms(DynamicUniformHolder uniforms) {

@@ -27,7 +27,7 @@ public class PropertyCollectingListener extends DefaultPreprocessorListener {
     public void handleError(Source source, int line, int column, String msg) throws LexerException {
         if (msg.contains("Unknown preprocessor directive")
              || msg.contains("Preprocessor directive not a word")) {
-            // Suppress log spam since hashed lines also function as comments in preprocessed files.
+            // # lines are comments in properties files, so suppress the log spam
             return;
         }
 

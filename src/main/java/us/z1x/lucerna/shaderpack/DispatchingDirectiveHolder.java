@@ -56,7 +56,7 @@ public class DispatchingDirectiveHolder implements DirectiveHolder {
             typeCheckHelper("float", floatConstVariables, directive);
             typeCheckHelper("vec4", vec4ConstVariables, directive);
         } else if (type == ConstDirectiveParser.Type.INT) {
-            // GLSL does not actually have a string type, so string constant directives use "const int" instead.
+            // glsl has no string type, so string const directives use const int
             Consumer<String> stringConsumer = stringConstVariables.get(key);
 
             if (stringConsumer != null) {
@@ -240,22 +240,18 @@ public class DispatchingDirectiveHolder implements DirectiveHolder {
 
     @Override
     public void acceptUniformDirective(String name, Runnable onDetected) {
-        // TODO
     }
 
     @Override
     public void acceptCommentStringDirective(String name, Consumer<String> consumer) {
-        // TODO
     }
 
     @Override
     public void acceptCommentIntDirective(String name, IntConsumer consumer) {
-        // TODO
     }
 
     @Override
     public void acceptCommentFloatDirective(String name, FloatConsumer consumer) {
-        // TODO
     }
 
     @Override

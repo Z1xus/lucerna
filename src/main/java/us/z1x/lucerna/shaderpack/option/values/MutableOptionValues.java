@@ -60,15 +60,12 @@ public class MutableOptionValues implements OptionValues {
             } else if (value.equals("true")) {
                 booleanValue = OptionalBoolean.TRUE;
             } else {
-                // Invalid value specified, ignore it
-                // TODO: Diagnostic message?
                 booleanValue = OptionalBoolean.DEFAULT;
             }
 
             boolean actualValue = booleanValue.orElse(option.getOption().getDefaultValue());
 
             if (actualValue == option.getOption().getDefaultValue()) {
-                // Just set it to default by removing it from the map
                 booleanValues.remove(name);
                 return;
             }
@@ -83,11 +80,7 @@ public class MutableOptionValues implements OptionValues {
                 return;
             }
 
-            // NB: We don't check if the option is in the allowed values here. This matches OptiFine
-            //     behavior, the allowed values is only used when the user is changing options in the
-            //     GUI. Profiles might specify values for options that aren't in the allowed values
-            //     list, and values typed manually into the config .txt are unchecked.
-
+            // allowed values are not checked here to match optifine, they only limit the gui
             if (value.equals(option.getOption().getDefaultValue())) {
                 stringValues.remove(name);
                 return;

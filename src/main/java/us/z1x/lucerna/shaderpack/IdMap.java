@@ -29,28 +29,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
-/**
- * A utility class for parsing entries in item.properties, block.properties, and entities.properties files in shaderpacks
- */
 public class IdMap {
-    /**
-     * Maps a given item ID to an integer ID
-     */
     private final Object2IntMap<NamespacedId> itemIdMap;
 
-    /**
-     * Maps a given entity ID to an integer ID
-     */
     private final Object2IntMap<NamespacedId> entityIdMap;
 
-    /**
-     * Maps block states to block ids defined in block.properties
-     */
     private Int2ObjectMap<List<BlockEntry>> blockPropertiesMap;
 
-    /**
-     * A set of render type overrides for specific blocks. Allows shader packs to move blocks to different render types.
-     */
     private Map<NamespacedId, BlockRenderType> blockRenderTypeMap;
 
     IdMap(Path shaderPath, ShaderPackOptions shaderPackOptions, Iterable<StringPair> environmentDefines) {
@@ -65,10 +50,8 @@ public class IdMap {
             blockRenderTypeMap = parseRenderTypeMap(blockProperties, "layer.", "block.properties");
         });
 
-        // TODO: Properly override block render layers
 
         if (blockPropertiesMap == null) {
-            // Fill in with default values...
             blockPropertiesMap = new Int2ObjectOpenHashMap<>();
             LegacyIdMap.addLegacyValues(blockPropertiesMap);
         }
@@ -78,9 +61,6 @@ public class IdMap {
         }
     }
 
-    /**
-     * Loads properties from a properties file in a shaderpack path
-     */
     private static Optional<Properties> loadProperties(Path shaderPath, String name, ShaderPackOptions shaderPackOptions,
                                                        Iterable<StringPair> environmentDefines) {
         String fileContents = readProperties(shaderPath, name);
@@ -92,9 +72,7 @@ public class IdMap {
 
         StringReader propertiesReader = new StringReader(processed);
 
-        // Note: ordering of properties is significant
-        // See https://github.com/IrisShaders/Iris/issues/1327 and the relevant putIfAbsent calls in
-        // BlockMaterialMapping
+        // property order matters, see https://github.com/IrisShaders/Iris/issues/1327 and putIfAbsent in BlockMaterialMapping
         Properties properties = new OrderBackedProperties();
         try {
             properties.load(propertiesReader);
@@ -109,7 +87,6 @@ public class IdMap {
 
     private static String readProperties(Path shaderPath, String name) {
         try {
-            // ID maps should be encoded in ISO_8859_1.
             return new String(Files.readAllBytes(shaderPath.resolve(name)), StandardCharsets.ISO_8859_1);
         } catch (NoSuchFileException e) {
             Iris.logger.debug("An " + name + " file was not found in the current shaderpack");
@@ -130,9 +107,6 @@ public class IdMap {
         return parseIdMap(properties, "entity.", "entity.properties");
     }
 
-    /**
-     * Parses a NamespacedId map in OptiFine format
-     */
     private static Object2IntMap<NamespacedId> parseIdMap(Properties properties, String keyPrefix, String fileName) {
         Object2IntMap<NamespacedId> idMap = new Object2IntOpenHashMap<>();
         idMap.defaultReturnValue(-1);
@@ -142,7 +116,6 @@ public class IdMap {
             String value = (String) valueObject;
 
             if (!key.startsWith(keyPrefix)) {
-                // Not a valid line, ignore it
                 return;
             }
 
@@ -151,21 +124,17 @@ public class IdMap {
             try {
                 intId = Integer.parseInt(key.substring(keyPrefix.length()));
             } catch (NumberFormatException e) {
-                // Not a valid property line
                 Iris.logger.warn("Failed to parse line in " + fileName + ": invalid key " + key);
                 return;
             }
 
-            // Split on any whitespace
             for (String part : value.split("\\s+")) {
                 if (part.contains("=")) {
-                    // Avoid tons of logspam for now
                     Iris.logger.warn("Failed to parse an ResourceLocation in " + fileName + " for the key " + key + ": state properties are currently not supported: " + part);
                     continue;
                 }
 
-                // Note: NamespacedId performs no validation on the content. That will need to be done by whatever is
-                //       converting these things to ResourceLocations.
+                // NamespacedId does not validate, the consumer must
                 idMap.put(new NamespacedId(part), intId);
             }
         });
@@ -181,7 +150,6 @@ public class IdMap {
             String value = (String) valueObject;
 
             if (!key.startsWith(keyPrefix)) {
-                // Not a valid line, ignore it
                 return;
             }
 
@@ -190,14 +158,12 @@ public class IdMap {
             try {
                 intId = Integer.parseInt(key.substring(keyPrefix.length()));
             } catch (NumberFormatException e) {
-                // Not a valid property line
                 Iris.logger.warn("Failed to parse line in " + fileName + ": invalid key " + key);
                 return;
             }
 
             List<BlockEntry> entries = new ArrayList<>();
 
-            // Split on whitespace groups, not just single spaces
             for (String part : value.split("\\s+")) {
                 if (part.isEmpty()) {
                     continue;
@@ -216,11 +182,7 @@ public class IdMap {
         return Int2ObjectMaps.unmodifiable(entriesById);
     }
 
-    /**
-     * Parses a render layer map.
-     *
-     * This feature is used by Chocapic v9 and Wisdom Shaders. Otherwise, it is a rarely-used feature.
-     */
+    // used by chocapic v9 and wisdom shaders
     private static Map<NamespacedId, BlockRenderType> parseRenderTypeMap(Properties properties, String keyPrefix, String fileName) {
         Map<NamespacedId, BlockRenderType> overrides = new HashMap<>();
 
@@ -229,11 +191,9 @@ public class IdMap {
             String value = (String) valueObject;
 
             if (!key.startsWith(keyPrefix)) {
-                // Not a valid line, ignore it
                 return;
             }
 
-            // Note: We have to remove the prefix "layer." because fromString expects "cutout", not "layer.cutout".
             String keyWithoutPrefix = key.substring(keyPrefix.length());
 
             BlockRenderType renderType = BlockRenderType.fromString(keyWithoutPrefix).orElse(null);
@@ -244,8 +204,7 @@ public class IdMap {
             }
 
             for (String part : value.split("\\s+")) {
-                // Note: NamespacedId performs no validation on the content. That will need to be done by whatever is
-                //       converting these things to ResourceLocations.
+                // NamespacedId does not validate, the consumer must
                 overrides.put(new NamespacedId(part), renderType);
             }
         });

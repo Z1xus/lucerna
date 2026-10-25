@@ -14,7 +14,7 @@ public class NativeImageBackedCustomTexture extends DynamicTexture {
     public NativeImageBackedCustomTexture(CustomTextureData.PngData textureData) throws IOException {
         super(ImageIO.read(new ByteArrayInputStream(textureData.getContent())));
 
-        // By default, images are unblurred and not clamped.
+        // images are not blurred or clamped by default
 
         if (textureData.getFilteringData().shouldBlur()) {
             IrisRenderSystem.texParameteri(getGlId(), GL11C.GL_TEXTURE_2D, GL11C.GL_TEXTURE_MIN_FILTER, GL11C.GL_LINEAR);

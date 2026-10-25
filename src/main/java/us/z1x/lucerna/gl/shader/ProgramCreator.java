@@ -16,8 +16,6 @@ public class ProgramCreator {
     public static int create(String name, GlShader... shaders) {
         int program = GL20.glCreateProgram();
 
-        // TODO: This is *really* hardcoded, we need to refactor this to support external calls
-        // to glBindAttribLocation
         IrisRenderSystem.bindAttributeLocation(program, 11, "mc_Entity");
         IrisRenderSystem.bindAttributeLocation(program, 12, "mc_midTexCoord");
         IrisRenderSystem.bindAttributeLocation(program, 13, "at_tangent");
@@ -31,7 +29,7 @@ public class ProgramCreator {
 
         GLDebug.nameObject(KHRDebug.GL_PROGRAM, program, name);
 
-        //Always detach shaders according to https://www.khronos.org/opengl/wiki/Shader_Compilation#Cleanup
+        // https://www.khronos.org/opengl/wiki/Shader_Compilation#Cleanup
         for (GlShader shader : shaders) {
             IrisRenderSystem.detachShader(program, shader.getHandle());
         }

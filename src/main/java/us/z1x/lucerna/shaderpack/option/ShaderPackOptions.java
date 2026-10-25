@@ -12,10 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * A helper class that dispatches all the heavy lifting needed to discover, merge, and apply shader pack options to
- * an existing {@link IncludeGraph}.
- */
 public class ShaderPackOptions {
     private final OptionSet optionSet;
     private final OptionValues optionValues;

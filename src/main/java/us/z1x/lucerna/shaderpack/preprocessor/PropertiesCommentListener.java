@@ -10,7 +10,7 @@ public class PropertiesCommentListener extends DefaultPreprocessorListener {
 
     @Override
     public void handleError(Source source, int line, int column, String msg) throws LexerException {
-        // In .properties files, #'s are also used for comments, so ignore these errors
+        // # also starts comments in properties files, so ignore these errors
         if (msg.contains(UNKNOWN_PREPROCESSOR_DIRECTIVE) || msg.contains(NOT_A_WORD)) {
             return;
         }

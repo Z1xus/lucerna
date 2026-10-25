@@ -35,10 +35,6 @@ public final class Program extends GlResource {
         GL20.glDeleteProgram(getGlId());
     }
 
-    /**
-     * @return the OpenGL ID of this program.
-     * @deprecated this should be encapsulated eventually
-     */
     @Deprecated
     public int getProgramId() {
         return getGlId();

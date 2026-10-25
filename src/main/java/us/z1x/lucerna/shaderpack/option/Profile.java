@@ -11,7 +11,7 @@ import java.util.Map;
 
 public final class Profile {
     public final String name;
-    public final int precedence; // Used for prioritizing during matching
+    public final int precedence; // used to order matching
     public final Map<String, String> optionValues;
     public final List<String> disabledPrograms;
 

@@ -15,8 +15,7 @@ class CompositeTransformer {
             Root root) {
         CompositeDepthTransformer.transform(t, tree, root);
 
-        // if using a lod texture sampler and on version 120, patch in the extension
-        // #extension GL_ARB_shader_texture_lod : require
+        // patch in GL_ARB_shader_texture_lod for lod samplers on version 120
         if (tree.getVersionStatement().version.number <= 120
                 && Stream.concat(
                         root.identifierIndex.getStream("texture2DLod"),

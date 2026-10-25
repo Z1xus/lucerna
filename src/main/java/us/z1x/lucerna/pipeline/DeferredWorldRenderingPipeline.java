@@ -84,9 +84,6 @@ import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
-/**
- * Encapsulates the compiled shader program objects for the currently loaded shaderpack.
- */
 public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, RenderTargetStateListener  {
     private final RenderTargets renderTargets;
     private final DepthTexture mainDepth;
@@ -182,7 +179,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         RenderTarget mainTarget = Minecraft.getInstance().getRenderTarget();
 
-        // The vanilla main framebuffer uses a depth renderbuffer, so the gbuffers get a depth texture of their own.
+        // the vanilla main framebuffer uses a depth renderbuffer, so the gbuffers get their own depth texture
         this.mainDepth = new DepthTexture(mainTarget.width, mainTarget.height, DepthBufferFormat.DEPTH24);
 
         this.renderTargets = new RenderTargets(mainTarget.width, mainTarget.height, mainDepth.getTextureId(), 0,
@@ -194,7 +191,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         if (shadowDirectives.isDistanceRenderMulExplicit()) {
             if (shadowDirectives.getDistanceRenderMul() >= 0.0) {
-                // add 15 and then divide by 16 to ensure we're rounding up
+                // add 15 before dividing by 16 to round up
                 forcedShadowRenderDistanceChunks =
                         OptionalInt.of(((int) (shadowDirectives.getDistance() * shadowDirectives.getDistanceRenderMul()) + 15) / 16);
             } else {
@@ -215,7 +212,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         BlockRenderingSettings.INSTANCE.setUseSeparateAo(programs.getPackDirectives().shouldUseSeparateAo());
         BlockRenderingSettings.INSTANCE.setUseExtendedVertexFormat(true);
 
-        // Don't clobber anything in texture unit 0. It probably won't cause issues, but we're just being cautious here.
+        // avoid clobbering texture unit 0
         GlStateManager.activeTexture(GL20C.GL_TEXTURE2);
 
         customTextureManager = new CustomTextureManager(programs.getPackDirectives(), programs.getPack().getCustomTextureDataMap(), programs.getPack().getCustomNoiseTexture());
@@ -293,7 +290,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 ProgramId.Hand, ProgramId.Hand, ProgramId.Hand,
                 ProgramId.HandWater, ProgramId.HandWater, ProgramId.HandWater,
                 null, null, ProgramId.Weather,
-                // world border uses textured_lit even though it has no lightmap :/
+                // world border uses textured_lit even though it has no lightmap
                 null, ProgramId.TexturedLit, ProgramId.TexturedLit,
                 ProgramId.Shadow, ProgramId.Shadow, ProgramId.Shadow
         };
@@ -332,7 +329,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
                 if (condition == RenderCondition.SHADOW) {
                     if (!shadowDirectives.isShadowEnabled().orElse(shadowRenderTargets != null)) {
-                        // shadow is not used
                         return null;
                     } else if (source == null) {
                         // still need the custom framebuffer, viewport, and blend mode behavior
@@ -383,8 +379,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         this.clearPasses = ClearPassCreator.createClearPasses(renderTargets, false,
                 programs.getPackDirectives().getRenderTargetDirectives());
 
-        // SodiumTerrainPipeline setup follows.
-
         Supplier<ImmutableSet<Integer>> flipped =
             () -> isBeforeTranslucent ? flippedAfterPrepare : flippedAfterTranslucent;
 
@@ -424,8 +418,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             IrisSamplers.addLevelSamplers(customTextureSamplerInterceptor, this, whitePixel, new InputAvailability(true, true, false));
             IrisSamplers.addNoiseSampler(customTextureSamplerInterceptor, customTextureManager.getNoiseTexture());
 
-            // Only initialize these samplers if the shadow map renderer exists.
-            // Otherwise, this program shouldn't be used at all?
             if (IrisSamplers.hasShadowSamplers(customTextureSamplerInterceptor)) {
                 IrisSamplers.addShadowSamplers(customTextureSamplerInterceptor, Objects.requireNonNull(shadowRenderTargets));
             }
@@ -459,7 +451,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     }
 
     private void checkWorld() {
-        // If we're not in a world, then obviously we cannot possibly be rendering a world.
         if (Minecraft.getInstance().world == null) {
             isRenderingWorld = false;
             current = null;
@@ -468,7 +459,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
     @Override
     public boolean shouldDisableVanillaEntityShadows() {
-        // OptiFine seems to disable vanilla shadows when the shaderpack uses shadow mapping?
+        // optifine seems to disable vanilla shadows when the pack uses shadow mapping
         return shadowRenderer != null;
     }
 
@@ -628,7 +619,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     }
 
     private Pass createPass(ProgramSource source, InputAvailability availability, boolean shadow, ProgramId id) {
-        // TODO: Properly handle empty shaders?
         Map<PatchShaderType, String> transformed = TransformPatcher.patchAttributes(
             source.getVertexSource().orElseThrow(NullPointerException::new),
             source.getGeometrySource().orElse(null),
@@ -696,7 +686,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         GlFramebuffer framebufferAfterTranslucents;
 
         if (shadow) {
-            // Always add both draw buffers on the shadow pass.
             framebufferBeforeTranslucents =
                 shadowTargetsSupplier.get().createShadowFramebuffer(shadowRenderTargets.snapshot(), new int[] { 0, 1 });
             framebufferAfterTranslucents = framebufferBeforeTranslucents;
@@ -751,7 +740,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         }
 
         if (bound) {
-            // force refresh
             current = null;
         } else {
             beginPass(null);
@@ -835,14 +823,14 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             if (alphaTestOverride != null) {
                 alphaTestOverride.apply();
             } else {
-                // Previous program on the stack might have applied an override
+                // a previous program on the stack may have applied an override
                 AlphaTestOverride.restore();
             }
 
             if (blendModeOverride != null) {
                 blendModeOverride.apply();
             } else {
-                // Previous program on the stack might have applied an override
+                // a previous program on the stack may have applied an override
                 BlendModeOverride.restore();
             }
 
@@ -880,9 +868,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         destroyPasses(table);
 
-        // Destroy the composite rendering pipeline
-        //
-        // This destroys all the loaded composite programs as well.
         setupRenderer.destroy();
         beginRenderer.destroy();
         compositeRenderer.destroy();
@@ -892,21 +877,16 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         horizonRenderer.destroy();
 
-        // Make sure that any custom framebuffers are not bound before destroying render targets
+        // unbind custom framebuffers before destroying render targets
         IrisRenderSystem.bindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, 0);
         IrisRenderSystem.bindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, 0);
         IrisRenderSystem.bindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 
         Minecraft.getInstance().getRenderTarget().bindWrite(false);
 
-        // Destroy our render targets
-        //
-        // While it's possible to just clear them instead and reuse them, we'd need to investigate whether or not this
-        // would help performance.
         renderTargets.destroy();
         mainDepth.destroy();
 
-        // destroy the shadow render targets
         if (shadowRenderTargets != null) {
             shadowRenderTargets.destroy();
         }
@@ -915,7 +895,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             shadowRenderer.destroy();
         }
 
-        // Destroy custom textures and the static samplers (normals, specular, and noise)
         customTextureManager.destroy();
         whitePixel.clearGlId();
         defaultNormal.clearGlId();
@@ -943,7 +922,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     private int mainDepthHeight = -1;
 
     private void prepareRenderTargets() {
-        // Make sure we're using texture unit 0 for this.
         GlStateManager.activeTexture(GL15C.GL_TEXTURE0);
         Vector4f emptyClearColor = new Vector4f(1.0F);
 
@@ -956,7 +934,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                     }
                 }
             } else {
-                // Clear depth first, regardless of any color clearing.
+                // clear depth first, regardless of color clearing
                 shadowRenderTargets.getDepthSourceFb().bind();
                 GlStateManager.clear(GL21C.GL_DEPTH_BUFFER_BIT);
 
@@ -1027,8 +1005,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         Vector3d fogColor3 = CapturedRenderingState.INSTANCE.getFogColor();
 
-        // NB: The alpha value must be 1.0 here, or else you will get a bunch of bugs. Sildur's Vibrant Shaders
-        //     will give you pink reflections and other weirdness if this is zero.
+        // alpha must be 1.0, sildur's vibrant shaders get pink reflections otherwise
         Vector4f fogColor = new Vector4f((float) fogColor3.x, (float) fogColor3.y, (float) fogColor3.z, 1.0F);
 
         for (ClearPass clearPass : passes) {
@@ -1040,7 +1017,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         GlStateManager.depthMask(true);
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
-        // Reset framebuffer and viewport
         Minecraft.getInstance().getRenderTarget().bindWrite(true);
     }
 
@@ -1056,7 +1032,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 try {
                     builder = ProgramBuilder.beginCompute(source.getName(), TransformPatcher.patchCompute(source.getSource().get(), programSet.getPack().getCustomTexturePatching(TextureStage.SHADOWCOMP)), IrisSamplers.WORLD_RESERVED_TEXTURE_UNITS);
                 } catch (RuntimeException e) {
-                    // TODO: Better error handling
                     throw new RuntimeException("Shader compilation failed!", e);
                 }
 
@@ -1093,14 +1068,12 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             }
         }
 
-
         return programs;
     }
 
     @Override
     public void beginHand() {
-        // We need to copy the current depth texture so that depthtex2 can contain the depth values for
-        // all non-translucent content without the hand, as required.
+        // copy depth now so depthtex2 holds the non-translucent depth without the hand
         renderTargets.copyPreHandDepth();
     }
 
@@ -1108,12 +1081,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     public void beginTranslucents() {
         isBeforeTranslucent = false;
 
-        // We need to copy the current depth texture so that depthtex1 can contain the depth values for
-        // all non-translucent content, as required.
+        // copy depth now so depthtex1 holds the non-translucent depth
         renderTargets.copyPreTranslucentDepth();
 
-
-        // needed to remove blend mode overrides and similar
+        // removes blend mode overrides and similar
         beginPass(null);
 
         isRenderingFullScreenPass = true;
@@ -1123,14 +1094,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         GlStateManager.enableBlend();
         GlStateManager.enableAlphaTest();
 
-        // note: we are careful not to touch the lightmap texture unit or overlay color texture unit here,
-        // so we don't need to do anything to restore them if needed.
-        //
-        // Previous versions of the code tried to "restore" things by enabling the lightmap & overlay color
-        // but that actually broke rendering of clouds and rain by making them appear red in the case of
-        // a pack not overriding those shader programs.
-        //
-        // Not good!
+        // leave the lightmap and overlay units alone, enabling them here turned clouds and rain red
 
         isRenderingFullScreenPass = false;
     }
@@ -1150,7 +1114,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
             shadowRenderer.renderShadows(worldRenderer, playerCamera, playerCuller);
 
-            // needed to remove blend mode overrides and similar
+            // removes blend mode overrides and similar
             beginPass(null);
             isRenderingShadow = false;
         }
@@ -1180,7 +1144,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         return forcedShadowRenderDistanceChunks;
     }
 
-    // TODO: better way to avoid this global state?
     private boolean isRenderingWorld = false;
     private boolean isRenderingFullScreenPass = false;
 
@@ -1213,15 +1176,11 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         inputs = StateTracker.INSTANCE.getInputs();
         IrisRenderSystem.invalidateFramebufferBindings();
 
-        // Get ready for world rendering
         prepareRenderTargets();
 
         setPhase(WorldRenderingPhase.SKY);
 
-        // Render our horizon box before actual sky rendering to avoid being broken by mods that do weird things
-        // while rendering the sky.
-        //
-        // A lot of dimension mods touch sky rendering, FabricSkyboxes injects at HEAD and cancels, etc.
+        // draw the horizon before the sky so mods that change sky rendering cannot break it
         if (Minecraft.getInstance().world.dimension.isNatural()) {
             GlStateManager.disableTexture();
             GlStateManager.depthMask(false);

@@ -82,7 +82,6 @@ public interface LocationalUniformHolder extends UniformHolder {
         return this;
     }
 
-
     @Override
     default LocationalUniformHolder uniformTruncated3f(UniformUpdateFrequency updateFrequency, String name, Supplier<Vector4f> value) {
         location(name, UniformType.VEC3).ifPresent(id -> addUniform(updateFrequency, Vector3Uniform.truncated(id, value)));
@@ -110,7 +109,6 @@ public interface LocationalUniformHolder extends UniformHolder {
 
         return this;
     }
-
 
     @Override
     default LocationalUniformHolder uniformMatrixFromArray(UniformUpdateFrequency updateFrequency, String name, Supplier<float[]> value) {

@@ -38,7 +38,7 @@ public class CenterDepthSampler {
         this.altTexture = GlStateManager.genTextures();
         this.framebuffer = new GlFramebuffer();
 
-        // Fall back to a less precise format if the system doesn't support OpenGL 3
+        // fall back to a less precise format without opengl 3
         InternalTextureFormat format = GL.getCapabilities().OpenGL32 ? InternalTextureFormat.R32F : InternalTextureFormat.RGB16;
         setupColorTexture(texture, format);
         setupColorTexture(altTexture, format);
@@ -72,8 +72,7 @@ public class CenterDepthSampler {
 
     public void sampleCenterDepth() {
         if ((hasFirstSample && (!everRetrieved)) || destroyed) {
-            // If the shaderpack isn't reading center depth values, don't bother sampling it
-            // This improves performance with most shaderpacks
+            // skip sampling while the pack never reads center depth
             return;
         }
 
@@ -89,10 +88,9 @@ public class CenterDepthSampler {
         ProgramUniforms.clearActiveUniforms();
         ProgramSamplers.clearActiveSamplers();
 
-        // The API contract of DepthCopyStrategy claims it can only copy depth, however the 2 non-stencil methods used are entirely capable of copying color as of now.
+        // DepthCopyStrategy claims depth only, but the 2 non-stencil methods also copy color
         DepthCopyStrategy.fastest(false).copy(this.framebuffer, texture, null, altTexture, 1, 1);
 
-        //Reset viewport
         Minecraft.getInstance().getRenderTarget().bindWrite(true);
     }
 

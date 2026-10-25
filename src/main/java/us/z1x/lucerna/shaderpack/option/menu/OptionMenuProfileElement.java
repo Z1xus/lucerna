@@ -18,10 +18,6 @@ public class OptionMenuProfileElement extends OptionMenuElement {
         this.packAppliedValues = packAppliedValues;
     }
 
-    /**
-     * @return an {@link OptionValues} that also contains values currently
-     * pending application.
-     */
     public OptionValues getPendingOptionValues() {
         MutableOptionValues values = packAppliedValues.mutableCopy();
         values.addAll(Iris.getShaderPackOptionQueue());

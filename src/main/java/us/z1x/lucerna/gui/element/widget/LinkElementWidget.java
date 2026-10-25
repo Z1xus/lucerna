@@ -54,7 +54,7 @@ public class LinkElementWidget extends CommentedElementWidget<OptionMenuLinkElem
         font.draw(ARROW, (x + width) - 9, y + 7, 0xFFFFFF);
 
         if (hovered && this.isLabelTrimmed) {
-            // To prevent other elements from being drawn on top of the tooltip
+            // queued so other elements never draw over the tooltip
             ShaderPackScreen.TOP_LAYER_RENDER_QUEUE.add(() -> GuiUtil.drawTextPanel(font, this.label, mouseX + 2, mouseY - 16));
         }
     }

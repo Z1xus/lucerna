@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-/**
- * Intended to make very simple rows of buttons easier to make
- */
 public class IrisElementRow {
     private final Map<Element, Integer> elements = new HashMap<>();
     private final List<Element> orderedElements = new ArrayList<>();
@@ -31,13 +28,6 @@ public class IrisElementRow {
         this(1);
     }
 
-    /**
-     * Adds an element to the right of this row.
-     *
-     * @param element The element to add
-     * @param width The width of the element in this row
-     * @return {@code this}, to be used for chaining statements
-     */
     public IrisElementRow add(Element element, int width) {
         if (!this.orderedElements.contains(element)) {
             this.orderedElements.add(element);
@@ -49,12 +39,6 @@ public class IrisElementRow {
         return this;
     }
 
-    /**
-     * Modifies the width of an element.
-     *
-     * @param element The element whose width to modify
-     * @param width The width to be assigned to the specified element
-     */
     public void setWidth(Element element, int width) {
         if (!this.elements.containsKey(element)) {
             return;
@@ -65,9 +49,6 @@ public class IrisElementRow {
         add(element, width);
     }
 
-    /**
-     * Renders the row, with the anchor point being the top left.
-     */
     public void render(int x, int y, int height, int mouseX, int mouseY, boolean rowHovered) {
         this.x = x;
         this.y = y;
@@ -85,9 +66,6 @@ public class IrisElementRow {
         }
     }
 
-    /**
-     * Renders the row, with the anchor point being the top right.
-     */
     public void renderRightAligned(int x, int y, int height, int mouseX, int mouseY, boolean hovered) {
         render(x - this.width, y, height, mouseX, mouseY, hovered);
     }
@@ -162,9 +140,6 @@ public class IrisElementRow {
         }
     }
 
-    /**
-     * A clickable button element that uses a {@link us.z1x.lucerna.gui.GuiUtil.Icon} as its label.
-     */
     public static class IconButtonElement extends ButtonElement<IconButtonElement> {
         public GuiUtil.Icon icon;
 
@@ -183,9 +158,6 @@ public class IrisElementRow {
         }
     }
 
-    /**
-     * A clickable button element that uses a text as its label.
-     */
     public static class TextButtonElement extends ButtonElement<TextButtonElement> {
         protected final TextRenderer font;
         public String text;

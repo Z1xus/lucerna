@@ -11,31 +11,17 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
 
-/**
- * A class dedicated to storing the config values of shaderpacks. Right now it only stores the path to the current shaderpack
- */
 public class IrisConfig {
     private static final String COMMENT =
         "This file stores configuration options for Iris, such as the currently active shaderpack";
 
-    /**
-     * The path to the current shaderpack. Null if the internal shaderpack is being used.
-     */
     private String shaderPackName;
 
-    /**
-     * Whether or not shaders are used for rendering. False to disable all shader-based rendering, true to enable it.
-     */
     private boolean enableShaders;
 
-    /**
-     * If debug features should be enabled. Gives much more detailed OpenGL error outputs at the cost of performance.
-     */
+    // gives detailed opengl error output at a performance cost
     private boolean enableDebugOptions;
 
-    /**
-     * If the update notification should be disabled or not.
-     */
     private boolean disableUpdateMessage;
 
     private final Path propertiesPath;
@@ -48,11 +34,6 @@ public class IrisConfig {
         this.propertiesPath = propertiesPath;
     }
 
-    /**
-     * Initializes the configuration, loading it if it is present and creating a default config otherwise.
-     *
-     * @throws IOException file exceptions
-     */
     public void initialize() throws IOException {
         load();
         if (!Files.exists(propertiesPath)) {
@@ -60,27 +41,14 @@ public class IrisConfig {
         }
     }
 
-    /**
-     * returns whether or not the current shaderpack is internal
-     *
-     * @return if the shaderpack is internal
-     */
     public boolean isInternal() {
         return false;
     }
 
-    /**
-     * Returns the name of the current shaderpack
-     *
-     * @return Returns the current shaderpack name - if internal shaders are being used it returns "(internal)"
-     */
     public Optional<String> getShaderPackName() {
         return Optional.ofNullable(shaderPackName);
     }
 
-    /**
-     * Sets the name of the current shaderpack
-     */
     public void setShaderPackName(String name) {
         if (name == null || name.equals("(internal)") || name.isEmpty()) {
             this.shaderPackName = null;
@@ -89,11 +57,6 @@ public class IrisConfig {
         }
     }
 
-    /**
-     * Determines whether or not shaders are used for rendering.
-     *
-     * @return False to disable all shader-based rendering, true to enable shader-based rendering.
-     */
     public boolean areShadersEnabled() {
         return enableShaders;
     }
@@ -110,18 +73,9 @@ public class IrisConfig {
         enableDebugOptions = enabled;
     }
 
-    /**
-     * Sets whether shaders should be used for rendering.
-     */
     public void setShadersEnabled(boolean enabled) {
         this.enableShaders = enabled;
     }
-
-    /**
-     * loads the config file and then populates the string, int, and boolean entries with the parsed entries
-     *
-     * @throws IOException if the file cannot be loaded
-     */
 
     public void load() throws IOException {
         if (!Files.exists(propertiesPath)) {
@@ -129,7 +83,7 @@ public class IrisConfig {
         }
 
         Properties properties = new Properties();
-        // NB: This uses ISO-8859-1 with unicode escapes as the encoding
+        // properties files use iso-8859-1 with unicode escapes
         try (InputStream is = Files.newInputStream(propertiesPath)) {
             properties.load(is);
         }
@@ -157,11 +111,6 @@ public class IrisConfig {
         }
     }
 
-    /**
-     * Serializes the config into a file. Should be called whenever any config values are modified.
-     *
-     * @throws IOException file exceptions
-     */
     public void save() throws IOException {
         Properties properties = new Properties();
         properties.setProperty("shaderPack", getShaderPackName().orElse(""));
@@ -172,7 +121,7 @@ public class IrisConfig {
         properties.setProperty("renderQuality", String.valueOf(IrisVideoSettings.renderQuality));
         properties.setProperty("shadowQuality", String.valueOf(IrisVideoSettings.shadowQuality));
         properties.setProperty("shadowCaching", String.valueOf(IrisVideoSettings.shadowCaching));
-        // NB: This uses ISO-8859-1 with unicode escapes as the encoding
+        // properties files use iso-8859-1 with unicode escapes
         try (OutputStream os = Files.newOutputStream(propertiesPath)) {
             properties.store(os, COMMENT);
         }

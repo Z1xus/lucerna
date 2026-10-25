@@ -19,8 +19,6 @@ public class BaseClippingPlanes {
     }
 
     private void init(Matrix4f view, Matrix4f projection) {
-        // Transform = Transpose(Projection x View)
-
         Matrix4f transform = new Matrix4f(projection);
         transform.mul(view);
         transform.transpose();
@@ -29,9 +27,9 @@ public class BaseClippingPlanes {
         planes[1] = transform(transform, 1, 0, 0);
         planes[2] = transform(transform, 0, -1, 0);
         planes[3] = transform(transform, 0, 1, 0);
-        // FAR clipping plane
+        // far clipping plane
         planes[4] = transform(transform, 0, 0, -1);
-        // NEAR clipping plane
+        // near clipping plane
         planes[5] = transform(transform, 0, 0, 1);
     }
 

@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Enumerates the possible program source file names to
- */
 public class ShaderPackSourceNames {
     public static final ImmutableList<String> POTENTIAL_STARTS = findPotentialStarts();
 
@@ -47,7 +44,6 @@ public class ShaderPackSourceNames {
     private static ImmutableList<String> findPotentialStarts() {
         ImmutableList.Builder<String> potentialFileNames = ImmutableList.builder();
 
-        // TODO: Iterate over program groups for exact iteration order.
         for (ProgramArrayId programArrayId : ProgramArrayId.values()) {
             for (int i = 0; i < programArrayId.getNumPrograms(); i++) {
                 String name = programArrayId.getSourcePrefix();

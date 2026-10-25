@@ -23,24 +23,23 @@ public class ClearPassCreator {
                                                              PackRenderTargetDirectives renderTargetDirectives) {
         final int maxDrawBuffers = GL11.glGetInteger(GL21C.GL_MAX_DRAW_BUFFERS);
 
-        // Sort buffers by their clear color so we can group up glClear calls.
+        // sort buffers by clear color to group glClear calls
         Map<Vector2i, Map<ClearPassInformation, IntList>> clearByColor = new HashMap<>();
 
         renderTargetDirectives.getRenderTargetSettings().forEach((bufferI, settings) -> {
-            // unboxed
             final int buffer = bufferI;
 
             if (fullClear || settings.shouldClear()) {
                 Vector4f defaultClearColor;
 
                 if (buffer == 0) {
-                    // colortex0 is cleared to the fog color (with 1.0 alpha) by default.
+                    // colortex0 defaults to the fog color with 1.0 alpha
                     defaultClearColor = null;
                 } else if (buffer == 1) {
-                    // colortex1 is cleared to solid white (with 1.0 alpha) by default.
+                    // colortex1 defaults to solid white with 1.0 alpha
                     defaultClearColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
                 } else {
-                    // all other buffers are cleared to solid black (with 0.0 alpha) by default.
+                    // other buffers default to solid black with 0.0 alpha
                     defaultClearColor = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
                 }
 
@@ -57,9 +56,7 @@ public class ClearPassCreator {
                 int startIndex = 0;
 
                 while (startIndex < buffers.size()) {
-                    // clear up to the maximum number of draw buffers per each clear pass.
-                    // This allows us to handle having more than 8 buffers with the same clear color on systems with
-                    // a max draw buffers of 8 (ie, most systems).
+                    // split into passes of max draw buffers so more than 8 buffers with one color work where the limit is 8
                     int[] clearBuffers = new int[Math.min(buffers.size() - startIndex, maxDrawBuffers)];
 
                     for (int i = 0; i < clearBuffers.length; i++) {
@@ -67,7 +64,7 @@ public class ClearPassCreator {
                         startIndex++;
                     }
 
-                    // No need to clear the depth buffer, since we're using Minecraft's depth buffer.
+                    // the depth buffer is cleared separately
                     clearPasses.add(new ClearPass(clearInfo.getColor(), clearInfo::getWidth, clearInfo::getHeight,
                         renderTargets.createClearFramebuffer(true, clearBuffers), GL21C.GL_COLOR_BUFFER_BIT));
 
@@ -84,11 +81,10 @@ public class ClearPassCreator {
                                                                    PackShadowDirectives renderTargetDirectives) {
         final int maxDrawBuffers = GL11.glGetInteger(GL21C.GL_MAX_DRAW_BUFFERS);
 
-        // Sort buffers by their clear color so we can group up glClear calls.
+        // sort buffers by clear color to group glClear calls
         Map<Vector4f, IntList> clearByColor = new HashMap<>();
 
         for (int i = 0; i < renderTargetDirectives.getColorSamplingSettings().size(); i++) {
-            // unboxed
             PackShadowDirectives.SamplingSettings settings = renderTargetDirectives.getColorSamplingSettings().get(i);
 
             if (fullClear || settings.getClear()) {
@@ -99,14 +95,11 @@ public class ClearPassCreator {
 
         List<ClearPass> clearPasses = new ArrayList<>();
 
-
         clearByColor.forEach((clearColor, buffers) -> {
             int startIndex = 0;
 
             while (startIndex < buffers.size()) {
-                // clear up to the maximum number of draw buffers per each clear pass.
-                // This allows us to handle having more than 8 buffers with the same clear color on systems with
-                // a max draw buffers of 8 (ie, most systems).
+                // split into passes of max draw buffers so more than 8 buffers with one color work where the limit is 8
                 int[] clearBuffers = new int[Math.min(buffers.size() - startIndex, maxDrawBuffers)];
 
                 for (int i = 0; i < clearBuffers.length; i++) {
@@ -114,7 +107,7 @@ public class ClearPassCreator {
                     startIndex++;
                 }
 
-                // No need to clear the depth buffer, since we're using Minecraft's depth buffer.
+                // the depth buffer is cleared separately
                 clearPasses.add(new ClearPass(clearColor, renderTargets::getResolution, renderTargets::getResolution,
                     renderTargets.createFramebufferWritingToAlt(clearBuffers), GL21C.GL_COLOR_BUFFER_BIT));
 

@@ -190,29 +190,16 @@ public class CompatibilityTransformer {
             root.replaceReferenceExpressions(t, "gl_FragColor", "gl_FragData[0]");
         }
 
-        /**
-         * Removes const storage qualifier from declarations in functions if they are
-         * initialized with const parameters. Const parameters are immutable parameters
-         * and can't be used to initialize const declarations because they expect
-         * constant, not just immutable, expressions. This varies between drivers and
-         * versions. Also removes the const qualifier from declarations that use the
-         * identifiers from which the declaration was removed previously.
-         * See https://wiki.shaderlabs.org/wiki/Compiler_Behavior_Notes
-         */
+        // drop const from declarations initialized with const parameters, those need constant, not just immutable, expressions
+        // see https://wiki.shaderlabs.org/wiki/Compiler_Behavior_Notes
         Map<FunctionDefinition, Set<String>> constFunctions = new HashMap<>();
         Set<String> processingSet = new HashSet<>();
         List<FunctionDefinition> unusedFunctions = new LinkedList<>();
         for (FunctionDefinition definition : root.nodeIndex.get(FunctionDefinition.class)) {
-            // check if this function is ever used
             FunctionPrototype prototype = definition.getFunctionPrototype();
             String functionName = prototype.getName().getName();
             if (!functionName.equals("main") && root.identifierIndex.getStream(functionName).count() <= 1) {
-                // remove unused functions
-                // unused function removal can be helpful since some drivers don't do some
-                // checks on unused functions. Additionally, sometimes bugs in unused code can
-                // be avoided this way.
-                // TODO: integrate into debug mode (allow user to disable this behavior for
-                // debugging purposes)
+                // some drivers skip checks on unused functions, removing them also avoids bugs in unused code
                 unusedFunctions.add(definition);
                 if (PatchedShaderPrinter.PRETTY_PRINT_SHADERS) {
                     LOGGER.info("Removing unused function {}", functionName);
@@ -220,12 +207,10 @@ public class CompatibilityTransformer {
                 continue;
             }
 
-            // stop on functions without parameters
             if (prototype.getChildren().isEmpty()) {
                 continue;
             }
 
-            // find the const parameters
             Set<String> names = new HashSet<>(prototype.getChildren().size());
             for (FunctionParameter parameter : prototype.getChildren()) {
                 if (getConstQualifier(parameter.getType().getTypeQualifier()) != null) {
@@ -239,21 +224,17 @@ public class CompatibilityTransformer {
             }
         }
 
-        // remove collected unused functions
         for (FunctionDefinition definition : unusedFunctions) {
             definition.detachAndDelete();
         }
 
-        // find the reference expressions for the const parameters
-        // and check that they are in the right function and are of the right type
         boolean constDeclarationHit = false;
         Deque<String> processingQueue = new ArrayDeque<>(processingSet);
         while (!processingQueue.isEmpty()) {
             String name = processingQueue.poll();
             processingSet.remove(name);
             for (Identifier id : root.identifierIndex.get(name)) {
-                // since this searches for reference expressions, this won't accidentally find
-                // the name as the name of a declaration member
+                // searching reference expressions cannot match a declaration member name
                 ReferenceExpression reference = id.getAncestor(ReferenceExpression.class);
                 if (reference == null) {
                     continue;
@@ -271,7 +252,6 @@ public class CompatibilityTransformer {
                     continue;
                 }
                 if (constIdsInFunction.contains(name)) {
-                    // remove the const qualifier from the reference expression
                     TypeQualifier qualifier = taid.getType().getTypeQualifier();
                     StorageQualifier constQualifier = getConstQualifier(qualifier);
                     if (constQualifier == null) {
@@ -283,7 +263,6 @@ public class CompatibilityTransformer {
                     }
                     constDeclarationHit = true;
 
-                    // add all members of the declaration to the list of const parameters to process
                     for (DeclarationMember member : taid.getMembers()) {
                         String memberName = member.getName().getName();
 
@@ -309,7 +288,6 @@ public class CompatibilityTransformer {
                     "Removed the const keyword from declarations that use const parameters. See debugging.md for more information.");
         }
 
-        // remove empty external declarations
         boolean emptyDeclarationHit = root.process(
                 root.nodeIndex.getStream(EmptyDeclaration.class),
                 ASTNode::detachAndDelete);
@@ -340,8 +318,6 @@ public class CompatibilityTransformer {
                 if (part instanceof StorageQualifier) {
                     StorageQualifier storageQualifier = (StorageQualifier) part;
                     StorageType qualifierStorageType = storageQualifier.storageType;
-                    // TODO: investigate the specified behavior of varying in geometry shaders and
-                    // the combination of varying with in or out qualifiers
                     if (qualifierStorageType == storageType ||
                             qualifierStorageType == StorageType.VARYING &&
                                     (shaderType == ShaderType.VERTEX && storageType == StorageType.OUT ||
@@ -417,27 +393,12 @@ public class CompatibilityTransformer {
             ASTParser t,
             Map<PatchShaderType, TranslationUnit> trees,
             Parameters parameters) {
-        /**
-         * find attributes that are declared as "in" in geometry or fragment but not
-         * declared as "out" in the previous stage. The missing "out" declarations for
-         * these attributes are added and initialized.
-         *
-         * It doesn't bother with array specifiers because they are only legal in
-         * geometry shaders, but then also only as an in declaration. The out
-         * declaration in the vertex shader is still just a single value. Missing out
-         * declarations in the geometry shader are also just normal.
-         *
-         * TODO:
-         * - fix issues where Iris' own declarations are detected and patched like
-         * iris_FogFragCoord if there are geometry shaders present
-         * - improved geometry shader support? They use funky declarations
-         */
+        // adds missing out declarations for in declarations in geometry or fragment that the previous stage lacks
         ShaderType prevType = null;
         for (int i = 0; i < pipeline.length; i++) {
             ShaderType type = pipeline[i];
             PatchShaderType[] patchTypes = PatchShaderType.fromGlShaderType(type);
 
-            // check if the patch types have sources and continue if not
             boolean hasAny = false;
             for (PatchShaderType currentType : patchTypes) {
                 if (trees.get(currentType) != null) {
@@ -448,8 +409,6 @@ public class CompatibilityTransformer {
                 continue;
             }
 
-            // if the current type has sources but the previous one doesn't, set the
-            // previous one and continue
             if (prevType == null) {
                 prevType = type;
                 continue;
@@ -459,13 +418,11 @@ public class CompatibilityTransformer {
             TranslationUnit prevTree = trees.get(prevPatchTypes);
             Root prevRoot = prevTree.getRoot();
 
-            // test if the prefix tag is used for some reason
             if (prevRoot.identifierIndex.prefixQueryFlat(TAG_PREFIX).findAny().isPresent()) {
                 LOGGER.warn("The prefix tag " + TAG_PREFIX + " is used in the shader, bailing compatibility transformation.");
                 return;
             }
 
-            // find out declarations
             Map<String, BuiltinNumericTypeSpecifier> outDeclarations = new HashMap<>();
             for (DeclarationExternalDeclaration declaration : prevRoot.nodeIndex.get(DeclarationExternalDeclaration.class)) {
                 if (outDeclarationMatcher.matchesSpecialized(declaration, prevType)) {
@@ -483,7 +440,6 @@ public class CompatibilityTransformer {
                 }
             }
 
-            // add out declarations that are missing for in declarations
             for (PatchShaderType currentType : patchTypes) {
                 TranslationUnit currentTree = trees.get(currentType);
                 if (currentTree == null) {
@@ -507,9 +463,8 @@ public class CompatibilityTransformer {
                             continue;
                         }
 
-                        // patch missing declarations with an initialization
+                        // add missing out declarations with an initializer
                         if (!outDeclarations.containsKey(name)) {
-                            // make sure the declared in is actually used
                             if (!currentRoot.identifierIndex.getAncestors(name, ReferenceExpression.class).findAny().isPresent()) {
                                 continue;
                             }
@@ -523,8 +478,6 @@ public class CompatibilityTransformer {
                             }
                             Type inType = inTypeSpecifier.type;
 
-                            // insert the new out declaration but copy over the type qualifiers, except for
-                            // the in/out qualifier
                             TypeQualifier outQualifier = (TypeQualifier) inDeclarationMatcher
                                     .getNodeMatch("qualifier").cloneInto(prevRoot);
                             makeQualifierOut(outQualifier);
@@ -533,10 +486,9 @@ public class CompatibilityTransformer {
                                     inTypeSpecifier.cloneInto(prevRoot),
                                     new Identifier(name)));
 
-                            // add the initializer to the main function
                             prevTree.prependMain(getInitializer(prevRoot, name, inType));
 
-                            // update out declarations to prevent duplicates
+                            // mark as handled to prevent duplicates
                             outDeclarations.put(name, null);
 
                             LOGGER.warn(
@@ -545,12 +497,11 @@ public class CompatibilityTransformer {
                                             + prevType.name() + " and has been compatibility-patched. See debugging.md for more information.");
                         }
 
-                        // patch mismatching declaration with a local variable and a cast
+                        // mismatched types, patch with a global variable and a cast
                         else {
-                            // there is an out declaration for this in declaration, check if the types match
                             BuiltinNumericTypeSpecifier outTypeSpecifier = outDeclarations.get(name);
 
-                            // skip newly inserted out declarations
+                            // null marks a newly inserted out declaration
                             if (outTypeSpecifier == null) {
                                 continue;
                             }
@@ -558,21 +509,17 @@ public class CompatibilityTransformer {
                             Type inType = inTypeSpecifier.type;
                             Type outType = outTypeSpecifier.type;
 
-                            // skip if the type matches, nothing has to be done
                             if (inType == outType) {
-                                // if the types match but it's never assigned a value,
-                                // an initialization is added
+                                // matching types that are never assigned get an initializer
                                 if (prevRoot.identifierIndex.get(name).size() > 1) {
                                     continue;
                                 }
 
-                                // add an initialization statement for this declaration
                                 prevTree.prependMain(getInitializer(prevRoot, name, inType));
                                 outDeclarations.put(name, null);
                                 continue;
                             }
 
-                            // bail and warn on mismatching dimensionality
                             if (outType.getDimension() != inType.getDimension()) {
                                 LOGGER.warn(
                                         "The in declaration '" + name + "' in the " + currentType.glShaderType.name()
@@ -583,11 +530,10 @@ public class CompatibilityTransformer {
 
                             boolean isVector = outType.isVector();
 
-                            // rename all references of this out declaration to a new name (iris_)
                             String newName = TAG_PREFIX + name;
                             prevRoot.identifierIndex.rename(name, newName);
 
-                            // rename the original out declaration back to the original name
+                            // then restore the original name on the out declaration
                             TypeAndInitDeclaration outDeclaration = outTypeSpecifier.getAncestor(TypeAndInitDeclaration.class);
                             if (outDeclaration == null) {
                                 continue;
@@ -605,8 +551,7 @@ public class CompatibilityTransformer {
                             }
                             outMember.getName().replaceByAndDelete(new Identifier(name));
 
-                            // move the declaration member out of the declaration in case there is more than
-                            // one member to avoid changing the other member's type as well.
+                            // split multi-member declarations so the other members keep their type
                             if (outMembers.size() > 1) {
                                 outMember.detach();
                                 outTypeSpecifier = outTypeSpecifier.cloneInto(prevRoot);
@@ -619,13 +564,11 @@ public class CompatibilityTransformer {
                                 prevTree.injectNode(ASTInjectionPoint.BEFORE_DECLARATIONS, singleOutDeclaration);
                             }
 
-                            // add a global variable with the new name and the old type
                             prevTree.injectNode(ASTInjectionPoint.BEFORE_DECLARATIONS, variableTemplate.getInstanceFor(prevRoot,
                                     outTypeSpecifier.cloneInto(prevRoot),
                                     new Identifier(newName)));
 
-                            // insert a statement at the end of the main function that sets the value of the
-                            // out declaration to the value of the global variable and does a type cast
+                            // at the end of main, assign the global to the out declaration with a cast
                             prevTree.appendMain(
                                     (isVector && outType.getDimensions()[0] < inType.getDimensions()[0] ? statementTemplateVector
                                             : statementTemplate).getInstanceFor(prevRoot,
@@ -633,10 +576,9 @@ public class CompatibilityTransformer {
                                                     new Identifier(newName),
                                                     inTypeSpecifier.cloneInto(prevRoot)));
 
-                            // make the out declaration use the same type as the fragment shader
+                            // the out declaration takes the type of the next stage
                             outTypeSpecifier.replaceByAndDelete(inTypeSpecifier.cloneInto(prevRoot));
 
-                            // don't do the patch twice
                             outDeclarations.put(name, null);
 
                             LOGGER.warn(

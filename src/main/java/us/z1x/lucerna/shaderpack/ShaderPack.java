@@ -76,18 +76,8 @@ public class ShaderPack {
         this(root, Collections.emptyMap(), environmentDefines);
     }
 
-    /**
-     * Reads a shader pack from the disk.
-     *
-     * @param root The path to the "shaders" directory within the shader pack. The created ShaderPack will not retain
-     *             this path in any form; once the constructor exits, all disk I/O needed to load this shader pack will
-     *             have completed, and there is no need to hold on to the path for that reason.
-     * @throws IOException if there are any IO errors during shader pack loading.
-     */
     public ShaderPack(Path root, Map<String, String> changedConfigs, Iterable<StringPair> environmentDefines) throws IOException, IllegalStateException {
-        // A null path is not allowed.
         Objects.requireNonNull(root);
-
 
         ImmutableList.Builder<AbsolutePackPath> starts = ImmutableList.builder();
         ImmutableList<String> potentialFileNames = ShaderPackSourceNames.POTENTIAL_STARTS;
@@ -104,7 +94,6 @@ public class ShaderPack {
         boolean hasEnd = ShaderPackSourceNames.findPresentSources(starts, root,
                 AbsolutePackPath.fromAbsolutePath("/world1"), potentialFileNames);
 
-        // Read all files and included files recursively
         IncludeGraph graph = new IncludeGraph(root, starts.build());
 
         if (!graph.getFailures().isEmpty()) {
@@ -117,7 +106,6 @@ public class ShaderPack {
 
         this.languageMap = new LanguageMap(root.resolve("lang"));
 
-        // Discover, merge, and apply shader pack options
         this.shaderPackOptions = new ShaderPackOptions(graph, changedConfigs);
         graph = this.shaderPackOptions.getIncludes();
 
@@ -154,10 +142,8 @@ public class ShaderPack {
         ProfileSet profiles = ProfileSet.fromTree(shaderProperties.getProfiles(), this.shaderPackOptions.getOptionSet());
         this.profile = profiles.scan(this.shaderPackOptions.getOptionSet(), this.shaderPackOptions.getOptionValues());
 
-        // Get programs that should be disabled from the detected profile
         List<String> disabledPrograms = new ArrayList<>();
         this.profile.current.ifPresent(profile -> disabledPrograms.addAll(profile.disabledPrograms));
-        // Add programs that are disabled by shader options
         shaderProperties.getConditionallyEnabledPrograms().forEach((program, shaderOption) -> {
             if ("true".equals(shaderOption)) return;
 
@@ -180,18 +166,14 @@ public class ShaderPack {
 
         Iris.logger.info(this.profileInfo);
 
-        // Prepare our include processor
         IncludeProcessor includeProcessor = new IncludeProcessor(graph);
 
-        // Set up our source provider for creating ProgramSets
         Iterable<StringPair> finalEnvironmentDefines1 = environmentDefines;
         Function<AbsolutePackPath, String> sourceProvider = (path) -> {
             String pathString = path.getPathString();
-            // Removes the first "/" in the path if present, and the file
-            // extension in order to represent the path as its program name
+            // strip a leading slash and the extension to get the program name
             String programString = pathString.substring(pathString.indexOf("/") == 0 ? 1 : 0, pathString.lastIndexOf("."));
 
-            // Return an empty program source if the program is disabled by the current profile
             if (disabledPrograms.contains(programString)) {
                 return null;
             }
@@ -209,12 +191,7 @@ public class ShaderPack {
                 builder.append('\n');
             }
 
-            // Apply GLSL preprocessor to source, while making environment defines available.
-            //
-            // This uses similar techniques to the *.properties preprocessor to avoid actually putting
-            // #define statements in the actual source - instead, we tell the preprocessor about them
-            // directly. This removes one obstacle to accurate reporting of line numbers for errors,
-            // though there exist many more (such as relocating all #extension directives and similar things)
+            // environment defines go to the preprocessor, not into the source, to keep error line numbers accurate
             String source = builder.toString();
             source = JcppProcessor.glslPreprocessSource(source, finalEnvironmentDefines1);
 
@@ -276,7 +253,6 @@ public class ShaderPack {
         return null;
     }
 
-    // TODO: Copy-paste from IdMap, find a way to deduplicate this
     private static Optional<String> loadProperties(Path shaderPath, String name) {
         String fileContents = readProperties(shaderPath, name);
         if (fileContents == null) {
@@ -286,7 +262,6 @@ public class ShaderPack {
         return Optional.of(fileContents);
     }
 
-    // TODO: Implement raw texture data types
     public CustomTextureData readTexture(Path root, String value) throws IOException {
         CustomTextureData customTextureData;
         String[] parts = value.split(" ");
@@ -305,10 +280,8 @@ public class ShaderPack {
                 customTextureData = new CustomTextureData.ResourceData(location[0], location[1]);
             }
         } else {
-            // TODO: Make sure the resulting path is within the shaderpack?
             if (path.startsWith("/")) {
-                // NB: This does not guarantee the resulting path is in the shaderpack as a double slash could be used,
-                // this just fixes shaderpacks like Continuum 2.0.4 that use a leading slash in texture paths
+                // fixes packs like continuum 2.0.4 that use a leading slash
                 path = path.substring(1);
             }
 
@@ -371,7 +344,6 @@ public class ShaderPack {
 
     private static String readProperties(Path shaderPath, String name) {
         try {
-            // Property files should be encoded in ISO_8859_1.
             return new String(Files.readAllBytes(shaderPath.resolve(name)), StandardCharsets.ISO_8859_1);
         } catch (NoSuchFileException e) {
             Iris.logger.debug("An " + name + " file was not found in the current shaderpack");
@@ -401,14 +373,7 @@ public class ShaderPack {
                 throw new IllegalArgumentException("Unknown dimension " + dimension);
         }
 
-        // NB: If a dimension overrides directory is present, none of the files from the parent directory are "merged"
-        //     into the override. Rather, we act as if the overrides directory contains a completely different set of
-        //     shader programs unrelated to that of the base shader pack.
-        //
-        //     This makes sense because if base defined a composite pass and the override didn't, it would make it
-        //     impossible to "un-define" the composite pass. It also removes a lot of complexity related to "merging"
-        //     program sets. At the same time, this might be desired behavior by shader pack authors. It could make
-        //     sense to bring it back as a configurable option, and have a more maintainable set of code backing it.
+        // a dimension override replaces the base programs fully with no merging, so it can drop base passes
         if (overrides != null) {
             return overrides;
         } else {

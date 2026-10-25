@@ -11,8 +11,7 @@ public class FileNode {
     private final ImmutableList<String> lines;
     private final ImmutableMap<Integer, AbsolutePackPath> includes;
 
-    // NB: The caller is responsible for ensuring that the includes map
-    //     is in sync with the lines list.
+    // the caller keeps the includes map in sync with the lines
     private FileNode(AbsolutePackPath path, ImmutableList<String> lines,
                      ImmutableMap<Integer, AbsolutePackPath> includes) {
         this.path = path;
@@ -73,15 +72,8 @@ public class FileNode {
                 continue;
             }
 
-            // Remove the "#include " part so that we just have the file path
             String target = line.substring("#include ".length()).trim();
 
-            // Remove quotes if they're present
-            // All include directives should have quotes, but I'm not sure whether they're required to.
-            // TODO: Check if quotes are required, and don't permit mismatched quotes
-            // TODO: This shouldn't be accepted:
-            //       #include "test.glsl
-            //       #include test.glsl"
             if (target.startsWith("\"")) {
                 target = target.substring(1);
             }

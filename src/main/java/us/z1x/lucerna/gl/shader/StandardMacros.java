@@ -61,17 +61,8 @@ public class StandardMacros {
         return ImmutableList.copyOf(standardDefines);
     }
 
-    /**
-     * Gets the current mc version String in a 5 digit format
-     *
-     * @return mc version string
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L696-L699">Optifine Doc</a>
-     */
     public static String getMcVersion() {
         String version = "1.8.9";
-            // release target so snapshots are set to the higher version
-            //
-            // For example if we were running iris on 21w07a, getReleaseTarget() would return 1.17
 
         if (version == null) {
             throw new IllegalStateException("Could not get the current minecraft version!");
@@ -103,14 +94,6 @@ public class StandardMacros {
         return major + minor + bugfix;
     }
 
-    /**
-     * Returns the current GL Version using regex
-     *
-     * @param name the name of the gl attribute to parse
-     * @return current gl version stripped of semantic versioning
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L701-L703">Optifine Doc for GL Version</a>
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L705-L707">Optifine Doc for GLSL Version</a>
-     */
     public static String getGlVersion(int name) {
         String info = GL11.glGetString(name);
 
@@ -125,7 +108,6 @@ public class StandardMacros {
         String bugfix = group(matcher, "bugfix");
 
         if (bugfix == null) {
-            // if bugfix is not there, it is 0
             bugfix = "0";
         }
 
@@ -136,14 +118,6 @@ public class StandardMacros {
         return major + minor + bugfix;
     }
 
-    /**
-     * Expanded version of {@link Matcher#group(String)} that does not throw an exception.
-     * If the argument is incorrect (normally resulting in an exception), it returns null
-     *
-     * @param matcher matcher to check the group by
-     * @param name    name of the group
-     * @return the section of the matcher that is a group, or null, if that matcher does not contain said group
-     */
     public static String group(Matcher matcher, String name) {
         try {
             return matcher.group(name);
@@ -152,12 +126,6 @@ public class StandardMacros {
         }
     }
 
-    /**
-     * Returns the current OS String
-     *
-     * @return the string based on the current OS
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L709-L714">Optifine Doc</a>
-     */
     public static String getOsString() {
         String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
         if (os.contains("mac")) {
@@ -170,12 +138,6 @@ public class StandardMacros {
         return "MC_OS_UNKNOWN";
     }
 
-    /**
-     * Returns a string indicating the graphics card being used
-     *
-     * @return the graphics card prefixed with "MC_GL_VENDOR_"
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L716-L723">Optifine Doc</a>
-     */
     public static String getVendor() {
         String vendor = Objects.requireNonNull(GL11.glGetString(GL11.GL_VENDOR)).toLowerCase(Locale.ROOT);
         if (vendor.startsWith("ati")) {
@@ -192,12 +154,6 @@ public class StandardMacros {
         return "MC_GL_VENDOR_OTHER";
     }
 
-    /**
-     * Returns the graphics driver being used
-     *
-     * @return graphics driver prefixed with "MC_GL_RENDERER_"
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L725-L733">Optifine Doc</a>
-     */
     public static String getRenderer() {
         String renderer = Objects.requireNonNull(GL11.glGetString(GL11.GL_RENDERER)).toLowerCase(Locale.ROOT);
         if (renderer.startsWith("amd")) {
@@ -224,23 +180,10 @@ public class StandardMacros {
         return "MC_GL_RENDERER_OTHER";
     }
 
-    /**
-     * Returns the list of currently enabled GL extensions
-     * This is done by calling {@link GL11#glGetString} with the arg {@link GL11#GL_EXTENSIONS}
-     *
-     * @return list of activated extensions prefixed with "MC_"
-     * @see <a href="https://github.com/sp614x/optifine/blob/9c6a5b5326558ccc57c6490b66b3be3b2dc8cbef/OptiFineDoc/doc/shaders.txt#L735-L738">Optifine Doc</a>
-     */
     public static Set<String> getGlExtensions() {
         String[] extensions = Objects.requireNonNull(GL11.glGetString(GL11.GL_EXTENSIONS)).split("\\s+");
 
-        // TODO note that we do not add extensions based on if the shader uses them and if they are supported
-        // see https://github.com/sp614x/optifine/blob/master/OptiFineDoc/doc/shaders.txt#L738
-
-        // NB: Use Collectors.toSet(). In some cases, there are duplicate extensions in the extension list.
-        // RenderDoc is one example - it causes the GL_KHR_debug extension to appear twice:
-        //
-        // https://github.com/IrisShaders/Iris/issues/971
+        // a set because renderdoc and others list some extensions twice, https://github.com/IrisShaders/Iris/issues/971
         return Arrays.stream(extensions).map(s -> "MC_" + s).collect(Collectors.toSet());
     }
 
@@ -252,15 +195,8 @@ public class StandardMacros {
         return stages;
     }
 
-    /**
-     * Returns the list of Iris-exclusive uniforms supported in the current version of Iris.
-     *
-     * @return List of definitions corresponding to the uniform names prefixed with "MC_"
-     */
     public static List<String> getIrisDefines() {
         List<String> defines = new ArrayList<>();
-        // All Iris-exclusive uniforms should have a corresponding definition here. Example:
-        // defines.add("MC_UNIFORM_DRAGON_DEATH_PROGRESS");
 
         return defines;
     }

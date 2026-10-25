@@ -13,7 +13,6 @@ public class DepthColorStorage {
 
     public static void disableDepthColor() {
         if (!depthColorLocked) {
-            // Only save the previous state if the depth and color mask wasn't already locked
             GlStateManager.ColorMask colorMask = GlStateManager.COLOR_MASK;
             GlStateManager.Depth depthState = GlStateManager.DEPTH;
 

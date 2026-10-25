@@ -4,9 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-/**
- * An absurdly simple class for storing pairs of strings because Java lacks pair / tuple types.
- */
 public class StringPair {
     private final String key;
     private final String value;

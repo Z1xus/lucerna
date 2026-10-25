@@ -18,7 +18,6 @@ public class ProgramTable<T> {
         }
     }
 
-    // TODO: Remove InputAvailability allocations?
     public T match(RenderCondition condition, InputAvailability availability) {
         int index = (condition.ordinal() * InputAvailability.NUM_VALUES) + availability.pack();
 

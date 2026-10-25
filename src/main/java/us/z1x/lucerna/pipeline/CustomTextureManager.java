@@ -35,11 +35,7 @@ public class CustomTextureManager {
     private final EnumMap<TextureStage, Object2ObjectMap<String, IntSupplier>> customTextureIdMap = new EnumMap<>(TextureStage.class);
     private final IntSupplier noise;
 
-    /**
-     * List of all OpenGL texture objects owned by this CustomTextureManager that need to be deleted in order to avoid
-     * leaks.
-     * Make sure any textures added to this list call releaseId from the close method.
-     */
+    // gl textures owned here, each must call releaseId in close to avoid leaks
     private final List<AbstractTexture> ownedTextures = new ArrayList<>();
     private final IntList ownedRawTextures = new IntArrayList();
 
@@ -91,8 +87,7 @@ public class CustomTextureManager {
 
             return () -> texture;
         } else if (textureData instanceof CustomTextureData.LightmapMarker) {
-            // Special code path for the light texture. While shader packs hardcode the primary light texture, it's
-            // possible that a mod will create a different light texture, so this code path is robust to that.
+            // the light texture gets its own path since a mod can create a different one
             return () -> ((GameRendererAccessor) Minecraft.getInstance().gameRenderer).lucerna$getLightmapTexture().getGlId();
         } else if (textureData instanceof CustomTextureData.ResourceData) {
             CustomTextureData.ResourceData resourceData = (CustomTextureData.ResourceData) textureData;
@@ -102,11 +97,7 @@ public class CustomTextureManager {
             TextureManager textureManager = Minecraft.getInstance().getTextureManager();
             Identifier textureLocation = new Identifier(namespace, location);
 
-            // NB: We have to re-query the TextureManager for the texture object every time. This is because the
-            //     texture object could be removed / deleted from the TextureManager on resource reloads,
-            //     and we could end up holding on to a deleted texture unless we added special code to handle resource
-            //     reloads. Re-fetching the texture from the TextureManager every time is the most robust approach for
-            //     now.
+            // re-query the texture manager every time since a resource reload can delete the texture object
             return () -> {
                 Texture texture = textureManager.get(textureLocation);
 

@@ -45,8 +45,7 @@ public class RenderTarget {
         setupTexture(mainTexture, builder.width, builder.height, !isPixelFormatInteger);
         setupTexture(altTexture, builder.width, builder.height, !isPixelFormatInteger);
 
-        // Clean up after ourselves
-        // This is strictly defensive to ensure that other buggy code doesn't tamper with our textures
+        // unbind so other code cannot change these textures
         GlStateManager.bindTexture(0);
     }
 
@@ -67,7 +66,7 @@ public class RenderTarget {
         this.resize(textureScaleOverride.x, textureScaleOverride.y);
     }
 
-    // Package private, call CompositeRenderTargets#resizeIfNeeded instead.
+    // call RenderTargets#resizeIfNeeded instead
     void resize(int width, int height) {
         requireValid();
 
@@ -128,7 +127,6 @@ public class RenderTarget {
         private PixelType type = PixelType.UNSIGNED_BYTE;
 
         private Builder() {
-            // No-op
         }
 
         public Builder setInternalFormat(InternalTextureFormat format) {

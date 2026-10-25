@@ -45,11 +45,6 @@ import java.util.Properties;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/**
- * The parsed representation of the shaders.properties file. This class is not meant to be stored permanently, rather
- * it merely exists as an intermediate step until we build up PackDirectives and ProgramDirectives objects from the
- * values in here & the values parsed from shader source code.
- */
 public class ShaderProperties {
     private CloudSetting cloudSetting = CloudSetting.DEFAULT;
     private OptionalBoolean oldHandLight = OptionalBoolean.DEFAULT;
@@ -83,7 +78,6 @@ public class ShaderProperties {
     private final Map<String, List<String>> subScreenOptions = new HashMap<>();
     private Integer mainScreenColumnCount = null;
     private final Map<String, Integer> subScreenColumnCount = new HashMap<>();
-    // TODO: private Map<String, String> optifineVersionRequirements;
     private final CustomUniforms.Builder customUniforms = new CustomUniforms.Builder();
     private final Object2ObjectMap<String, AlphaTestOverride> alphaTestOverrides = new Object2ObjectOpenHashMap<>();
     private final Object2FloatMap<String> viewportScaleOverrides = new Object2FloatOpenHashMap<>();
@@ -102,10 +96,8 @@ public class ShaderProperties {
     private List<String> optionalFeatureFlags = new ArrayList<>();
 
     private ShaderProperties() {
-        // empty
     }
 
-    // TODO: Is there a better solution than having ShaderPack pass a root path to ShaderProperties to be able to read textures?
     public ShaderProperties(String contents, ShaderPackOptions shaderPackOptions, Iterable<StringPair> environmentDefines) {
         String preprocessedContents = PropertiesPreprocessor.preprocessSource(contents, shaderPackOptions, environmentDefines);
 
@@ -164,8 +156,6 @@ public class ShaderProperties {
             handleBooleanDirective(key, value, "shadow.enabled", bool -> shadowEnabled = bool);
             handleBooleanDirective(key, value, "particles.before.deferred", bool -> particlesBeforeDeferred = bool);
             handleBooleanDirective(key, value, "prepareBeforeShadow", bool -> prepareBeforeShadow = bool);
-
-            // TODO: Min optifine versions, shader options layout / appearance / profiles
 
             handlePassDirective("scale.", key, value, pass -> {
                 float scale;
@@ -322,7 +312,6 @@ public class ShaderProperties {
                 });
             });
 
-
             handlePassDirective("variable.", key, value, pass -> {
                 String[] parts = pass.split("\\.");
                 if (parts.length != 2) {
@@ -390,17 +379,14 @@ public class ShaderProperties {
                 }
             });
 
-            // TODO: Buffer size directives
-            // TODO: Conditional program enabling directives
         });
 
-        // We need to use a non-preprocessed property file here since we don't want any weird preprocessor changes to be applied to the screen/value layout.
+        // use the non-preprocessed file so the preprocessor does not change the screen and value layout
         original.forEach((keyObject, valueObject) -> {
             String key = (String) keyObject;
             String value = (String) valueObject;
 
-            // Defining "sliders" multiple times in the properties file will only result in
-            // the last definition being used, should be tested if behavior matches OptiFine
+            // the last sliders definition wins, not checked against optifine
             handleWhitespacedListDirective(key, value, "sliders", sliders -> sliderOptions = sliders);
             handlePrefixedWhitespacedListDirective("profile.", key, value, profiles::put);
 

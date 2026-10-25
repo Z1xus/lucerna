@@ -9,15 +9,13 @@ import org.joml.Vector4f;
 import java.util.Optional;
 
 public class PackShadowDirectives {
-    // Bump this up if you want more shadow color buffers!
-    // This is currently set at 2 for ShadersMod / OptiFine parity but can theoretically be bumped up to 8.
-    // TODO: Make this configurable?
+    // 2 for shadersmod and optifine parity, can go up to 8
     public static final int MAX_SHADOW_COLOR_BUFFERS = 2;
 
     private final OptionalBoolean shadowEnabled;
 
     private int resolution;
-    // Use a boxed form so we can use null to indicate that there is not an FOV specified.
+    // boxed so null means no fov
     private Float fov;
     private float distance;
     private float distanceRenderMul;
@@ -36,42 +34,21 @@ public class PackShadowDirectives {
     private final ImmutableList<SamplingSettings> colorSamplingSettings;
 
     public PackShadowDirectives(ShaderProperties properties) {
-        // By default, the shadow map has a resolution of 1024x1024. It's recommended to increase this for better
-        // quality.
         this.resolution = 1024;
 
-        // By default, shadows do not use FOV, and instead use an orthographic projection controlled by shadowDistance
-        //
-        // If FOV is defined, shadows will use a perspective projection controlled by the FOV, and shadowDistance will
-        // be disregarded for the purposes of creating the projection matrix. However, it will still be used to figure
-        // out the render distance for shadows if shadowRenderDistanceMul is greater than zero.
+        // null fov means an orthographic projection sized by shadowDistance
+        // with fov the projection is perspective and shadowDistance only sets the render distance
         this.fov = null;
 
-        // By default, an orthographic projection with a half plane of 160 meters is used, corresponding to a render
-        // distance of 10 chunks.
-        //
-        // It's recommended for shader pack authors to lower this setting to meet their needs in addition to setting
-        // shadowRenderDistanceMul to a nonzero value, since having a high shadow render distance will impact
-        // performance quite heavily on most systems.
+        // 160 m half plane, about 10 chunks of render distance
         this.distance = 160.0f;
 
-        // By default, shadows are not culled based on distance from the player. However, pack authors may
-        // enable this by setting shadowRenderDistanceMul to a nonzero value.
-        //
-        // Culling shadows based on the shadow matrices is often infeasible because shader packs frequently
-        // employ non-linear transformations that end up fitting more far away chunks into the shadow map,
-        // as well as giving higher detail to close up chunks.
-        //
-        // However, Iris does still does cull shadows whenever it can - but, it does so by analyzing
-        // whether or not shadows can possibly be cast into the player's view, instead of just checking
-        // the shadow matrices.
+        // negative means no distance culling, matrix culling fails with the non-linear distortion packs use
         this.distanceRenderMul = -1.0f;
         this.entityShadowDistanceMul = 1.0f;
         this.explicitRenderDistance = false;
 
-        // By default, a shadow interval size of 2 meters is used. This means that the shadow camera will be snapped to
-        // a grid where each grid cell is 2 meters by 2 meters by 2 meters, and it will only move either when the sun /
-        // moon move, or when the player camera moves into a different grid cell.
+        // the shadow camera snaps to a 2 m grid and moves only with the sun or on a cell change
         this.intervalSize = 2.0f;
 
         this.shouldRenderTerrain = properties.getShadowTerrain().orElse(true);
@@ -204,18 +181,13 @@ public class PackShadowDirectives {
         acceptBufferDirectives(directives, colorSamplingSettings);
     }
 
-    /**
-     * Handles shadowHardwareFiltering* directives
-     */
     private static void acceptHardwareFilteringSettings(DirectiveHolder directives, ImmutableList<DepthSamplingSettings> samplers) {
-        // Get the default base value for the hardware filtering setting
         directives.acceptConstBooleanDirective("shadowHardwareFiltering", hardwareFiltering -> {
             for (DepthSamplingSettings samplerSettings : samplers) {
                 samplerSettings.setHardwareFiltering(hardwareFiltering);
             }
         });
 
-        // Find any per-sampler overrides for the hardware filtering setting
         for (int i = 0; i < samplers.size(); i++) {
             String name = "shadowHardwareFiltering" + i;
 
@@ -224,21 +196,17 @@ public class PackShadowDirectives {
     }
 
     private static void acceptDepthMipmapSettings(DirectiveHolder directives, ImmutableList<DepthSamplingSettings> samplers) {
-        // Get the default base value for the shadow depth mipmap setting
         directives.acceptConstBooleanDirective("generateShadowMipmap", mipmap -> {
             for (SamplingSettings samplerSettings : samplers) {
                 samplerSettings.setMipmap(mipmap);
             }
         });
 
-        // Find any per-sampler overrides for the shadow depth mipmap setting
-
-        // Legacy override option: shadowtexMipmap, an alias for shadowtex0Mipmap
+        // legacy alias for shadowtex0Mipmap
         if (samplers.size() >= 1) {
             directives.acceptConstBooleanDirective("shadowtexMipmap", samplers.get(0)::setMipmap);
         }
 
-        // Standard override option: shadowtex0Mipmap and shadowtex1Mipmap
         for (int i = 0; i < samplers.size(); i++) {
             String name = "shadowtex" + i + "Mipmap";
 
@@ -247,14 +215,12 @@ public class PackShadowDirectives {
     }
 
     private static void acceptColorMipmapSettings(DirectiveHolder directives, ImmutableList<SamplingSettings> samplers) {
-        // Get the default base value for the shadow depth mipmap setting
         directives.acceptConstBooleanDirective("generateShadowColorMipmap", mipmap -> {
             for (SamplingSettings samplerSettings : samplers) {
                 samplerSettings.setMipmap(mipmap);
             }
         });
 
-        // Find any per-sampler overrides for the shadow depth mipmap setting
         for (int i = 0; i < samplers.size(); i++) {
             String name = "shadowcolor" + i + "Mipmap";
             directives.acceptConstBooleanDirective(name, samplers.get(i)::setMipmap);
@@ -310,14 +276,10 @@ public class PackShadowDirectives {
                 }
             });
 
-            // TODO: Only for composite and deferred
             directives.acceptConstBooleanDirective(bufferName + "Clear",
                 shouldClear -> settings.get(finalI).setClear(shouldClear));
 
-            // TODO: Only for composite, deferred, and final
-
-            // Note: This is still relevant even if shouldClear is false,
-            // since this will be the initial color of the buffer.
+            // still applies when clear is false since this is the initial color
             directives.acceptConstVec4Directive(bufferName + "ClearColor",
                 clearColor -> settings.get(finalI).setClearColor(clearColor));
         }
@@ -338,30 +300,14 @@ public class PackShadowDirectives {
     }
 
     public static class SamplingSettings {
-        /**
-         * Whether mipmaps should be generated before sampling. Disabled by default.
-         */
         private boolean mipmap;
 
-        /**
-         * Whether nearest texture filtering should be used in place of linear filtering. By default, linear filtering
-         * is used, which applies some blur, but if this is not desired behavior, nearest filtering can be used.
-         */
         private boolean nearest;
 
-        /**
-         * Whether to clear the buffer every frame.
-         */
         private boolean clear;
 
-        /**
-         * The color to clear the buffer to. If {@code clear} is false, this has no effect.
-         */
         private Vector4f clearColor;
 
-        /**
-         * The internal format to use for the color buffer.
-         */
         private InternalTextureFormat format;
 
         public SamplingSettings() {

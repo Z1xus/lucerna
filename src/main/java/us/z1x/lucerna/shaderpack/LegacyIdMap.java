@@ -27,7 +27,6 @@ public class LegacyIdMap {
         add(blockIdMap, 50, block("torch"));
         add(blockIdMap, 89, block("glowstone"));
 
-        // TODO: what about inactive redstone lamps?
         add(blockIdMap, 124, block("redstone_lamp"));
 
         add(blockIdMap, 12, block("sand"));
@@ -36,13 +35,13 @@ public class LegacyIdMap {
         add(blockIdMap, 41, block("gold_block"));
         add(blockIdMap, 42, block("iron_block"));
         add(blockIdMap, 57, block("diamond_block"));
-        // Apparently this is what SEUS v11 expects? Maybe old shadersmod was buggy.
+        // seus v11 expects this, old shadersmod may have been buggy
         add(blockIdMap, -123, block("emerald_block"));
 
         addMany(blockIdMap, 35, COLORS, color -> block(color + "_wool"));
 
-        // NB: Use the "still" IDs for water and lava, since some shader packs don't properly support the "flowing"
-        // versions: https://github.com/IrisShaders/Iris/issues/1462
+        // use the still ids for water and lava since some packs lack flowing support
+        // see https://github.com/IrisShaders/Iris/issues/1462
         add(blockIdMap, 9, block("water"));
         add(blockIdMap, 11, block("lava"));
         add(blockIdMap, 79, block("ice"));
@@ -52,30 +51,22 @@ public class LegacyIdMap {
         addMany(blockIdMap, 95, COLORS, color -> block(color + "_stained_glass"));
         addMany(blockIdMap, 160, COLORS, color -> block(color + "_stained_glass_pane"));
 
-        // Short grass / bush
         add(blockIdMap, 31, block("grass"), block("seagrass"), block("sweet_berry_bush"));
 
-        // Crops (59 = wheat), but we include carrots and potatoes too.
         add(blockIdMap, 59, block("wheat"), block("carrots"), block("potatoes"));
 
-        // Small flowers
         add(blockIdMap, 37, block("dandelion"), block("poppy"), block("blue_orchid"),
                 block("allium"), block("azure_bluet"), block("red_tulip"), block("pink_tulip"),
                 block("white_tulip"), block("orange_tulip"), block("oxeye_daisy"),
                 block("cornflower"), block("lily_of_the_valley"), block("wither_rose"));
 
-        // Big tall grass / flowers
-        // Also include seagrass here
         add(blockIdMap, 175, block("sunflower"), block("lilac"), block("tall_grass"),
                 block("large_fern"), block("rose_bush"), block("peony"), block("tall_seagrass"));
 
-        // Fire
         add(blockIdMap, 51, block("fire"));
 
-        // Lily pad
         add(blockIdMap, 111, block("lily_pad"));
 
-        // TODO: 76 -> redstone_torch (on)
     }
 
     private static BlockEntry block(String name) {

@@ -7,9 +7,6 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20C;
 
-/**
- * Renders a full-screen textured quad to the screen. Used in composite / deferred rendering.
- */
 public class FullScreenQuadRenderer {
     private final int quadBuffer;
 
@@ -70,21 +67,18 @@ public class FullScreenQuadRenderer {
         GlStateManager.popMatrix();
     }
 
-    /**
-     * Creates and uploads a vertex buffer containing a single full-screen quad
-     */
     private static int createQuad() {
         float[] vertices = new float[] {
-            // Vertex 0: Top right corner
+            // top right
             1.0F, 1.0F, 0.0F,
             1.0F, 1.0F,
-            // Vertex 1: Top left corner
+            // top left
             0.0F, 1.0F, 0.0F,
             0.0F, 1.0F,
-            // Vertex 2: Bottom right corner
+            // bottom right
             1.0F, 0.0F, 0.0F,
             1.0F, 0.0F,
-            // Vertex 3: Bottom left corner
+            // bottom left
             0.0F, 0.0F, 0.0F,
             0.0F, 0.0F
         };

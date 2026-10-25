@@ -85,7 +85,6 @@ public class ProgramUniforms {
             updateStage(perTick);
         }
 
-        // TODO: Move the frame counter to a different place?
         int currentFrame = SystemTimeUniforms.COUNTER.getAsInt();
 
         if (lastFrame != currentFrame) {
@@ -185,8 +184,7 @@ public class ProgramUniforms {
         }
 
         public ProgramUniforms buildUniforms() {
-            // Check for any unsupported uniforms and warn about them so that we can easily figure out what uniforms we
-            // need to add.
+            // warn about uniforms the pack uses that we do not provide
             int activeUniforms = GL20.glGetProgrami(program, GL20C.GL_ACTIVE_UNIFORMS);
             IntBuffer sizeBuf = BufferUtils.createIntBuffer(1);
             IntBuffer typeBuf = BufferUtils.createIntBuffer(1);
@@ -195,7 +193,6 @@ public class ProgramUniforms {
                 String name = IrisRenderSystem.getActiveUniform(program, index, 128, sizeBuf, typeBuf);
 
                 if (name.isEmpty()) {
-                    // No further information available.
                     continue;
                 }
 
@@ -209,8 +206,7 @@ public class ProgramUniforms {
                     String typeName = getTypeName(type);
 
                     if (isSampler(type) || isImage(type)) {
-                        // don't print a warning, samplers and images are managed elsewhere.
-                        // TODO: Detect unsupported samplers/images?
+                        // samplers and images are managed elsewhere
                         continue;
                     }
 

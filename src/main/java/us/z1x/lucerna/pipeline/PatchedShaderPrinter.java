@@ -9,9 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-/**
- * Static class that deals with printing the patched_shader folder.
- */
 public class PatchedShaderPrinter {
     private static boolean outputLocationCleared = false;
     private static int programCounter = 0;

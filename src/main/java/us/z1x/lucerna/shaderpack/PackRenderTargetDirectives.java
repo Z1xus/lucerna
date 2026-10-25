@@ -27,8 +27,6 @@ public class PackRenderTargetDirectives {
         "gaux4"
     );
 
-    // TODO: Instead of just passing this, the shader pack loader should try to figure out what color buffers are in
-    //       use.
     public static final Set<Integer> BASELINE_SUPPORTED_RENDER_TARGETS;
 
     static {
@@ -68,8 +66,6 @@ public class PackRenderTargetDirectives {
 
     public void acceptDirectives(DirectiveHolder directives) {
         Optional.ofNullable(renderTargetSettings.get(7)).ifPresent(colortex7 -> {
-            // Handle legacy GAUX4FORMAT directives
-
             directives.acceptCommentStringDirective("GAUX4FORMAT", format -> {
                 if ("RGBA32F".equals(format)) {
                     colortex7.requestedFormat = InternalTextureFormat.RGBA32F;
@@ -84,8 +80,7 @@ public class PackRenderTargetDirectives {
             });
         });
 
-        // If a shaderpack declares a gdepth uniform (even if it is not actually sampled or even of the correct type),
-        // we upgrade the format of gdepth / colortex1 to RGBA32F if it is currently RGBA.
+        // any gdepth uniform, even unsampled or mistyped, upgrades colortex1 from RGBA to RGBA32F
         Optional.ofNullable(renderTargetSettings.get(1)).ifPresent(gdepth -> {
             directives.acceptUniformDirective("gdepth", () -> {
                 if (gdepth.requestedFormat == InternalTextureFormat.RGBA) {
@@ -114,14 +109,10 @@ public class PackRenderTargetDirectives {
             }
         });
 
-        // TODO: Only for composite and deferred
         directives.acceptConstBooleanDirective(bufferName + "Clear",
                 shouldClear -> settings.clear = shouldClear);
 
-        // TODO: Only for composite, deferred, and final
-
-        // Note: This is still relevant even if shouldClear is false,
-        // since this will be the initial color of the buffer.
+        // still applies when clear is false since this is the initial color
         directives.acceptConstVec4Directive(bufferName + "ClearColor",
                 clearColor -> settings.clearColor = clearColor);
     }

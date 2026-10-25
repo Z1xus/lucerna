@@ -77,7 +77,7 @@ public class CompositeRenderer {
         explicitPreFlips.forEach((buffer, shouldFlip) -> {
             if (shouldFlip) {
                 bufferFlipper.flip(buffer);
-                // NB: Flipping deferred_pre or composite_pre does NOT cause the "flippedAtLeastOnce" flag to trigger
+                // flipping deferred_pre or composite_pre does not set flippedAtLeastOnce
             }
         });
 
@@ -106,7 +106,6 @@ public class CompositeRenderer {
             GlFramebuffer framebuffer = renderTargets.createColorFramebuffer(flipped, drawBuffers);
 
             int passWidth = 0, passHeight = 0;
-            // Flip the buffers that this shader wrote to, and set pass width and height
             ImmutableMap<Integer, Boolean> explicitFlips = directives.getExplicitFlips();
 
             for (int buffer : drawBuffers) {
@@ -117,7 +116,7 @@ public class CompositeRenderer {
                 passWidth = target.getWidth();
                 passHeight = target.getHeight();
 
-                // compare with boxed Boolean objects to avoid NPEs
+                // compare with boxed Boolean to avoid npes
                 if (explicitFlips.get(buffer) == Boolean.FALSE) {
                     continue;
                 }
@@ -154,7 +153,6 @@ public class CompositeRenderer {
     public ImmutableSet<Integer> getFlippedAtLeastOnceFinal() {
         return this.flippedAtLeastOnceFinal;
     }
-
 
     public void recalculateSizes() {
         for (Pass pass : passes) {
@@ -255,17 +253,13 @@ public class CompositeRenderer {
 
         FullScreenQuadRenderer.end();
 
-        // Make sure to reset the viewport to how it was before... Otherwise weird issues could occur.
-        // Also bind the "main" framebuffer if it isn't already bound.
         Minecraft.getInstance().getRenderTarget().bindWrite(true);
         ProgramUniforms.clearActiveUniforms();
         ProgramSamplers.clearActiveSamplers();
         IrisRenderSystem.useProgram(0);
 
-        // NB: Unbinding all of these textures is necessary for proper shaderpack reloading.
+        // unbinding these textures is needed for shader pack reloading
         for (int i = 0; i < SamplerLimits.get().getMaxTextureUnits(); i++) {
-            // Unbind all textures that we may have used.
-            // NB: This is necessary for shader pack reloading to work propely
             GlStateManager.activeTexture(GL15C.GL_TEXTURE0 + i);
             GlStateManager.bindTexture(0);
         }
@@ -276,17 +270,7 @@ public class CompositeRenderer {
     private static void setupMipmapping(RenderTarget target, boolean readFromAlt) {
         int texture = readFromAlt ? target.getAltTexture() : target.getMainTexture();
 
-        // TODO: Only generate the mipmap if a valid mipmap hasn't been generated or if we've written to the buffer
-        // (since the last mipmap was generated)
-        //
-        // NB: We leave mipmapping enabled even if the buffer is written to again, this appears to match the
-        // behavior of ShadersMod/OptiFine, however I'm not sure if it's desired behavior. It's possible that a
-        // program could use mipmapped sampling with a stale mipmap, which probably isn't great. However, the
-        // sampling mode is always reset between frames, so this only persists after the first program to use
-        // mipmapping on this buffer.
-        //
-        // Also note that this only applies to one of the two buffers in a render target buffer pair - making it
-        // unlikely that this issue occurs in practice with most shader packs.
+        // mipmapping stays on after writes like optifine, the sampling mode resets each frame
         IrisRenderSystem.generateMipmaps(texture, GL20C.GL_TEXTURE_2D);
 
         int filter = GL20C.GL_LINEAR_MIPMAP_LINEAR;
@@ -297,10 +281,8 @@ public class CompositeRenderer {
         IrisRenderSystem.texParameteri(texture, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, filter);
     }
 
-    // TODO: Don't just copy this from DeferredWorldRenderingPipeline
     private Program createProgram(ProgramSource source, ImmutableSet<Integer> flipped, ImmutableSet<Integer> flippedAtLeastOnceSnapshot,
                                                            Supplier<ShadowRenderTargets> shadowTargetsSupplier) {
-        // TODO: Properly handle empty shaders
         Map<PatchShaderType, String> transformed = TransformPatcher.patchComposite(
             source.getVertexSource().orElseThrow(NullPointerException::new),
             source.getGeometrySource().orElse(null),
@@ -317,7 +299,6 @@ public class CompositeRenderer {
             builder = ProgramBuilder.begin(source.getName(), vertex, geometry, fragment,
                 IrisSamplers.COMPOSITE_RESERVED_TEXTURE_UNITS);
         } catch (RuntimeException e) {
-            // TODO: Better error handling
             throw new RuntimeException("Shader compilation failed!", e);
         }
 
@@ -336,7 +317,6 @@ public class CompositeRenderer {
             IrisImages.addShadowColorImages(builder, shadowTargetsSupplier.get());
         }
 
-        // TODO: Don't duplicate this with FinalPassRenderer
         centerDepthSampler.setUsage(builder.addDynamicSampler(centerDepthSampler::getCenterDepthTexture, "iris_centerDepthSmooth"));
 
         return builder.build();
@@ -349,14 +329,12 @@ public class CompositeRenderer {
             if (source == null || !source.getSource().isPresent()) {
                 continue;
             } else {
-                // TODO: Properly handle empty shaders
                 Objects.requireNonNull(flipped);
                 ProgramBuilder builder;
 
                 try {
                     builder = ProgramBuilder.beginCompute(source.getName(), TransformPatcher.patchCompute(source.getSource().get(), textureRenames), IrisSamplers.COMPOSITE_RESERVED_TEXTURE_UNITS);
                 } catch (RuntimeException e) {
-                    // TODO: Better error handling
                     throw new RuntimeException("Shader compilation failed!", e);
                 }
 
@@ -375,7 +353,6 @@ public class CompositeRenderer {
                     IrisImages.addShadowColorImages(builder, shadowTargetsSupplier.get());
                 }
 
-                // TODO: Don't duplicate this with FinalPassRenderer
                 centerDepthSampler.setUsage(builder.addDynamicSampler(centerDepthSampler::getCenterDepthTexture, "iris_centerDepthSmooth"));
 
                 programs[i] = builder.buildCompute();
@@ -383,7 +360,6 @@ public class CompositeRenderer {
                 programs[i].setWorkGroupInfo(source.getWorkGroupRelative(), source.getWorkGroups());
             }
         }
-
 
         return programs;
     }

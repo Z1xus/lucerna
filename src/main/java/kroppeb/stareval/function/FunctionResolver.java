@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 public class FunctionResolver {
     private final Map<String, Map<Type, List<TypedFunction>>> functions;
-    // TODO: instead of a suplier we could use an int->function to make varargs
     private final Map<String, Map<Type, List<Supplier<? extends TypedFunction>>>> dynamicFunctions;
 
     public FunctionResolver(

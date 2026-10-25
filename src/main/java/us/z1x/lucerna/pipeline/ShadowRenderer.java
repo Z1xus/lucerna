@@ -129,8 +129,7 @@ public class ShadowRenderer {
         this.targets = shadowRenderTargets;
 
         if (shadow != null) {
-            // Assume that the shader pack is doing voxelization if a geometry shader is detected.
-            // Also assume voxelization if image load / store is detected.
+            // a geometry shader means the pack likely does voxelization
             this.packHasVoxelization = shadow.getGeometrySource().isPresent();
             this.packCullingState = shadowDirectives.getCullingState();
         } else {
@@ -173,13 +172,11 @@ public class ShadowRenderer {
 
     private void configureDepthSampler(int glTextureId, PackShadowDirectives.DepthSamplingSettings settings) {
         if (settings.getHardwareFiltering()) {
-            // We have to do this or else shadow hardware filtering breaks entirely!
+            // shadow hardware filtering breaks without the compare mode
             IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_COMPARE_MODE, GL30C.GL_COMPARE_REF_TO_TEXTURE);
         }
 
-        // Workaround for issues with old shader packs like Chocapic v4.
-        // They expected the driver to put the depth value in z, but it's supposed to only
-        // be available in r. So we set up the swizzle to fix that.
+        // old packs like chocapic v4 read depth from z, but drivers only put it in r, so swizzle it
         IrisRenderSystem.texParameteriv(glTextureId, GL20C.GL_TEXTURE_2D, ARBTextureSwizzle.GL_TEXTURE_SWIZZLE_RGBA,
             new int[] { GL30C.GL_RED, GL30C.GL_RED, GL30C.GL_RED, GL30C.GL_ONE });
 
@@ -193,7 +190,6 @@ public class ShadowRenderer {
         }
 
         if (!settings.getNearest()) {
-            // Make sure that things are smoothed
             IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, GL20C.GL_LINEAR);
             IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MAG_FILTER, GL20C.GL_LINEAR);
         } else {
@@ -218,7 +214,6 @@ public class ShadowRenderer {
     }
 
     private FrustumHolder createShadowFrustum(float renderMultiplier, FrustumHolder holder) {
-        // TODO: Cull entities / block entities with Advanced Frustum Culling even if voxelization is detected.
         String distanceInfo;
         String cullingInfo;
         if ((packCullingState == OptionalBoolean.FALSE || packHasVoxelization) && packCullingState != OptionalBoolean.TRUE) {
@@ -376,14 +371,12 @@ public class ShadowRenderer {
 
         terrainFrustumHolder = createShadowFrustum(renderDistanceMultiplier, terrainFrustumHolder);
 
-        // Determine the player camera position
         Vector3d cameraPos = CameraUniforms.getUnshiftedCameraPosition();
 
         double cameraX = cameraPos.x;
         double cameraY = cameraPos.y;
         double cameraZ = cameraPos.z;
 
-        // Center the frustum on the player camera position
         terrainFrustumHolder.getFrustum().prepare(cameraX, cameraY, cameraZ);
 
         Viewport playerViewport = ((ViewportProvider) playerCuller).sodium$createViewport();
@@ -405,7 +398,6 @@ public class ShadowRenderer {
 
         profiler.swap("terrain");
 
-        // Set up our orthographic projection matrix and load it into the legacy matrix stack
         Matrix4f projection = new Matrix4f().set(this.fov != null
             ? ShadowMatrices.createPerspectiveMatrix(this.fov)
             : ShadowMatrices.createOrthoMatrix(halfPlaneLength));
@@ -416,14 +408,9 @@ public class ShadowRenderer {
         ChunkRenderMatrices playerMatrices = ((ArgentumWorldRendererAccessor) renderer).lucerna$getMatrices();
         ((ArgentumWorldRendererAccessor) renderer).lucerna$setMatrices(new ChunkRenderMatrices(projection, modelView));
 
-        // Disable backface culling
-        // This partially works around an issue where if the front face of a mountain isn't visible, it casts no
-        // shadow.
-        //
-        // However, it only partially resolves issues of light leaking into caves.
+        // no backface culling so mountains with a hidden front face still cast shadows, this only partly stops cave light leaks
         GlStateManager.disableCull();
 
-        // Render all opaque terrain unless pack requests not to
         if (shouldRenderTerrain && reuseTerrain) {
             terrainCache.restore();
         } else if (shouldRenderTerrain) {
@@ -436,13 +423,12 @@ public class ShadowRenderer {
             }
         }
 
-        // Reset our viewport in case Argentum overrode it
+        // reset the viewport in case argentum changed it
         GlStateManager.viewport(0, 0, resolution, resolution);
 
         profiler.swap("entities");
 
-        // Create a constrained shadow frustum for entities to avoid rendering faraway entities in the shadow pass,
-        // if the shader pack has requested it. Otherwise, use the same frustum as for terrain.
+        // entities get a tighter frustum when the pack asks for one, otherwise the terrain frustum is used
         boolean hasEntityFrustum = false;
 
         if (entityShadowDistanceMultiplier == 1.0F || entityShadowDistanceMultiplier < 0.0F) {
@@ -494,9 +480,7 @@ public class ShadowRenderer {
 
         client.gameRenderer.disableLightMap();
 
-        // NB: Don't try to draw the translucent parts of entities afterwards in the shadow pass. It'll cause problems since some
-        // shader packs assume that everything drawn afterwards is actually translucent and should cast a colored
-        // shadow...
+        // do not draw translucent entity parts afterwards, some packs treat everything drawn later as colored shadow casters
         copyPreTranslucentDepth();
 
         profiler.swap("translucent terrain");

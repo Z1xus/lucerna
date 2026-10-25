@@ -51,7 +51,6 @@ public class BlockRenderingSettings {
         return blockTypeIds;
     }
 
-    // TODO (coderbot): This doesn't belong here. But I couldn't think of a nicer place to put it.
     @Nullable
     public Object2IntFunction<NamespacedId> getEntityIds() {
         return entityIds;
@@ -85,7 +84,7 @@ public class BlockRenderingSettings {
     }
 
     public void setEntityIds(Object2IntFunction<NamespacedId> entityIds) {
-        // note: no reload needed, entities are rebuilt every frame.
+        // no reload needed, entities are rebuilt every frame
         this.entityIds = entityIds;
     }
 

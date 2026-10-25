@@ -13,9 +13,6 @@ import org.lwjgl.opengl.KHRDebug;
 
 import java.util.Locale;
 
-/**
- * A compiled OpenGL shader object.
- */
 public class GlShader extends GlResource {
     private static final Logger LOGGER = LogManager.getLogger(GlShader.class);
 

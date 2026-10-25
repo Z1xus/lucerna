@@ -17,11 +17,6 @@ public class BlockEntry {
         this.propertyPredicates = propertyPredicates;
     }
 
-    /**
-     * Parses a block ID entry.
-     *
-     * @param entry The string representation of the entry. Must not be empty.
-     */
     @NotNull
     public static final String LEGACY_METADATA = "<metadata>";
 
@@ -38,15 +33,14 @@ public class BlockEntry {
             throw new IllegalArgumentException("Called BlockEntry::parse with an empty string");
         }
 
-        // We can assume that this array is of at least array length because the input string is non-empty.
+        // never empty since the entry is non-empty
         String[] splitStates = entry.split(":");
 
-        // Trivial case: no states, no namespace
         if (splitStates.length == 1) {
             return new BlockEntry(new NamespacedId("minecraft", entry), Collections.emptyMap());
         }
 
-        // Legacy OptiFine entries can use numeric block ids and metadata values, like "18:0,4,8" or "minecraft:leaves:0"
+        // legacy optifine entries can use numeric block ids and metadata, like "18:0,4,8" or "minecraft:leaves:0"
         if (isLegacyId(splitStates[0]) || splitStates.length > 2 && isLegacyMetadata(splitStates[2])) {
             boolean numeric = isLegacyId(splitStates[0]);
             NamespacedId id = numeric ? new NamespacedId("minecraft", splitStates[0]) : new NamespacedId(splitStates[0], splitStates[1]);
@@ -60,43 +54,27 @@ public class BlockEntry {
             return new BlockEntry(id, map);
         }
 
-        // Less trivial case: no states involved, just a namespace
-        //
-        // The first term MUST be a valid ResourceLocation component without an equals sign
-        // The second term, if it does not contain an equals sign, must be a valid ResourceLocation component.
         if (splitStates.length == 2 && !splitStates[1].contains("=")) {
             return new BlockEntry(new NamespacedId(splitStates[0], splitStates[1]), Collections.emptyMap());
         }
 
-        // Complex case: One or more states involved...
         int statesStart;
         NamespacedId id;
 
         if (splitStates[1].contains("=")) {
-            // We have an entry of the form "tall_grass:half=upper"
+            // form "tall_grass:half=upper"
             statesStart = 1;
             id = new NamespacedId("minecraft", splitStates[0]);
         } else {
-            // We have an entry of the form "minecraft:tall_grass:half=upper"
+            // form "minecraft:tall_grass:half=upper"
             statesStart = 2;
             id = new NamespacedId(splitStates[0], splitStates[1]);
         }
 
-        // We must parse each property key=value pair from the state entry.
-        //
-        // These pairs act as a filter on the block states. Thus, the shader pack does not have to specify all the
-        // individual block properties itself; rather, it only specifies the parts of the block state that it wishes
-        // to filter in/out.
-        //
-        // For example, some shader packs may make it so that hanging lantern blocks wave. They will put something of
-        // the form "lantern:hanging=false" in the ID map as a result. Note, however, that there are also waterlogged
-        // hanging lanterns, which would have "lantern:hanging=false:waterlogged=true". We must make sure that when the
-        // shader pack author writes "lantern:hanging=false", that we do not just match that individual state, but that
-        // we also match the waterlogged variant too.
+        // states act as a filter, so "lantern:hanging=false" must also match the waterlogged variant
         Map<String, String> map = new HashMap<>();
 
         for (int index = statesStart; index < splitStates.length; index++) {
-            // Split "key=value" into the key and value
             String[] propertyParts = splitStates[index].split("=");
 
             if (propertyParts.length != 2) {
@@ -104,7 +82,6 @@ public class BlockEntry {
                 Iris.logger.warn("- Block state property filters must be of the form \"key=value\", but "
                         + splitStates[index] + " is not of that form!");
 
-                // Continue and ignore the invalid entry.
                 continue;
             }
 

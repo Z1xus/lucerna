@@ -10,9 +10,6 @@ import java.util.Objects;
 
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 
-/**
- * @see <a href="https://github.com/IrisShaders/ShaderDoc/blob/master/uniforms.md#celestial-bodies">Uniforms: Celestial bodies</a>
- */
 public final class CelestialUniforms {
     private final float sunPathRotation;
 
@@ -69,8 +66,7 @@ public final class CelestialUniforms {
     private Vector4f getCelestialPositionInWorldSpace(float y) {
         Vector4f position = new Vector4f(0.0F, y, 0.0F, 0.0F);
 
-        // This is the same transformation applied by renderSky, however, it's been moved to here.
-        // This is because we need the result of it before it's actually performed in vanilla.
+        // same transform as renderSky, needed before vanilla applies it
         return new Matrix4f()
             .rotateY((float) Math.toRadians(-90.0F))
             .rotateZ((float) Math.toRadians(sunPathRotation))
@@ -81,8 +77,7 @@ public final class CelestialUniforms {
     private Vector4f getCelestialPosition(float y) {
         Vector4f position = new Vector4f(0.0F, y, 0.0F, 0.0F);
 
-        // This is the same transformation applied by renderSky, however, it's been moved to here.
-        // This is because we need the result of it before it's actually performed in vanilla.
+        // same transform as renderSky, needed before vanilla applies it
         return new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferModelView())
             .rotateY((float) Math.toRadians(-90.0F))
             .rotateZ((float) Math.toRadians(sunPathRotation))
@@ -93,17 +88,14 @@ public final class CelestialUniforms {
     private static Vector4f getUpPosition() {
         Vector4f upVector = new Vector4f(0.0F, 100.0F, 0.0F, 0.0F);
 
-        // Apply the fixed -90.0F degrees rotation to mirror the same transformation in renderSky.
-        // But, notably, skip the rotation by the skyAngle.
+        // mirrors the fixed rotation of renderSky but skips the sky angle rotation
         return new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferModelView())
             .rotateY((float) Math.toRadians(-90.0F))
             .transform(upVector);
     }
 
     public static boolean isDay() {
-        // Determine whether it is day or night based on the sky angle.
-        //
-        // World#isDay appears to do some nontrivial calculations that appear to not entirely work for us here.
+        // World#isDay does calculations that do not work here
         return getSunAngle() <= 0.5;
     }
 

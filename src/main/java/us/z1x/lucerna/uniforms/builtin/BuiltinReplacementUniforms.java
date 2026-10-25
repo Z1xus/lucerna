@@ -6,7 +6,7 @@ import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import org.joml.Matrix4f;
 
 public class BuiltinReplacementUniforms {
-    // This mimics the transformations done in GameRenderer to the GL_TEXTURE matrix of the lightmap unit.
+    // mimics the GL_TEXTURE matrix that GameRenderer sets on the lightmap unit
     private static final Matrix4f lightmapTextureMatrix = new Matrix4f().scale(0.00390625f).translate(8.0f, 8.0f, 8.0f);
 
     public static void addBuiltinReplacementUniforms(UniformHolder uniforms) {

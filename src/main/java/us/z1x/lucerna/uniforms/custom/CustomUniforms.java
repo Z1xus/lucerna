@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 public class CustomUniforms implements FunctionContext {
     private final Map<String, CachedUniform> variables = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, Expression> variablesExpressions = new Object2ObjectLinkedOpenHashMap<>();
@@ -122,13 +121,12 @@ public class CustomUniforms implements FunctionContext {
                     if (evaluated instanceof CachedUniform) {
                         dependencies.add((CachedUniform) evaluated);
                     } else {
-                        // we are depending on a broken uniform
                         brokenUniforms.add(uniform);
                     }
                 }
 
                 if (dependencies.isEmpty()) {
-                    // can be empty if we rely on broken uniforms
+                    // empty when every dependency is broken
                     continue;
                 }
 
@@ -140,11 +138,9 @@ public class CustomUniforms implements FunctionContext {
                 }
             }
 
-            // actual toposort:
             List<CachedUniform> ordered = new ObjectArrayList<>();
             List<CachedUniform> free = new ObjectArrayList<>();
 
-            // init
             for (CachedUniform entry : requiredBy.keySet()) {
                 if (!dependsOnCount.containsKey(entry)) {
                     free.add(entry);
@@ -154,10 +150,8 @@ public class CustomUniforms implements FunctionContext {
             while (!free.isEmpty()) {
                 CachedUniform pop = free.remove(free.size() - 1);
                 if (!brokenUniforms.contains(pop)) {
-                    // only add those that aren't broken
                     ordered.add(pop);
                 } else {
-                    // mark all those that rely on use as broken too
                     brokenUniforms.addAll(requiredBy.get(pop));
                 }
                 for (CachedUniform dependent : requiredBy.get(pop)) {
@@ -230,55 +224,30 @@ public class CustomUniforms implements FunctionContext {
         }
     }
 
-    /**
-     * This function will do the following:
-     * <ul>
-     *     <li>
-     *         Remove unused uniforms
-     *     </li>
-     *     <li>
-     *         TODO: Create separate push lists for each renderpass
-     *     </li>
-     *     <li>
-     *         TODO: Sort the others in the correct execution line <p/>
-     *               note: that if a `EVERY_FRAME` depends on a `EVERY_TICK`, it has to correctly now that it's
-     *               dependency hasn't updated <br/>
-     *                  suggestion: set a boolean in the `EVERY_TICK` execution line saying this is a tick
-     *                  and have it set to false in the `EVERY_FRAME`. Depending on the value, `frameDependencies` or
-     *                  `allDependencies` lists are used
-     *     </li>
-     * </ul>
-     */
     private void optimise() {
         this.optimised = true;
 
         Object2IntMap<CachedUniform> dependedByCount = new Object2IntOpenHashMap<>();
 
-        // Count the times a uniform is depended on
         for (List<CachedUniform> dependencies : this.dependsOn.values()) {
             for (CachedUniform dependency : dependencies) {
                 dependedByCount.mergeInt(dependency, 1, Integer::sum);
             }
         }
 
-        // Count the times a pass depends on a uniform
-        // ensures they wont ever be removed
+        // uniforms assigned to a pass are never removed
         for (CachedUniform cachedUniform : this.assigned) {
             dependedByCount.mergeInt(cachedUniform, 1, Integer::sum);
         }
-
 
         Set<CachedUniform> unused = new ObjectOpenHashSet<>();
         for (int i = this.orderedUniforms.size() - 1; i >= 0; i--) {
             CachedUniform uniform = this.orderedUniforms.get(i);
             if (!dependedByCount.containsKey(uniform)) {
-                // not used
                 unused.add(uniform);
-                // remove dependencies
                 List<CachedUniform> dependencies = this.dependsOn.get(uniform);
                 if (dependencies != null) {
                     for (CachedUniform dependency : dependencies) {
-                        // reduce count by 1
                         dependedByCount.computeIntIfPresent(dependency, (key, value) -> value - 1);
                     }
                 }
@@ -300,7 +269,6 @@ public class CustomUniforms implements FunctionContext {
 
     @Override
     public Expression getVariable(String name) {
-        // TODO: Make the simplify just return these ones
         final CachedUniform inputUniform = this.inputHolder.getUniform(name);
         if (inputUniform != null)
             return inputUniform;
@@ -321,7 +289,7 @@ public class CustomUniforms implements FunctionContext {
 
         @Override
         public void update() {
-            // Versions start at 1, so a zeroed field means the uniform is pushed on the first bind.
+            // versions start at 1, so the zeroed field pushes on the first bind
             int version = this.uniform.getVersion();
 
             if (this.lastPushedVersion != version) {
@@ -380,7 +348,6 @@ public class CustomUniforms implements FunctionContext {
 
         private record Variable(Type type, String name, ExpressionElement expression, boolean uniform) {
         }
-
 
     }
 }

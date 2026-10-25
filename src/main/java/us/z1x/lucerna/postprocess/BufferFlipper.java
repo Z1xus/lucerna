@@ -14,18 +14,11 @@ public class BufferFlipper {
 
     public void flip(int target) {
         if (!flippedBuffers.remove(target)) {
-            // If the target wasn't in the set, add it to the set.
             flippedBuffers.add(target);
         }
     }
 
-    /**
-     * Returns true if this buffer is flipped.
-     *
-     * If this buffer is not flipped, then users should write to the alternate variant and read from the main variant.
-     *
-     * If this buffer is flipped, then users should write to the main variant and read from the alternate variant.
-     */
+    // when flipped, write to main and read from alt, otherwise the reverse
     public boolean isFlipped(int target) {
         return flippedBuffers.contains(target);
     }

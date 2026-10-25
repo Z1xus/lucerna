@@ -36,7 +36,6 @@ public class SliderElementWidget extends StringElementWidget {
         }
 
         if (this.mouseDown) {
-            // Release if the mouse went off the slider
             if (!hovered) {
                 this.onReleased();
             }
@@ -48,19 +47,13 @@ public class SliderElementWidget extends StringElementWidget {
     private void renderSlider(int x, int y, int width, int height) {
         GuiUtil.bindIrisWidgetsTexture();
 
-        // Draw background button
         GuiUtil.drawButton(x, y, width, height, false, false);
-        // Draw slider area
         GuiUtil.drawButton(x + 2, y + 2, width - 4, height - 4, false, true);
 
-        // Range of x values the slider can occupy
         int sliderSpace = (width - 8) - ACTIVE_SLIDER_WIDTH;
-        // Position of slider
         int sliderPos = (x + 4) + (int)(((float)valueIndex / (valueCount - 1)) * sliderSpace);
-        // Draw slider
         GuiUtil.drawButton(sliderPos, y + 4, ACTIVE_SLIDER_WIDTH, height - 8, this.mouseDown, false);
 
-        // Draw value label
         TextRenderer font = Minecraft.getInstance().textRenderer;
         font.drawWithShadow(this.valueLabel, (int)(x + (width * 0.5)) - (int)(font.getWidth(this.valueLabel) * 0.5), y + 7, 0xFFFFFF);
     }
@@ -104,7 +97,6 @@ public class SliderElementWidget extends StringElementWidget {
             return true;
         }
 
-        // Do not use base widget's button click behavior
         return false;
     }
 

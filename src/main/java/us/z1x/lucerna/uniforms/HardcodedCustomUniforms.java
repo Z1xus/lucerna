@@ -12,10 +12,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.SwampBiome;
 import org.joml.Math;
 
-// These expressions are copied directly from BSL and Complementary.
-
-// TODO: Remove once custom uniforms are actually supported, this is just a temporary thing to get BSL & Complementary
-// mostly working under Iris.
+// expressions copied from bsl and complementary
 public class HardcodedCustomUniforms {
     private static final Minecraft client = Minecraft.getInstance();
     private static Biome storedBiome;
@@ -44,19 +41,19 @@ public class HardcodedCustomUniforms {
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "rainStrengthShiningStars", rainStrengthShining);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "rainStrengthS2", rainStrengthS2);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "blindFactor", HardcodedCustomUniforms::getBlindFactor);
-        // The following uniforms are Complementary specific, used for the biome check and starter/TAA features.
+        // complementary, for the biome check and starter and taa features
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "isDry", new SmoothedFloat(20, 10, () -> getRawPrecipitation() == 0 ? 1 : 0, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "isRainy", new SmoothedFloat(20, 10, () -> getRawPrecipitation() == 1 ? 1 : 0, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "isSnowy", new SmoothedFloat(20, 10, () -> getRawPrecipitation() == 2 ? 1 : 0, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "isEyeInCave", () -> CommonUniforms.isEyeInWater() == 0 ? eyeInCave.getAsFloat() : 0);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "velocity", () -> getVelocity(tracker));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "starter", getStarter(tracker, updateNotifier));
-        // The following uniforms are Project Reimagined specific.
+        // project reimagined
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "frameTimeSmooth", new SmoothedFloat(5, 5, SystemTimeUniforms.TIMER::getLastFrameTime, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "eyeBrightnessM", new SmoothedFloat(5, 5, HardcodedCustomUniforms::getEyeBrightnessM, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "rainFactor", rainStrengthS);
 
-        // The following uniforms are Sildur's specific.
+        // sildur's
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "inSwamp", new SmoothedFloat(5, 5, () -> {
             if (storedBiome == null) {
                 return 0;
@@ -72,14 +69,14 @@ public class HardcodedCustomUniforms {
             }
         });
 
-        // The following uniforms are specific to Super Duper Vanilla Shaders.
+        // super duper vanilla
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "day", HardcodedCustomUniforms::getDay);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "night", HardcodedCustomUniforms::getNight);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "dawnDusk", HardcodedCustomUniforms::getDawnDusk);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "shdFade", HardcodedCustomUniforms::getShdFade);
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "isPrecipitationRain", new SmoothedFloat(6, 6, () -> (getRawPrecipitation() == 1 && tracker.getCurrentCameraPosition().y < 96.0f) ? 1 : 0, updateNotifier));
 
-        // The following uniforms are specific to AstralEX, and require an active player.
+        // astralex, these need an active player
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "touchmybody", new SmoothedFloat(0f, 0.1f, HardcodedCustomUniforms::getHurtFactor, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "sneakSmooth", new SmoothedFloat(2.0f, 0.9f, HardcodedCustomUniforms::getSneakFactor, updateNotifier));
         holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "burningSmooth", new SmoothedFloat(1.0f, 2.0f, HardcodedCustomUniforms::getBurnFactor, updateNotifier));
@@ -205,7 +202,6 @@ public class HardcodedCustomUniforms {
     private static float getDawnDusk() {
         return (1.0f - getDay()) - getNight();
     }
-
 
     private static float getShdFade() {
         return (float) Math.clamp(0.0, 1.0, 1.0 - (Math.abs(Math.abs(CelestialUniforms.getSunAngle() - 0.5) - 0.25) - 0.225) * 40.0);

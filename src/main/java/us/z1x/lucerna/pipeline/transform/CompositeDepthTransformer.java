@@ -17,7 +17,6 @@ class CompositeDepthTransformer {
             ASTParser t,
             TranslationUnit tree,
             Root root) {
-        // replace original declaration
         if (root.processMatches(t, uniformFloatCenterDepthSmooth, ASTNode::detachAndDelete)) {
             tree.parseAndInjectNode(t, ASTInjectionPoint.BEFORE_DECLARATIONS,
                     "uniform sampler2D iris_centerDepthSmooth;");

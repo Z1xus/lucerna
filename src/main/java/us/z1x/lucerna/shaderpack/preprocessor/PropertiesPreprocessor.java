@@ -75,19 +75,14 @@ public class PropertiesPreprocessor {
         PropertyCollectingListener listener = new PropertyCollectingListener();
         preprocessor.setListener(listener);
 
-        // Not super efficient, but this removes trailing whitespace on lines, fixing an issue with whitespace after
-        // line continuations (see PreprocessorTest#testWeirdPropertiesLineContinuation)
-        // Required for Voyager Shader
+        // trim lines to fix whitespace after line continuations, needed for voyager shader
         source = Arrays.stream(source.split("\\R")).map(String::trim)
             .map(line -> {
                 if (line.startsWith("#")) {
-                    // In PropertyCollectingListener we suppress "unknown preprocessor directive errors" and
-                    // assume the line to be a comment, since in .properties files `#` also functions as a comment
-                    // marker.
+                    // PropertyCollectingListener treats unknown directives as comments, as # is a comment in properties
                     return line;
                 } else {
-                    // This is a hack to ensure that non-macro lines don't have any preprocessing applied...
-                    // In properties files, we don't substitute #define values except on macro lines.
+                    // hack: only macro lines get #define substitution in properties files
                     return "#warning IRIS_PASSTHROUGH " + line;
                 }
             }).collect(Collectors.joining("\n")) + "\n";

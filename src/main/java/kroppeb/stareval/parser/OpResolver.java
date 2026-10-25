@@ -5,11 +5,6 @@ import kroppeb.stareval.exception.ParseException;
 
 import java.util.Map;
 
-/**
- * OpResolver maps the trailing characters identifying an operator to an actual operator.
- *
- * @param <T>
- */
 abstract class OpResolver<T> {
     abstract T resolve(StringReader input) throws ParseException;
 
@@ -24,12 +19,6 @@ abstract class OpResolver<T> {
             multiChar("", op);
         }
 
-        /**
-         * Adds a new multi-character operator. Calling this with an empty string is equivalent to calling singleChar.
-         *
-         * @param trailing every character after the first character of the operator.
-         * @param op       the operator
-         */
         public void multiChar(String trailing, T op) {
             T previous = map.put(trailing, op);
 
@@ -52,7 +41,7 @@ abstract class OpResolver<T> {
                 } else {
                     for (Map.Entry<String, T> subEntry : map.entrySet()) {
                         if ("".equals(subEntry.getKey())) {
-                            // We already checked this key
+                            // we already checked this key
                             continue;
                         }
 
@@ -61,7 +50,7 @@ abstract class OpResolver<T> {
                                 "currently only be built of operators that contain one or two characters.");
                         }
 
-                        // We can assume that this is the only other entry in the map due to the size check above
+                        // the size check above means this is the only other entry
                         return new OpResolver.SingleDualChar<>(
                             singleChar,
                             subEntry.getValue(),
@@ -81,7 +70,7 @@ abstract class OpResolver<T> {
                             "currently only be built of operators that contain one or two characters.");
                     }
 
-                    // We can assume that this is the only entry in the map due to the size check above.
+                    // the size check above means this is the only entry
                     return new OpResolver.DualChar<>(
                         subEntry.getValue(),
                         subEntry.getKey().charAt(0)
@@ -97,9 +86,6 @@ abstract class OpResolver<T> {
         }
     }
 
-    /**
-     * Matches a single-character operator.
-     */
     static class SingleChar<T> extends OpResolver<T> {
         private final T op;
 
@@ -113,9 +99,6 @@ abstract class OpResolver<T> {
         }
     }
 
-    /**
-     * Matches a two-character operator.
-     */
     static class DualChar<T> extends OpResolver<T> {
         private final T op;
         private final char secondChar;
@@ -132,9 +115,6 @@ abstract class OpResolver<T> {
         }
     }
 
-    /**
-     * Matches either a dual character operator or a single character operator.
-     */
     static class SingleDualChar<T> extends OpResolver<T> {
         private final T singleCharOperator;
         private final T doubleCharOperator;

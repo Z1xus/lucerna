@@ -24,16 +24,7 @@ public class JcppProcessor {
             throw new RuntimeException("Some shader author is trying to exploit internal Iris implementation details, stop!");
         }
 
-        // Note: This is an absolutely awful hack. But JCPP's lack of extensibility leaves me with no choice...
-        //       We should write our own preprocessor at some point to avoid this.
-        //
-        // Why are we doing this awful hack instead of just using the preprocessor like a normal person? Because it lets
-        // us only hoist #extension directives if they're actually used. This is needed for shader packs written on
-        // lenient drivers that allow #extension directives to be placed anywhere to work on strict drivers like Mesa
-        // that require #extension directives to occur at the top.
-        //
-        // TODO: This allows #version to not appear as the first non-comment non-whitespace thing in the file.
-        //       That's not the behavior we want. If you're reading this, don't rely on this behavior.
+        // hack: markers let us hoist #extension only when used, for packs from lenient drivers on strict ones like mesa
         source = source.replace("#version", GlslCollectingListener.VERSION_MARKER);
         source = source.replace("#extension", GlslCollectingListener.EXTENSION_MARKER);
 
@@ -45,9 +36,6 @@ public class JcppProcessor {
         @SuppressWarnings("resource")
         final Preprocessor pp = new Preprocessor();
 
-        // Add the values of the environment defines without actually modifying the source code
-        // of the shader program, one step down the road of having accurate line number reporting
-        // in errors...
         try {
             for (StringPair envDefine : environmentDefines) {
                 pp.addMacro(envDefine.getKey(), envDefine.getValue().isEmpty() ? "1" : envDefine.getValue());

@@ -58,7 +58,6 @@ public class RenderTargets {
         targets = new RenderTarget[renderTargets.size()];
 
         renderTargets.forEach((index, settings) -> {
-            // TODO: Handle mipmapping?
             Vector2i dimensions = packDirectives.getTextureScaleOverride(index, width, height);
             targets[index] = RenderTarget.builder().setDimensions(dimensions.x, dimensions.y)
                     .setInternalFormat(settings.getInternalFormat())
@@ -83,8 +82,7 @@ public class RenderTargets {
 
         this.ownedFramebuffers = new ArrayList<>();
 
-        // NB: Make sure all buffers are cleared so that they don't contain undefined
-        // data. Otherwise very weird things can happen.
+        // clear every buffer once so none holds undefined data
         fullClearRequired = true;
 
         this.depthSourceFb = createFramebufferWritingToMain(new int[] {0});
@@ -185,22 +183,15 @@ public class RenderTargets {
 
         if (depthFormatChanged) {
             currentDepthFormat = newDepthFormat;
-            // Might need a new copy strategy
             copyStrategy = DepthCopyStrategy.fastest(currentDepthFormat.isCombinedStencil());
         }
 
         if (recreateDepth) {
-            // Re-attach the depth textures with the new depth texture ID, since Minecraft re-creates
-            // the depth texture when resizing its render targets.
-            //
-            // I'm not sure if our framebuffers holding on to the old depth texture between frames
-            // could be a concern, in the case of resizing and similar. I think it should work
-            // based on what I've seen of the spec, though - it seems like deleting a texture
-            // automatically detaches it from its framebuffers.
+            // minecraft recreates the depth texture on resize, so attach the new id
+            // deleting the old texture detaches it from the framebuffers
             for (GlFramebuffer framebuffer : ownedFramebuffers) {
                 if (framebuffer == noHandDestFb || framebuffer == noTranslucentsDestFb) {
-                    // NB: Do not change the depth attachment of these framebuffers
-                    // as it is intentionally different
+                    // these framebuffers intentionally use a different depth attachment
                     continue;
                 }
 
@@ -211,7 +202,6 @@ public class RenderTargets {
         }
 
         if (depthFormatChanged || sizeChanged)  {
-            // Reallocate depth buffers
             noTranslucents.resize(newWidth, newHeight, newDepthFormat);
             noHand.resize(newWidth, newHeight, newDepthFormat);
             this.translucentDepthDirty = true;
@@ -303,8 +293,7 @@ public class RenderTargets {
 
         framebuffer.addDepthAttachment(currentDepthTexture);
 
-        // NB: Before OpenGL 3.0, all framebuffers are required to have a color
-        // attachment no matter what.
+        // before opengl 3.0 every framebuffer needs a color attachment
         framebuffer.addColorAttachment(0, get(0).getMainTexture());
         framebuffer.noDrawBuffers();
 
@@ -364,7 +353,6 @@ public class RenderTargets {
             actualDrawBuffers[i] = i;
 
             if (drawBuffers[i] >= getRenderTargetCount()) {
-                // TODO: This causes resource leaks, also we should really verify this in the shaderpack parser...
                 throw new IllegalStateException("Render target with index " + drawBuffers[i] + " is not supported, only "
                         + getRenderTargetCount() + " render targets are supported.");
             }

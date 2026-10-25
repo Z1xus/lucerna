@@ -23,7 +23,6 @@ public class Float4MatrixCachedUniform extends VectorCachedUniform<Matrix4f> {
 
     @Override
     public void push(int location) {
-        // `gets` the values from the matrix and put's them into a buffer
         this.cached.get(buffer);
         IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
     }

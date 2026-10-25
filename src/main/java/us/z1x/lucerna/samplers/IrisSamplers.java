@@ -23,18 +23,14 @@ public class IrisSamplers {
 
     public static final ImmutableSet<Integer> WORLD_RESERVED_TEXTURE_UNITS = ImmutableSet.of(0, 1, 2);
 
-    // TODO: In composite programs, there shouldn't be any reserved textures.
-    // We need a way to restore these texture bindings.
     public static final ImmutableSet<Integer> COMPOSITE_RESERVED_TEXTURE_UNITS = ImmutableSet.of(1, 2);
 
     private IrisSamplers() {
-        // no construction allowed
     }
 
     public static void addRenderTargetSamplers(SamplerHolder samplers, Supplier<ImmutableSet<Integer>> flipped,
                                                RenderTargets renderTargets, boolean isFullscreenPass) {
-        // colortex0,1,2,3 are only able to be sampled from fullscreen passes.
-        // Iris could lift this restriction, though I'm not sure if it could cause issues.
+        // colortex0 to colortex3 can only be sampled in fullscreen passes
         int startIndex = isFullscreenPass ? 0 : 4;
 
         for (int i = startIndex; i < renderTargets.getRenderTargetCount(); i++) {
@@ -52,8 +48,6 @@ public class IrisSamplers {
             };
 
             final String name = "colortex" + i;
-
-            // TODO: How do custom textures interact with aliases?
 
             if (i < PackRenderTargetDirectives.LEGACY_RENDER_TARGETS.size()) {
                 String legacyName = PackRenderTargetDirectives.LEGACY_RENDER_TARGETS.get(i);
@@ -81,9 +75,6 @@ public class IrisSamplers {
     }
 
     public static boolean hasShadowSamplers(SamplerHolder samplers) {
-        // TODO: Keep this up to date with the actual definitions.
-        // TODO: Don't query image presence using the sampler interface even though the current underlying implementation
-        //       is the same.
         ImmutableList<String> shadowSamplers = ImmutableList.of("shadowtex0", "shadowtex0HW", "shadowtex1", "shadowtex1HW", "shadow", "watershadow",
                 "shadowcolor", "shadowcolor0", "shadowcolor1", "shadowcolorimg0", "shadowcolorimg1");
 
@@ -99,8 +90,6 @@ public class IrisSamplers {
     public static boolean addShadowSamplers(SamplerHolder samplers, ShadowRenderTargets shadowRenderTargets) {
         boolean usesShadows;
 
-        // TODO: figure this out from parsing the shader source code to be 100% compatible with the legacy
-        // shader packs that rely on this behavior.
         boolean waterShadowEnabled = samplers.hasSampler("watershadow");
 
         if (waterShadowEnabled) {
@@ -135,7 +124,6 @@ public class IrisSamplers {
         if (availability.texture) {
             samplers.addExternalSampler(ALBEDO_TEXTURE_UNIT, "tex", "texture", "gtexture");
         } else {
-            // TODO: Rebind unbound sampler IDs instead of hardcoding a list...
             samplers.addDynamicSampler(whitePixel::getGlId, "tex", "texture", "gtexture",
                     "gcolor", "colortex0");
         }
@@ -158,7 +146,6 @@ public class IrisSamplers {
 
     public static void addWorldDepthSamplers(SamplerHolder samplers, RenderTargets renderTargets) {
         samplers.addDynamicSampler(renderTargets::getDepthTexture, "depthtex0");
-        // TODO: Should depthtex2 be made available to gbuffer / shadow programs?
         samplers.addDynamicSampler(renderTargets.getDepthTextureNoTranslucents()::getTextureId, "depthtex1");
     }
 

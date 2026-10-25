@@ -19,15 +19,14 @@ public class OptionMenuContainer {
 
     private final List<OptionMenuOptionElement> usedOptionElements = new ArrayList<>();
     private final List<String> usedOptions = new ArrayList<>();
-    private final List<String> unusedOptions = new ArrayList<>(); // To be used when screens contain a "*" element
-    private final Map<List<OptionMenuElement>, Integer> unusedOptionDumpQueue = new HashMap<>(); // Used by screens with "*" element
+    private final List<String> unusedOptions = new ArrayList<>();
+    private final Map<List<OptionMenuElement>, Integer> unusedOptionDumpQueue = new HashMap<>();
     private final ProfileSet profiles;
 
     public OptionMenuContainer(ShaderProperties shaderProperties, ShaderPackOptions shaderPackOptions, ProfileSet profiles) {
         this.profiles = profiles;
 
-        // note: if the Shader Pack does not provide a list of options for the main screen, then dump all options on to
-        // the main screen by default.
+        // without a main screen list, all options go on the main screen
         this.mainScreen = new OptionMenuMainElementScreen(
             this, shaderProperties, shaderPackOptions,
             shaderProperties.getMainScreenOptions().orElseGet(() -> Collections.singletonList("*")),
@@ -42,7 +41,6 @@ public class OptionMenuContainer {
                     screenKey, this, shaderProperties, shaderPackOptions, options, Optional.ofNullable(subScreenColumnCounts.get(screenKey))));
         });
 
-        // Dump all unused options into screens containing "*"
         for (Map.Entry<List<OptionMenuElement>, Integer> entry : unusedOptionDumpQueue.entrySet()) {
             List<OptionMenuElement> elementsToInsert = new ArrayList<>();
             List<String> unusedOptionsCopy = Lists.newArrayList(this.unusedOptions);
@@ -72,8 +70,7 @@ public class OptionMenuContainer {
         return profiles;
     }
 
-    // Screens will call this when they contain a "*" element, so that the list of
-    // unused options can be added after all other screens have been resolved
+    // called for screens with a "*" element, unused options are added after all screens resolve
     public void queueForUnusedOptionDump(int index, List<OptionMenuElement> elementList) {
         this.unusedOptionDumpQueue.put(elementList, index);
     }

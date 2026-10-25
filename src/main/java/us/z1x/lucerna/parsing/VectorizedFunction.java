@@ -64,7 +64,6 @@ public class VectorizedFunction implements TypedFunction {
         final Type parameterType;
         Object vector;
 
-
         ElementAccessExpression(Type parameterType) {
             this.parameterType = parameterType;
         }
@@ -73,7 +72,6 @@ public class VectorizedFunction implements TypedFunction {
         public void evaluateTo(FunctionContext context, FunctionReturn functionReturn) {
             parameterType.getValueFromArray(vector, index, functionReturn);
         }
-
 
         @Override
         public void listVariables(Collection<? super VariableExpression> variables) {

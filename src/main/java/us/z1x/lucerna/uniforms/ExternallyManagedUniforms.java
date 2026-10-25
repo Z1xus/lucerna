@@ -5,11 +5,10 @@ import us.z1x.lucerna.gl.uniform.UniformType;
 
 public class ExternallyManagedUniforms {
     private ExternallyManagedUniforms() {
-        // no construction allowed
     }
 
     public static void addExternallyManagedUniforms(UniformHolder uniformHolder) {
-        // Celeritas terrain
+        // celeritas terrain
         addMat4(uniformHolder, "iris_ModelViewMatrix");
         addMat4(uniformHolder, "iris_ModelViewMatrixInverse");
         addMat4(uniformHolder, "iris_ProjectionMatrix");
