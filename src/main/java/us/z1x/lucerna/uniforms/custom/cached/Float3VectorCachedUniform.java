@@ -1,0 +1,30 @@
+package us.z1x.lucerna.uniforms.custom.cached;
+
+import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
+import us.z1x.lucerna.parsing.VectorType;
+import org.joml.Vector3f;
+
+import java.util.function.Supplier;
+
+public class Float3VectorCachedUniform extends VectorCachedUniform<Vector3f> {
+
+	public Float3VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Vector3f> supplier) {
+		super(name, updateFrequency, new Vector3f(), supplier);
+	}
+
+	@Override
+	protected void setFrom(Vector3f other) {
+		this.cached.set(other);
+	}
+
+	@Override
+	public void push(int location) {
+		IrisRenderSystem.uniform3f(location, this.cached.x, this.cached.y, this.cached.z);
+	}
+
+	@Override
+	public VectorType getType() {
+		return VectorType.VEC3;
+	}
+}

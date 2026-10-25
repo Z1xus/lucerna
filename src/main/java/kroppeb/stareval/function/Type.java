@@ -2,9 +2,9 @@ package kroppeb.stareval.function;
 
 import kroppeb.stareval.expression.ConstantExpression;
 import kroppeb.stareval.function.TypedFunction.Parameter;
-import net.coderbot.iris.gl.uniform.UniformType;
-import net.coderbot.iris.parsing.MatrixType;
-import net.coderbot.iris.parsing.VectorType;
+import us.z1x.lucerna.gl.uniform.UniformType;
+import us.z1x.lucerna.parsing.MatrixType;
+import us.z1x.lucerna.parsing.VectorType;
 
 public abstract class Type {
 	public static Boolean Boolean = new Boolean();

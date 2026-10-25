@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.coderbot.iris.mixin",
+  "package": "us.z1x.lucerna.mixin",
   "compatibilityLevel": "JAVA_21",
   "injectors": {
     "defaultRequire": 1

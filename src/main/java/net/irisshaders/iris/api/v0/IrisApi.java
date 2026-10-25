@@ -1,6 +1,6 @@
 package net.irisshaders.iris.api.v0;
 
-import net.coderbot.iris.apiimpl.IrisApiV0Impl;
+import us.z1x.lucerna.apiimpl.IrisApiV0Impl;
 
 
 /**

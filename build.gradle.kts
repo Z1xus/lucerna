@@ -4,7 +4,7 @@ plugins {
     id("ploceus") version "1.17.6"
 }
 
-group = "org.polyfrost"
+group = "us.z1x"
 version = property("mod_version")!!
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
