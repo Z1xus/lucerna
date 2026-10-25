@@ -754,6 +754,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 		@Nullable
 		private final List<BufferBlendOverride> bufferBlendOverrides;
 		private final boolean shadowViewport;
+		private final boolean usesExtendedVertexAttributes;
 
 		private Pass(@Nullable Program program, GlFramebuffer framebufferBeforeTranslucents, GlFramebuffer framebufferAfterTranslucents,
 					 @Nullable AlphaTestOverride alphaTestOverride, @Nullable BlendModeOverride blendModeOverride, @Nullable List<BufferBlendOverride> bufferBlendOverrides, boolean shadowViewport) {
@@ -764,6 +765,9 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 			this.blendModeOverride = blendModeOverride;
 			this.bufferBlendOverrides = bufferBlendOverrides;
 			this.shadowViewport = shadowViewport;
+			this.usesExtendedVertexAttributes = program != null
+				&& (GL20C.glGetAttribLocation(program.getProgramId(), "mc_midTexCoord") != -1
+				|| GL20C.glGetAttribLocation(program.getProgramId(), "at_tangent") != -1);
 		}
 
 		public void use() {
@@ -1229,6 +1233,11 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 	@Override
 	public void syncProgram() {
 		matchPass();
+	}
+
+	@Override
+	public boolean usesExtendedVertexAttributes() {
+		return current != null && current.usesExtendedVertexAttributes;
 	}
 
 	@Override

@@ -88,6 +88,11 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 	}
 
 	@Override
+	public boolean usesExtendedVertexAttributes() {
+		return false;
+	}
+
+	@Override
 	public RenderTargetStateListener getRenderTargetStateListener() {
 		return RenderTargetStateListener.NOP;
 	}

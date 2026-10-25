@@ -27,6 +27,8 @@ public interface WorldRenderingPipeline {
 	void setInputs(InputAvailability availability);
 	void setSpecialCondition(SpecialCondition special);
 	void syncProgram();
+
+	boolean usesExtendedVertexAttributes();
 	RenderTargetStateListener getRenderTargetStateListener();
 
 	int getCurrentNormalTexture();
