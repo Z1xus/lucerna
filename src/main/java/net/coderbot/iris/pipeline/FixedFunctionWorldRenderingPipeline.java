@@ -1,14 +1,16 @@
 package net.coderbot.iris.pipeline;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.block_rendering.BlockRenderingSettings;
 import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 import net.coderbot.iris.gbuffer_overrides.matching.SpecialCondition;
 import net.coderbot.iris.gbuffer_overrides.state.RenderTargetStateListener;
-import net.coderbot.iris.mixin.LevelRendererAccessor;
+import net.minecraft.client.render.world.WorldRenderer;
 import net.coderbot.iris.shaderpack.CloudSetting;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
-import net.minecraft.client.Camera;
+import net.minecraft.entity.Entity;
+import net.minecraft.client.render.Culler;
 import net.minecraft.client.Minecraft;
 
 import java.util.List;
@@ -26,12 +28,12 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
 	@Override
 	public void beginLevelRendering() {
 		// Use the default Minecraft framebuffer and ensure that no programs are in use
-		Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
-		GlStateManager._glUseProgram(0);
+		Minecraft.getInstance().getRenderTarget().bindWrite(true);
+		IrisRenderSystem.useProgram(0);
 	}
 
 	@Override
-	public void renderShadows(LevelRendererAccessor levelRenderer, Camera camera) {
+	public void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller) {
 		// stub: nothing to do here
 	}
 

@@ -1,11 +1,9 @@
 package net.coderbot.iris;
 
 import com.google.common.base.Throwables;
-import com.mojang.blaze3d.platform.GlDebug;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.coderbot.iris.compat.sodium.SodiumVersionCheck;
 import net.coderbot.iris.config.IrisConfig;
 import net.coderbot.iris.gl.GLDebug;
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.shader.StandardMacros;
 import net.coderbot.iris.gui.screen.ShaderPackScreen;
 import net.coderbot.iris.pipeline.DeferredWorldRenderingPipeline;
@@ -21,19 +19,17 @@ import net.coderbot.iris.shaderpack.option.OptionSet;
 import net.coderbot.iris.shaderpack.option.Profile;
 import net.coderbot.iris.shaderpack.option.values.MutableOptionValues;
 import net.coderbot.iris.shaderpack.option.values.OptionValues;
-import net.coderbot.iris.texture.pbr.PBRTextureManager;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
+import net.minecraft.text.Formatting;
+import net.minecraft.text.Style;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.client.options.KeyBinding;
+import org.lwjgl.input.Keyboard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.client.world.ClientWorld;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,14 +50,14 @@ import java.util.zip.ZipError;
 import java.util.zip.ZipException;
 
 public class Iris {
-	public static final String MODID = "iris";
+	public static final String MODID = "lucerna";
 
 	/**
 	 * The user-facing name of the mod. Moved into a constant to facilitate
 	 * easy branding changes (for forks). You'll still need to change this
 	 * separately in mixin plugin classes & the language files.
 	 */
-	public static final String MODNAME = "Iris";
+	public static final String MODNAME = "Lucerna";
 
 	public static final IrisLogging logger = new IrisLogging(MODNAME);
 
@@ -70,17 +66,14 @@ public class Iris {
 
 	private static ShaderPack currentPack;
 	private static String currentPackName;
-	private static boolean sodiumInvalid;
-	private static boolean hasNEC;
-	private static boolean sodiumInstalled;
 	private static boolean initialized;
 
 	private static PipelineManager pipelineManager;
 	private static IrisConfig irisConfig;
 	private static FileSystem zipFileSystem;
-	private static KeyMapping reloadKeybind;
-	private static KeyMapping toggleShadersKeybind;
-	private static KeyMapping shaderpackScreenKeybind;
+	private static KeyBinding reloadKeybind;
+	private static KeyBinding toggleShadersKeybind;
+	private static KeyBinding shaderpackScreenKeybind;
 
 	private static final Map<String, String> shaderPackOptionQueue = new HashMap<>();
 	// Flag variable used when reloading
@@ -89,7 +82,6 @@ public class Iris {
 	private static boolean resetShaderPackOptions = false;
 
 	private static Version IRIS_VERSION;
-	private static UpdateChecker updateChecker;
 	private static boolean fallback;
 
     /**
@@ -101,28 +93,11 @@ public class Iris {
 	 *
 	 * <p>This is called right before options are loaded, so we can add key bindings here.</p>
 	 */
-	public void onEarlyInitialize() {
-		FabricLoader.getInstance().getModContainer("sodium").ifPresent(
-				modContainer -> {
-					sodiumInstalled = true;
-					String versionString = modContainer.getMetadata().getVersion().getFriendlyString();
-
-					// This makes it so that if we don't have the right version of Sodium, it will show the user a
-					// nice warning, and prevent them from playing the game with a wrong version of Sodium.
-					if (!SodiumVersionCheck.isAllowedVersion(versionString)) {
-						sodiumInvalid = true;
-					}
-				}
-		);
-
-		hasNEC = FabricLoader.getInstance().isModLoaded("notenoughcrashes");
-
+	public static KeyBinding[] onEarlyInitialize() {
 		ModContainer iris = FabricLoader.getInstance().getModContainer(MODID)
 				.orElseThrow(() -> new IllegalStateException("Couldn't find the mod container for Iris"));
 
 		IRIS_VERSION = iris.getMetadata().getVersion();
-
-		this.updateChecker = new UpdateChecker(IRIS_VERSION);
 
 		try {
 			if (!Files.exists(getShaderpacksDirectory())) {
@@ -142,49 +117,13 @@ public class Iris {
 			logger.error("", e);
 		}
 
-		this.updateChecker.checkForUpdates(irisConfig);
-
-		reloadKeybind = KeyBindingHelper.registerKeyBinding(new KeyMapping("iris.keybind.reload", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, "iris.keybinds"));
-		toggleShadersKeybind = KeyBindingHelper.registerKeyBinding(new KeyMapping("iris.keybind.toggleShaders", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, "iris.keybinds"));
-		shaderpackScreenKeybind = KeyBindingHelper.registerKeyBinding(new KeyMapping("iris.keybind.shaderPackSelection", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, "iris.keybinds"));
-
-		setupCommands(Minecraft.getInstance());
+		reloadKeybind = new KeyBinding("iris.keybind.reload", Keyboard.KEY_R, "iris.keybinds");
+		toggleShadersKeybind = new KeyBinding("iris.keybind.toggleShaders", Keyboard.KEY_K, "iris.keybinds");
+		shaderpackScreenKeybind = new KeyBinding("iris.keybind.shaderPackSelection", Keyboard.KEY_O, "iris.keybinds");
 
 		initialized = true;
-	}
 
-	private void setupCommands(Minecraft instance) {
-		// TODO: Add back commands when Fabric Maven stops dying
-		/*ClientCommandManager.DISPATCHER.register(ClientCommandManager.literal("iris").then(ClientCommandManager.literal("debug").then(
-			ClientCommandManager.argument("enabled", BoolArgumentType.bool()).executes(context -> {
-				boolean enable = BoolArgumentType.getBool(context, "enabled");
-
-				Iris.setDebug(enable);
-
-				return 0;
-			})
-		)).then(ClientCommandManager.literal("enabled").then(ClientCommandManager.argument("option", BoolArgumentType.bool()).executes(context -> {
-			try {
-				toggleShaders(instance, BoolArgumentType.getBool(context, "option"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return 0;
-		}))).then(ClientCommandManager.literal("reload").executes(context -> {
-			try {
-				reload();
-
-				if (instance.player != null) {
-					instance.player.displayClientMessage(new TranslatableComponent("iris.shaders.reloaded"), false);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				return -1;
-			}
-
-			return 0;
-		})));*/
+		return new KeyBinding[] { reloadKeybind, toggleShadersKeybind, shaderpackScreenKeybind };
 	}
 
 	/**
@@ -197,9 +136,9 @@ public class Iris {
 			return;
 		}
 
-		setDebug(irisConfig.areDebugOptionsEnabled());
+		IrisRenderSystem.initRenderer();
 
-		PBRTextureManager.INSTANCE.init();
+		setDebug(irisConfig.areDebugOptionsEnabled());
 
 		// Only load the shader pack when we can access OpenGL
 		loadShaderpack();
@@ -228,14 +167,14 @@ public class Iris {
 				reload();
 
 				if (minecraft.player != null) {
-					minecraft.player.displayClientMessage(new TranslatableComponent("iris.shaders.reloaded"), false);
+					minecraft.player.addMessage(new TranslatableText("iris.shaders.reloaded"));
 				}
 
 			} catch (Exception e) {
 				logger.error("Error while reloading Shaders for Iris!", e);
 
 				if (minecraft.player != null) {
-					minecraft.player.displayClientMessage(new TranslatableComponent("iris.shaders.reloaded.failure", Throwables.getRootCause(e).getMessage()).withStyle(ChatFormatting.RED), false);
+					minecraft.player.addMessage(new TranslatableText("iris.shaders.reloaded.failure", Throwables.getRootCause(e).getMessage()).setStyle(new Style().setColor(Formatting.RED)));
 				}
 			}
 		} else if (toggleShadersKeybind.consumeClick()) {
@@ -245,13 +184,13 @@ public class Iris {
 				logger.error("Error while toggling shaders!", e);
 
 				if (minecraft.player != null) {
-					minecraft.player.displayClientMessage(new TranslatableComponent("iris.shaders.toggled.failure", Throwables.getRootCause(e).getMessage()).withStyle(ChatFormatting.RED), false);
+					minecraft.player.addMessage(new TranslatableText("iris.shaders.toggled.failure", Throwables.getRootCause(e).getMessage()).setStyle(new Style().setColor(Formatting.RED)));
 				}
 				setShadersDisabled();
 				fallback = true;
 			}
 		} else if (shaderpackScreenKeybind.consumeClick()) {
-			minecraft.setScreen(new ShaderPackScreen(null));
+			minecraft.openScreen(new ShaderPackScreen(null));
 		}
 	}
 
@@ -261,7 +200,7 @@ public class Iris {
 
 		reload();
 		if (minecraft.player != null) {
-			minecraft.player.displayClientMessage(enabled ? new TranslatableComponent("iris.shaders.toggled", currentPackName) : new TranslatableComponent("iris.shaders.disabled"), false);
+			minecraft.player.addMessage(enabled ? new TranslatableText("iris.shaders.toggled", currentPackName) : new TranslatableText("iris.shaders.disabled"));
 		}
 	}
 
@@ -431,19 +370,13 @@ public class Iris {
 	}
 
 	private static void setDebug(boolean enable) {
-		int success;
-		if (enable) {
-			success = GLDebug.setupDebugMessageCallback();
-		} else {
-			GlDebug.enableDebugCallback(Minecraft.getInstance().options.glDebugVerbosity, false);
-			success = 1;
-		}
+		int success = enable ? GLDebug.setupDebugMessageCallback() : 1;
 
 		logger.info("Debug functionality is " + (enable ? "enabled, logging will be more verbose!" : "disabled."));
 		if (Minecraft.getInstance().player != null) {
-			Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent(success != 0 ? (enable ? "iris.shaders.debug.enabled" : "iris.shaders.debug.disabled") : "iris.shaders.debug.failure"), false);
+			Minecraft.getInstance().player.addMessage(new TranslatableText(success != 0 ? (enable ? "iris.shaders.debug.enabled" : "iris.shaders.debug.disabled") : "iris.shaders.debug.failure"));
 			if (success == 2) {
-				Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("iris.shaders.debug.restart"), false);
+				Minecraft.getInstance().player.addMessage(new TranslatableText("iris.shaders.debug.restart"));
 			}
 		}
 
@@ -591,7 +524,7 @@ public class Iris {
 
 		// Very important - we need to re-create the pipeline straight away.
 		// https://github.com/IrisShaders/Iris/issues/1330
-		if (Minecraft.getInstance().level != null) {
+		if (Minecraft.getInstance().world != null) {
 			Iris.getPipelineManager().preparePipeline(Iris.getCurrentDimension());
 		}
 	}
@@ -622,15 +555,16 @@ public class Iris {
 	public static DimensionId lastDimension = null;
 
 	public static DimensionId getCurrentDimension() {
-		ClientLevel level = Minecraft.getInstance().level;
+		ClientWorld world = Minecraft.getInstance().world;
 
-		if (level != null) {
-			if (level.dimensionType().effectsLocation().equals(DimensionType.END_EFFECTS) || level.dimension().equals(net.minecraft.world.level.Level.END)) {
-				return DimensionId.END;
-			} else if (level.dimensionType().effectsLocation().equals(DimensionType.NETHER_EFFECTS) || level.dimension().equals(net.minecraft.world.level.Level.NETHER)) {
-				return DimensionId.NETHER;
-			} else {
-				return DimensionId.OVERWORLD;
+		if (world != null) {
+			switch (world.dimension.getId()) {
+				case 1:
+					return DimensionId.END;
+				case -1:
+					return DimensionId.NETHER;
+				default:
+					return DimensionId.OVERWORLD;
 			}
 		} else {
 			// This prevents us from reloading the shaderpack unless we need to. Otherwise, if the player is in the
@@ -681,10 +615,6 @@ public class Iris {
 		return irisConfig;
 	}
 
-	public static UpdateChecker getUpdateChecker() {
-		return updateChecker;
-	}
-
 	public static boolean isFallback() {
 		return fallback;
 	}
@@ -698,33 +628,21 @@ public class Iris {
 	}
 
 	public static String getFormattedVersion() {
-		ChatFormatting color;
+		Formatting color;
 		String version = getVersion();
 
 		if (version.endsWith("-development-environment")) {
-			color = ChatFormatting.GOLD;
+			color = Formatting.GOLD;
 			version = version.replace("-development-environment", " (Development Environment)");
 		} else if (version.endsWith("-dirty") || version.contains("unknown") || version.endsWith("-nogit")) {
-			color = ChatFormatting.RED;
+			color = Formatting.RED;
 		} else if (version.contains("+rev.")) {
-			color = ChatFormatting.LIGHT_PURPLE;
+			color = Formatting.LIGHT_PURPLE;
 		} else {
-			color = ChatFormatting.GREEN;
+			color = Formatting.GREEN;
 		}
 
 		return color + version;
-	}
-
-	public static boolean isSodiumInvalid() {
-		return sodiumInvalid;
-  }
-
-	public static boolean isSodiumInstalled() {
-		return sodiumInstalled;
-	}
-
-	public static boolean hasNotEnoughCrashes() {
-		return hasNEC;
 	}
 
 	public static Path getShaderpacksDirectory() {

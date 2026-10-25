@@ -1,7 +1,7 @@
 package net.coderbot.iris.gl.uniform;
 
 import net.coderbot.iris.gl.IrisRenderSystem;
-import net.coderbot.iris.vendored.joml.Matrix4f;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -23,8 +23,12 @@ public class JomlMatrixUniform extends Uniform {
 	public void update() {
 		Matrix4f newValue = value.get();
 
-		if (!newValue.equals(cachedValue)) {
-			cachedValue = new Matrix4f(newValue);
+		if (cachedValue == null || !newValue.equals(cachedValue)) {
+			if (cachedValue == null) {
+				cachedValue = new Matrix4f(newValue);
+			} else {
+				cachedValue.set(newValue);
+			}
 
 			cachedValue.get(buffer);
 			buffer.rewind();

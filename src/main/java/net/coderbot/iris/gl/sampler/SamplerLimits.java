@@ -1,6 +1,7 @@
 package net.coderbot.iris.gl.sampler;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL20C;
 
 public class SamplerLimits {
@@ -9,8 +10,8 @@ public class SamplerLimits {
 	private static SamplerLimits instance;
 
 	private SamplerLimits() {
-		this.maxTextureUnits = GlStateManager._getInteger(GL20C.GL_MAX_TEXTURE_IMAGE_UNITS);
-		this.maxDrawBuffers = GlStateManager._getInteger(GL20C.GL_MAX_DRAW_BUFFERS);
+		this.maxTextureUnits = GL11.glGetInteger(GL20C.GL_MAX_TEXTURE_IMAGE_UNITS);
+		this.maxDrawBuffers = GL11.glGetInteger(GL20C.GL_MAX_DRAW_BUFFERS);
 	}
 
 	public int getMaxTextureUnits() {

@@ -1,12 +1,10 @@
 package net.coderbot.iris.uniforms;
 
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
-import net.coderbot.iris.JomlConversions;
 import net.coderbot.iris.gl.uniform.UniformHolder;
-import net.coderbot.iris.vendored.joml.Vector4f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.world.ClientWorld;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.util.Objects;
 
@@ -69,53 +67,37 @@ public final class CelestialUniforms {
 	}
 
 	private Vector4f getCelestialPositionInWorldSpace(float y) {
-		com.mojang.math.Vector4f position = new com.mojang.math.Vector4f(0.0F, y, 0.0F, 0.0F);
-
-		// TODO: Deduplicate / remove this function.
-		Matrix4f celestial = new Matrix4f();
-		celestial.setIdentity();
+		Vector4f position = new Vector4f(0.0F, y, 0.0F, 0.0F);
 
 		// This is the same transformation applied by renderSky, however, it's been moved to here.
 		// This is because we need the result of it before it's actually performed in vanilla.
-		celestial.multiply(Vector3f.YP.rotationDegrees(-90.0F));
-		celestial.multiply(Vector3f.ZP.rotationDegrees(sunPathRotation));
-		celestial.multiply(Vector3f.XP.rotationDegrees(getSkyAngle() * 360.0F));
-
-		position.transform(celestial);
-
-		return JomlConversions.toJoml(position);
+		return new Matrix4f()
+			.rotateY((float) Math.toRadians(-90.0F))
+			.rotateZ((float) Math.toRadians(sunPathRotation))
+			.rotateX((float) Math.toRadians(getSkyAngle() * 360.0F))
+			.transform(position);
 	}
 
 	private Vector4f getCelestialPosition(float y) {
-		com.mojang.math.Vector4f position = new com.mojang.math.Vector4f(0.0F, y, 0.0F, 0.0F);
-
-		Matrix4f celestial = CapturedRenderingState.INSTANCE.getGbufferModelView().copy();
+		Vector4f position = new Vector4f(0.0F, y, 0.0F, 0.0F);
 
 		// This is the same transformation applied by renderSky, however, it's been moved to here.
 		// This is because we need the result of it before it's actually performed in vanilla.
-		celestial.multiply(Vector3f.YP.rotationDegrees(-90.0F));
-		celestial.multiply(Vector3f.ZP.rotationDegrees(sunPathRotation));
-		celestial.multiply(Vector3f.XP.rotationDegrees(getSkyAngle() * 360.0F));
-
-		position.transform(celestial);
-
-		return JomlConversions.toJoml(position);
+		return new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferModelView())
+			.rotateY((float) Math.toRadians(-90.0F))
+			.rotateZ((float) Math.toRadians(sunPathRotation))
+			.rotateX((float) Math.toRadians(getSkyAngle() * 360.0F))
+			.transform(position);
 	}
 
 	private static Vector4f getUpPosition() {
-		com.mojang.math.Vector4f upVector = new com.mojang.math.Vector4f(0.0F, 100.0F, 0.0F, 0.0F);
-
-		// Get the current GBuffer model view matrix, since that is the basis of the celestial model view matrix
-		Matrix4f preCelestial = CapturedRenderingState.INSTANCE.getGbufferModelView().copy();
+		Vector4f upVector = new Vector4f(0.0F, 100.0F, 0.0F, 0.0F);
 
 		// Apply the fixed -90.0F degrees rotation to mirror the same transformation in renderSky.
 		// But, notably, skip the rotation by the skyAngle.
-		preCelestial.multiply(Vector3f.YP.rotationDegrees(-90.0F));
-
-		// Use this matrix to transform the vector.
-		upVector.transform(preCelestial);
-
-		return JomlConversions.toJoml(upVector);
+		return new Matrix4f(CapturedRenderingState.INSTANCE.getGbufferModelView())
+			.rotateY((float) Math.toRadians(-90.0F))
+			.transform(upVector);
 	}
 
 	public static boolean isDay() {
@@ -125,8 +107,8 @@ public final class CelestialUniforms {
 		return getSunAngle() <= 0.5;
 	}
 
-	private static ClientLevel getWorld() {
-		return Objects.requireNonNull(Minecraft.getInstance().level);
+	private static ClientWorld getWorld() {
+		return Objects.requireNonNull(Minecraft.getInstance().world);
 	}
 
 	private static float getSkyAngle() {

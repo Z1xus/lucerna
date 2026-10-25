@@ -1,10 +1,8 @@
 package net.coderbot.iris.uniforms;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.state.StateUpdateNotifiers;
 import net.coderbot.iris.gl.uniform.DynamicUniformHolder;
-import net.coderbot.iris.mixin.GlStateManagerAccessor;
-import net.coderbot.iris.mixin.statelisteners.BooleanStateAccessor;
 
 public class FogUniforms {
 	private FogUniforms() {
@@ -13,29 +11,29 @@ public class FogUniforms {
 
 	public static void addFogUniforms(DynamicUniformHolder uniforms) {
 		uniforms.uniform1i("fogMode", () -> {
-			GlStateManager.FogState fog = GlStateManagerAccessor.getFOG();
+			GlStateManager.Fog fog = GlStateManager.FOG;
 
-			if (!((BooleanStateAccessor) fog.enable).isEnabled()) {
+			if (!fog.state.enabled) {
 				return 0;
 			}
 
-			return GlStateManagerAccessor.getFOG().mode;
+			return GlStateManager.FOG.mode;
 		}, listener -> {
 			StateUpdateNotifiers.fogToggleNotifier.setListener(listener);
 			StateUpdateNotifiers.fogModeNotifier.setListener(listener);
 		});
 
-		uniforms.uniform1f("fogDensity", () -> GlStateManagerAccessor.getFOG().density, listener -> {
+		uniforms.uniform1f("fogDensity", () -> GlStateManager.FOG.density, listener -> {
 			StateUpdateNotifiers.fogToggleNotifier.setListener(listener);
 			StateUpdateNotifiers.fogDensityNotifier.setListener(listener);
 		});
 
-		uniforms.uniform1f("fogStart", () -> GlStateManagerAccessor.getFOG().start, listener -> {
+		uniforms.uniform1f("fogStart", () -> GlStateManager.FOG.start, listener -> {
 			StateUpdateNotifiers.fogToggleNotifier.setListener(listener);
 			StateUpdateNotifiers.fogStartNotifier.setListener(listener);
 		});
 
-		uniforms.uniform1f("fogEnd", () -> GlStateManagerAccessor.getFOG().end, listener -> {
+		uniforms.uniform1f("fogEnd", () -> GlStateManager.FOG.end, listener -> {
 			StateUpdateNotifiers.fogToggleNotifier.setListener(listener);
 			StateUpdateNotifiers.fogEndNotifier.setListener(listener);
 		});

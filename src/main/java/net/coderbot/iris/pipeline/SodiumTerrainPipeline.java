@@ -1,5 +1,6 @@
 package net.coderbot.iris.pipeline;
 
+import net.coderbot.iris.gl.IrisRenderSystem;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -164,7 +165,7 @@ public class SodiumTerrainPipeline {
 	}
 
 	public void unbindFramebuffer() {
-		GlStateManager.bindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
+		IrisRenderSystem.bindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 	}*/
 
 	@SafeVarargs

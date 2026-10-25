@@ -1,6 +1,6 @@
 package net.coderbot.iris.pipeline;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.render.block.BlockLayer;
 
 public enum WorldRenderingPhase {
 	NONE,
@@ -28,19 +28,18 @@ public enum WorldRenderingPhase {
 	WORLD_BORDER,
 	HAND_TRANSLUCENT;
 
-	public static WorldRenderingPhase fromTerrainRenderType(RenderType renderType) {
-		if (renderType == RenderType.solid()) {
-			return WorldRenderingPhase.TERRAIN_SOLID;
-		} else if (renderType == RenderType.cutout()) {
-			return WorldRenderingPhase.TERRAIN_CUTOUT;
-		} else if (renderType == RenderType.cutoutMipped()) {
-			return WorldRenderingPhase.TERRAIN_CUTOUT_MIPPED;
-		} else if (renderType == RenderType.translucent()) {
-			return WorldRenderingPhase.TERRAIN_TRANSLUCENT;
-		} else if (renderType == RenderType.tripwire()) {
-			return WorldRenderingPhase.TRIPWIRE;
-		} else {
-			throw new IllegalStateException("Illegal render type!");
+	public static WorldRenderingPhase fromTerrainRenderType(BlockLayer layer) {
+		switch (layer) {
+			case SOLID:
+				return WorldRenderingPhase.TERRAIN_SOLID;
+			case CUTOUT:
+				return WorldRenderingPhase.TERRAIN_CUTOUT;
+			case CUTOUT_MIPPED:
+				return WorldRenderingPhase.TERRAIN_CUTOUT_MIPPED;
+			case TRANSLUCENT:
+				return WorldRenderingPhase.TERRAIN_TRANSLUCENT;
+			default:
+				throw new IllegalStateException("Illegal block layer!");
 		}
 	}
 }

@@ -2,16 +2,15 @@ package net.coderbot.iris.uniforms;
 
 import net.coderbot.iris.gl.uniform.UniformHolder;
 import net.coderbot.iris.gl.uniform.UniformUpdateFrequency;
-import net.coderbot.iris.mixin.DimensionTypeAccessor;
 import net.coderbot.iris.uniforms.transforms.SmoothedFloat;
-import net.coderbot.iris.vendored.joml.Math;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.LightType;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.SwampBiome;
+import org.joml.Math;
 
 // These expressions are copied directly from BSL and Complementary.
 
@@ -23,8 +22,8 @@ public class HardcodedCustomUniforms {
 
 	public static void addHardcodedCustomUniforms(UniformHolder holder, FrameUpdateNotifier updateNotifier) {
 		updateNotifier.addListener(() -> {
-			if (Minecraft.getInstance().level != null) {
-				storedBiome = Minecraft.getInstance().level.getBiome(Minecraft.getInstance().getCameraEntity().blockPosition());
+			if (Minecraft.getInstance().world != null) {
+				storedBiome = Minecraft.getInstance().world.getBiome(new BlockPos(Minecraft.getInstance().getCamera()));
 			} else {
 				storedBiome = null;
 			}
@@ -62,14 +61,14 @@ public class HardcodedCustomUniforms {
 			if (storedBiome == null) {
 				return 0;
 			} else {
-				return storedBiome.getBiomeCategory() == Biome.BiomeCategory.SWAMP ? 1 : 0;
+				return storedBiome instanceof SwampBiome ? 1 : 0;
 			}
 		}, updateNotifier));
 		holder.uniform1f(UniformUpdateFrequency.PER_FRAME, "BiomeTemp", () -> {
 			if (storedBiome == null) {
 				return 0;
 			} else {
-				return storedBiome.getTemperature(Minecraft.getInstance().getCameraEntity().blockPosition());
+				return storedBiome.getTemperature(new BlockPos(Minecraft.getInstance().getCamera()));
 			}
 		});
 
@@ -97,16 +96,18 @@ public class HardcodedCustomUniforms {
 	}
 
 	private static float getSneakFactor() {
-		return Minecraft.getInstance().player.isCrouching() ? 1.0f : 0f;
+		return Minecraft.getInstance().player.isSneaking() ? 1.0f : 0f;
 	}
 
 	private static float getHurtFactor() {
-		Player player = Minecraft.getInstance().player;
-		return player.hurtTime > 0 || player.deathTime > 0 ? 0.4f : 0f;
+		LocalClientPlayerEntity player = Minecraft.getInstance().player;
+		return player.damagedTimer > 0 || player.deathTicks > 0 ? 0.4f : 0f;
 	}
 
 	private static float getEyeInCave() {
-		if (client.getCameraEntity().getEyeY() < 5.0) {
+		Entity camera = client.getCamera();
+
+		if (camera.y + camera.getEyeHeight() < 5.0) {
 			return 1.0f - getEyeSkyBrightness() / 240F;
 		}
 		return 0.0f;
@@ -117,15 +118,15 @@ public class HardcodedCustomUniforms {
 	}
 
 	private static float getEyeSkyBrightness() {
-		if (client.cameraEntity == null || client.level == null) {
+		Entity camera = client.getCamera();
+
+		if (camera == null || client.world == null) {
 			return 0;
 		}
 
-		Vec3 feet = client.cameraEntity.position();
-		Vec3 eyes = new Vec3(feet.x, client.cameraEntity.getEyeY(), feet.z);
-		BlockPos eyeBlockPos = new BlockPos(eyes);
+		BlockPos eyeBlockPos = new BlockPos(camera.x, camera.y + camera.getEyeHeight(), camera.z);
 
-		int skyLight = client.level.getBrightness(LightLayer.SKY, eyeBlockPos);
+		int skyLight = client.world.getBrightness(LightType.SKY, eyeBlockPos);
 
 		return skyLight * 16;
 	}
@@ -150,15 +151,7 @@ public class HardcodedCustomUniforms {
 	}
 
 	private static float getTimeAngle() {
-		return getWorldDayTime() / 24000F;
-	}
-
-	private static int getWorldDayTime() {
-		Level level = Minecraft.getInstance().level;
-		long  timeOfDay = level.getDayTime();
-		long dayTime = ((DimensionTypeAccessor) level.dimensionType()).getFixedTime().orElse(timeOfDay % 24000L);
-
-		return (int) dayTime;
+		return WorldTimeUniforms.getWorldDayTime() / 24000F;
 	}
 
 	private static float getTimeBrightness() {
@@ -181,15 +174,11 @@ public class HardcodedCustomUniforms {
 		if (storedBiome == null) {
 			return 0;
 		}
-		Biome.Precipitation precipitation = storedBiome.getPrecipitation();
-		switch (precipitation) {
-			case RAIN:
-				return 1;
-			case SNOW:
-				return 2;
-			default:
-				return 0;
+		if (storedBiome.isSnowy()) {
+			return 2;
 		}
+
+		return storedBiome.isRainy() ? 1 : 0;
 	}
 
 	private static float getBlindFactor() {

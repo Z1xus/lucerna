@@ -1,7 +1,7 @@
 package net.coderbot.iris.features;
 
 import net.coderbot.iris.gl.IrisRenderSystem;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resource.language.I18n;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.List;
@@ -32,12 +32,12 @@ public enum FeatureFlags {
 
 		if (unsupportedIris) {
 			if (unsupportedHardware) {
-				return I18n.get("iris.unsupported.irisorpc");
+				return I18n.translate("iris.unsupported.irisorpc");
 			}
 
-			return I18n.get("iris.unsupported.iris");
+			return I18n.translate("iris.unsupported.iris");
 		} else if (unsupportedHardware) {
-			return I18n.get("iris.unsupported.pc");
+			return I18n.translate("iris.unsupported.pc");
 		} else {
 			return null;
 		}

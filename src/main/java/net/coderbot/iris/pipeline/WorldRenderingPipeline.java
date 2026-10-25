@@ -3,17 +3,18 @@ package net.coderbot.iris.pipeline;
 import net.coderbot.iris.gbuffer_overrides.matching.InputAvailability;
 import net.coderbot.iris.gbuffer_overrides.matching.SpecialCondition;
 import net.coderbot.iris.gbuffer_overrides.state.RenderTargetStateListener;
-import net.coderbot.iris.mixin.LevelRendererAccessor;
+import net.minecraft.client.render.world.WorldRenderer;
 import net.coderbot.iris.shaderpack.CloudSetting;
 import net.coderbot.iris.uniforms.FrameUpdateNotifier;
-import net.minecraft.client.Camera;
+import net.minecraft.entity.Entity;
+import net.minecraft.client.render.Culler;
 
 import java.util.List;
 import java.util.OptionalInt;
 
 public interface WorldRenderingPipeline {
 	void beginLevelRendering();
-	void renderShadows(LevelRendererAccessor levelRenderer, Camera camera);
+	void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller);
 	void addDebugText(List<String> messages);
 	OptionalInt getForcedShadowRenderDistanceChunksForDisplay();
 

@@ -1,15 +1,14 @@
-package net.irisshaders.iris.shadows.frustum;
+package net.coderbot.iris.shadows.frustum;
 
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.client.render.Culler;
+import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 
-public class CullEverythingFrustum extends Frustum implements ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum {
+public class CullEverythingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum {
 	public CullEverythingFrustum() {
-		super(new Matrix4f(), new Matrix4f());
 	}
 
 	// For Immersive Portals
@@ -18,7 +17,12 @@ public class CullEverythingFrustum extends Frustum implements ViewportProvider, 
 		return false;
 	}
 
-	public boolean isVisible(AABB box) {
+	@Override
+	public void prepare(double cameraX, double cameraY, double cameraZ) {
+	}
+
+	@Override
+	public boolean isVisible(Box box) {
 		return false;
 	}
 

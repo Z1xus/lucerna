@@ -1,6 +1,8 @@
 package net.coderbot.iris.gl.framebuffer;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.coderbot.iris.gl.GlResource;
@@ -19,8 +21,8 @@ public class GlFramebuffer extends GlResource {
 		super(IrisRenderSystem.createFramebuffer());
 
 		this.attachments = new Int2IntArrayMap();
-		this.maxDrawBuffers = GlStateManager._getInteger(GL30C.GL_MAX_DRAW_BUFFERS);
-		this.maxColorAttachments = GlStateManager._getInteger(GL30C.GL_MAX_COLOR_ATTACHMENTS);
+		this.maxDrawBuffers = GL11.glGetInteger(GL30C.GL_MAX_DRAW_BUFFERS);
+		this.maxColorAttachments = GL11.glGetInteger(GL30C.GL_MAX_COLOR_ATTACHMENTS);
 		this.hasDepthAttachment = false;
 	}
 
@@ -82,24 +84,24 @@ public class GlFramebuffer extends GlResource {
 	}
 
 	public void bind() {
-		GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, getGlId());
+		IrisRenderSystem.bindFramebuffer(GL30C.GL_FRAMEBUFFER, getGlId());
 	}
 
 	public void bindAsReadBuffer() {
-		GlStateManager._glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, getGlId());
+		IrisRenderSystem.bindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, getGlId());
 	}
 
 	public void bindAsDrawBuffer() {
-		GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, getGlId());
+		IrisRenderSystem.bindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, getGlId());
 	}
 
 	protected void destroyInternal() {
-		GlStateManager._glDeleteFramebuffers(getGlId());
+		GL30.glDeleteFramebuffers(getGlId());
 	}
 
 	public boolean isComplete() {
 		bind();
-		int status = GlStateManager.glCheckFramebufferStatus(GL30C.GL_FRAMEBUFFER);
+		int status = GL30.glCheckFramebufferStatus(GL30C.GL_FRAMEBUFFER);
 
 		return status == GL30C.GL_FRAMEBUFFER_COMPLETE;
 	}

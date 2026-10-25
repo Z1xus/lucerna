@@ -1,6 +1,6 @@
 package net.coderbot.iris.shadows;
 
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import net.coderbot.iris.pipeline.ShadowRenderer;
 
 public class ShadowRenderingState {
@@ -9,6 +9,6 @@ public class ShadowRenderingState {
 	}
 
 	public static Matrix4f getShadowOrthoMatrix() {
-		return ShadowRenderer.ACTIVE ? ShadowRenderer.PROJECTION.copy() : null;
+		return ShadowRenderer.ACTIVE ? new Matrix4f(ShadowRenderer.PROJECTION) : null;
 	}
 }

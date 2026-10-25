@@ -10,15 +10,15 @@ import net.coderbot.iris.rendertarget.RenderTarget;
 import net.coderbot.iris.rendertarget.RenderTargets;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
-import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.render.texture.AbstractTexture;
 
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class IrisSamplers {
 	public static final int ALBEDO_TEXTURE_UNIT = 0;
-	public static final int OVERLAY_TEXTURE_UNIT = 1;
-	public static final int LIGHTMAP_TEXTURE_UNIT = 2;
+	public static final int OVERLAY_TEXTURE_UNIT = 2;
+	public static final int LIGHTMAP_TEXTURE_UNIT = 1;
 
 	public static final ImmutableSet<Integer> WORLD_RESERVED_TEXTURE_UNITS = ImmutableSet.of(0, 1, 2);
 
@@ -129,20 +129,20 @@ public class IrisSamplers {
 			samplers.addExternalSampler(ALBEDO_TEXTURE_UNIT, "tex", "texture", "gtexture");
 		} else {
 			// TODO: Rebind unbound sampler IDs instead of hardcoding a list...
-			samplers.addDynamicSampler(whitePixel::getId, "tex", "texture", "gtexture",
+			samplers.addDynamicSampler(whitePixel::getGlId, "tex", "texture", "gtexture",
 					"gcolor", "colortex0");
 		}
 
 		if (availability.lightmap) {
 			samplers.addExternalSampler(LIGHTMAP_TEXTURE_UNIT, "lightmap");
 		} else {
-			samplers.addDynamicSampler(whitePixel::getId, "lightmap");
+			samplers.addDynamicSampler(whitePixel::getGlId, "lightmap");
 		}
 
 		if (availability.overlay) {
 			samplers.addExternalSampler(OVERLAY_TEXTURE_UNIT, "iris_overlay");
 		} else {
-			samplers.addDynamicSampler(whitePixel::getId, "iris_overlay");
+			samplers.addDynamicSampler(whitePixel::getGlId, "iris_overlay");
 		}
 
 		samplers.addDynamicSampler(pipeline::getCurrentNormalTexture, StateUpdateNotifiers.normalTextureChangeNotifier, "normals");

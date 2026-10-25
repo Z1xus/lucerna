@@ -1,9 +1,9 @@
 package net.coderbot.iris.uniforms;
 
-import net.coderbot.iris.JomlConversions;
 import net.coderbot.iris.gl.uniform.UniformHolder;
-import net.coderbot.iris.vendored.joml.Vector3d;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import org.joml.Vector3d;
 
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.ONCE;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
@@ -29,11 +29,16 @@ public class CameraUniforms {
 
 	private static int getRenderDistanceInBlocks() {
 		// TODO: Should we ask the game renderer for this?
-		return client.options.renderDistance * 16;
+		return client.options.viewDistance * 16;
 	}
 
 	public static Vector3d getUnshiftedCameraPosition() {
-		return JomlConversions.fromVec3(client.gameRenderer.getMainCamera().getPosition());
+		Entity camera = client.getCamera();
+		double tickDelta = CapturedRenderingState.INSTANCE.getTickDelta();
+
+		return new Vector3d(camera.prevX + (camera.x - camera.prevX) * tickDelta,
+			camera.prevY + (camera.y - camera.prevY) * tickDelta,
+			camera.prevZ + (camera.z - camera.prevZ) * tickDelta);
 	}
 
 	static class CameraPositionTracker {

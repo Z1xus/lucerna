@@ -1,13 +1,9 @@
 package net.coderbot.iris.uniforms;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.coderbot.iris.JomlConversions;
 import net.coderbot.iris.gl.state.StateUpdateNotifiers;
 import net.coderbot.iris.gl.uniform.DynamicUniformHolder;
 import net.coderbot.iris.gl.uniform.UniformHolder;
 import net.coderbot.iris.layer.GbufferPrograms;
-import net.coderbot.iris.mixin.GlStateManagerAccessor;
-import net.coderbot.iris.mixin.statelisteners.BooleanStateAccessor;
 import net.coderbot.iris.shaderpack.IdMap;
 import net.coderbot.iris.shaderpack.PackDirectives;
 import net.coderbot.iris.texture.TextureInfoCache;
@@ -15,32 +11,27 @@ import net.coderbot.iris.texture.TextureInfoCache.TextureInfo;
 import net.coderbot.iris.texture.TextureTracker;
 import net.coderbot.iris.uniforms.transforms.SmoothedFloat;
 import net.coderbot.iris.uniforms.transforms.SmoothedVec2f;
-import net.coderbot.iris.vendored.joml.Math;
-import net.coderbot.iris.vendored.joml.Vector2f;
-import net.coderbot.iris.vendored.joml.Vector2i;
-import net.coderbot.iris.vendored.joml.Vector3d;
-import net.coderbot.iris.vendored.joml.Vector4f;
-import net.coderbot.iris.vendored.joml.Vector4i;
-import net.irisshaders.iris.api.v0.item.IrisItemLightProvider;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.core.BlockPos;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.Vec3;
-
-import java.util.Objects;
-import java.util.function.IntSupplier;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.client.render.texture.AbstractTexture;
+import net.minecraft.client.render.texture.TextureAtlas;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.living.LivingEntity;
+import net.minecraft.entity.living.effect.StatusEffect;
+import net.minecraft.entity.living.effect.StatusEffectInstance;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LightType;
+import org.joml.Math;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3d;
+import org.joml.Vector4f;
+import org.joml.Vector4i;
 
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.ONCE;
 import static net.coderbot.iris.gl.uniform.UniformUpdateFrequency.PER_FRAME;
@@ -72,7 +63,7 @@ public final class CommonUniforms {
 		// TODO: OptiFine doesn't think that atlasSize is a "dynamic" uniform,
 		//       but we do. How will custom uniforms depending on atlasSize work?
 		uniforms.uniform2i("atlasSize", () -> {
-			int glId = GlStateManagerAccessor.getTEXTURES()[0].binding;
+			int glId = GlStateManager.TEXTURES[0].texture;
 
 			AbstractTexture texture = TextureTracker.INSTANCE.getTexture(glId);
 			if (texture instanceof TextureAtlas) {
@@ -84,7 +75,7 @@ public final class CommonUniforms {
 		}, StateUpdateNotifiers.bindTextureNotifier);
 
 		uniforms.uniform2i("gtextureSize", () -> {
-			int glId = GlStateManagerAccessor.getTEXTURES()[0].binding;
+			int glId = GlStateManager.TEXTURES[0].texture;
 
 			TextureInfo info = TextureInfoCache.INSTANCE.getInfo(glId);
 			return new Vector2i(info.getWidth(), info.getHeight());
@@ -92,10 +83,10 @@ public final class CommonUniforms {
 		}, StateUpdateNotifiers.bindTextureNotifier);
 
 		uniforms.uniform4i("blendFunc", () -> {
-			GlStateManager.BlendState blend = GlStateManagerAccessor.getBLEND();
+			GlStateManager.Blend blend = GlStateManager.BLEND;
 
-			if (((BooleanStateAccessor) blend.mode).isEnabled()) {
-				return new Vector4i(blend.srcRgb, blend.dstRgb, blend.srcAlpha, blend.dstAlpha);
+			if (blend.state.enabled) {
+				return new Vector4i(blend.sfactorRGB, blend.dfactorRGB, blend.sfactorAlpha, blend.dfactorAlpha);
 			} else {
 				return ZERO_VECTOR_4i;
 			}
@@ -113,7 +104,7 @@ public final class CommonUniforms {
 
 		uniforms
 			.uniform1b(PER_FRAME, "hideGUI", () -> client.options.hideGui)
-			.uniform1f(PER_FRAME, "eyeAltitude", () -> Objects.requireNonNull(client.getCameraEntity()).getEyeY())
+			.uniform1f(PER_FRAME, "eyeAltitude", () -> client.getCamera().y + client.getCamera().getEyeHeight())
 			.uniform1i(PER_FRAME, "isEyeInWater", CommonUniforms::isEyeInWater)
 			.uniform1f(PER_FRAME, "blindness", CommonUniforms::getBlindness)
 			.uniform1f(PER_FRAME, "nightVision", CommonUniforms::getNightVision)
@@ -136,23 +127,21 @@ public final class CommonUniforms {
 	}
 
 	private static Vector3d getSkyColor() {
-		if (client.level == null || client.cameraEntity == null) {
+		if (client.world == null || client.getCamera() == null) {
 			return ZERO_VECTOR_3d;
 		}
 
-		return JomlConversions.fromVec3(client.level.getSkyColor(client.cameraEntity.blockPosition(),
-				CapturedRenderingState.INSTANCE.getTickDelta()));
+		Vec3d color = client.world.getSkyColor(client.getCamera(), CapturedRenderingState.INSTANCE.getTickDelta());
+		return new Vector3d(color.x, color.y, color.z);
 	}
 
 	static float getBlindness() {
-		Entity cameraEntity = client.getCameraEntity();
+		Entity cameraEntity = client.getCamera();
 
 		if (cameraEntity instanceof LivingEntity) {
-			MobEffectInstance blindness = ((LivingEntity) cameraEntity).getEffect(MobEffects.BLINDNESS);
+			StatusEffectInstance blindness = ((LivingEntity) cameraEntity).getEffectInstance(StatusEffect.BLINDNESS);
 
 			if (blindness != null) {
-				// Guessing that this is what OF uses, based on how vanilla calculates the fog value in BackgroundRenderer
-				// TODO: Add this to ShaderDoc
 				return Math.clamp(0.0F, 1.0F, blindness.getDuration() / 20.0F);
 			}
 		}
@@ -161,77 +150,42 @@ public final class CommonUniforms {
 	}
 
 	private static float getPlayerMood() {
-		if (!(client.cameraEntity instanceof LocalPlayer)) {
-			return 0.0F;
-		}
-
-		// This should always be 0 to 1 anyways but just making sure
-		return Math.clamp(0.0F, 1.0F, ((LocalPlayer) client.cameraEntity).getCurrentMood());
+		return 0.0F;
 	}
 
 	static float getRainStrength() {
-		if (client.level == null) {
+		if (client.world == null) {
 			return 0f;
 		}
 
-		// Note: Ensure this is in the range of 0 to 1 - some custom servers send out of range values.
-		return Math.clamp(0.0F, 1.0F,
-			client.level.getRainLevel(CapturedRenderingState.INSTANCE.getTickDelta()));
+		return Math.clamp(0.0F, 1.0F, client.world.getRain(CapturedRenderingState.INSTANCE.getTickDelta()));
 	}
 
 	private static Vector2i getEyeBrightness() {
-		if (client.cameraEntity == null || client.level == null) {
+		Entity camera = client.getCamera();
+
+		if (camera == null || client.world == null) {
 			return ZERO_VECTOR_2i;
 		}
 
-		Vec3 feet = client.cameraEntity.position();
-		Vec3 eyes = new Vec3(feet.x, client.cameraEntity.getEyeY(), feet.z);
-		BlockPos eyeBlockPos = new BlockPos(eyes);
+		BlockPos eyeBlockPos = new BlockPos(camera.x, camera.y + camera.getEyeHeight(), camera.z);
 
-		int blockLight = client.level.getBrightness(LightLayer.BLOCK, eyeBlockPos);
-		int skyLight = client.level.getBrightness(LightLayer.SKY, eyeBlockPos);
+		int blockLight = client.world.getBrightness(LightType.BLOCK, eyeBlockPos);
+		int skyLight = client.world.getBrightness(LightType.SKY, eyeBlockPos);
 
 		return new Vector2i(blockLight * 16, skyLight * 16);
 	}
 
 	private static float getNightVision() {
-		Entity cameraEntity = client.getCameraEntity();
+		Entity cameraEntity = client.getCamera();
 
 		if (cameraEntity instanceof LivingEntity) {
-			LivingEntity livingEntity = (LivingEntity) cameraEntity;
+			StatusEffectInstance nightVision = ((LivingEntity) cameraEntity).getEffectInstance(StatusEffect.NIGHTVISION);
 
-			try {
-				// See MixinGameRenderer#iris$safecheckNightvisionStrength.
-				//
-				// We modify the behavior of getNightVisionScale so that it's safe for us to call it even on entities
-				// that don't have the effect, allowing us to pick up modified night vision strength values from mods
-				// like Origins.
-				//
-				// See: https://github.com/apace100/apoli/blob/320b0ef547fbbf703de7154f60909d30366f6500/src/main/java/io/github/apace100/apoli/mixin/GameRendererMixin.java#L153
-				float nightVisionStrength =
-						GameRenderer.getNightVisionScale(livingEntity, CapturedRenderingState.INSTANCE.getTickDelta());
-
-				if (nightVisionStrength > 0) {
-					// Just protecting against potential weird mod behavior
-					return Math.clamp(0.0F, 1.0F, nightVisionStrength);
-				}
-			} catch (NullPointerException e) {
-				// If our injection didn't get applied, a NullPointerException will occur from calling that method if
-				// the entity doesn't currently have night vision. This isn't pretty but it's functional.
-				return 0.0F;
-			}
-		}
-
-		// Conduit power gives the player a sort-of night vision effect when underwater.
-		// This lets existing shaderpacks be compatible with conduit power automatically.
-		//
-		// Yes, this should be the player entity, to match LightmapTextureManager.
-		if (client.player != null && client.player.hasEffect(MobEffects.CONDUIT_POWER)) {
-			float underwaterVisibility = client.player.getWaterVision();
-
-			if (underwaterVisibility > 0.0f) {
-				// Just protecting against potential weird mod behavior
-				return Math.clamp(0.0F, 1.0F, underwaterVisibility);
+			if (nightVision != null) {
+				int duration = nightVision.getDuration();
+				float tickDelta = CapturedRenderingState.INSTANCE.getTickDelta();
+				return duration > 200 ? 1.0F : 0.7F + MathHelper.sin((duration - tickDelta) * (float) java.lang.Math.PI * 0.2F) * 0.3F;
 			}
 		}
 
@@ -239,17 +193,16 @@ public final class CommonUniforms {
 	}
 
 	static int isEyeInWater() {
-		// Note: With certain utility / cheat mods, this method will return air even when the player is submerged when
-		// the "No Overlay" feature is enabled.
-		//
-		// I'm not sure what the best way to deal with this is, but the current approach seems to be an acceptable one -
-		// after all, disabling the overlay results in the intended effect of it not really looking like you're
-		// underwater on most shaderpacks. For now, I will leave this as-is, but it is something to keep in mind.
-		FluidState submergedFluid = client.gameRenderer.getMainCamera().getFluidInCamera();
+		if (client.world == null || client.getCamera() == null) {
+			return 0;
+		}
 
-		if (submergedFluid.is(FluidTags.WATER)) {
+		Block block = Camera.getBlockInside(client.world, client.getCamera(), CapturedRenderingState.INSTANCE.getTickDelta());
+		Material material = block.getMaterial();
+
+		if (material == Material.WATER) {
 			return 1;
-		} else if (submergedFluid.is(FluidTags.LAVA)) {
+		} else if (material == Material.LAVA) {
 			return 2;
 		} else {
 			return 0;

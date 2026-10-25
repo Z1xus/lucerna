@@ -1,6 +1,8 @@
 package net.coderbot.iris.texture;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.coderbot.iris.gl.IrisRenderSystem;
+import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +30,7 @@ public class TextureInfoCache {
 	public void onTexImage2D(int target, int level, int internalformat, int width, int height, int border,
 							 int format, int type, @Nullable IntBuffer pixels) {
 		if (level == 0) {
-			int id = GlStateManager.getActiveTextureName();
+			int id = IrisRenderSystem.getActiveTextureName();
 			TextureInfo info = getInfo(id);
 			info.internalFormat = internalformat;
 			info.width = width;
@@ -77,14 +79,14 @@ public class TextureInfoCache {
 
 		private int fetchLevelParameter(int pname) {
 			// Keep track of what texture was bound before
-			int previousTextureBinding = GlStateManager._getInteger(GL20C.GL_TEXTURE_BINDING_2D);
+			int previousTextureBinding = GL11.glGetInteger(GL20C.GL_TEXTURE_BINDING_2D);
 
 			// Bind this texture and grab the parameter from it.
-			GlStateManager._bindTexture(id);
-			int parameter = GlStateManager._getTexLevelParameter(GL20C.GL_TEXTURE_2D, 0, pname);
+			GlStateManager.bindTexture(id);
+			int parameter = GL11.glGetTexLevelParameteri(GL20C.GL_TEXTURE_2D, 0, pname);
 
 			// Make sure to re-bind the previous texture to avoid issues.
-			GlStateManager._bindTexture(previousTextureBinding);
+			GlStateManager.bindTexture(previousTextureBinding);
 
 			return parameter;
 		}

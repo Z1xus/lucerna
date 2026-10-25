@@ -1,36 +1,25 @@
 package net.coderbot.iris.rendertarget;
 
-import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.coderbot.iris.gl.IrisRenderSystem;
+import net.minecraft.client.render.texture.DynamicTexture;
+import org.lwjgl.opengl.GL11C;
 
-import java.util.Objects;
 import java.util.Random;
 
 public class NativeImageBackedNoiseTexture extends DynamicTexture {
 	public NativeImageBackedNoiseTexture(int size) {
-		super(create(size));
-	}
+		super(size, size);
 
-	private static NativeImage create(int size) {
-		NativeImage image = new NativeImage(NativeImage.Format.RGBA, size, size, false);
 		Random random = new Random(0);
+		int[] pixels = getPixels();
 
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				int color = random.nextInt() | (255 << 24);
-
-				image.setPixelRGBA(x, y, color);
-			}
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = random.nextInt() | (255 << 24);
 		}
 
-		return image;
-	}
+		upload();
 
-	@Override
-	public void upload() {
-		NativeImage image = Objects.requireNonNull(getPixels());
-
-		bind();
-		image.upload(0, 0, 0, 0, 0, image.getWidth(), image.getHeight(), true, false, false, false);
+		IrisRenderSystem.texParameteri(getGlId(), GL11C.GL_TEXTURE_2D, GL11C.GL_TEXTURE_MIN_FILTER, GL11C.GL_LINEAR);
+		IrisRenderSystem.texParameteri(getGlId(), GL11C.GL_TEXTURE_2D, GL11C.GL_TEXTURE_MAG_FILTER, GL11C.GL_LINEAR);
 	}
 }

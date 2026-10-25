@@ -1,9 +1,7 @@
 package net.coderbot.iris.gl.blending;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
-import net.coderbot.iris.mixin.GlStateManagerAccessor;
-import net.coderbot.iris.mixin.statelisteners.BooleanStateAccessor;
 
 public class BlendModeStorage {
 	private static boolean originalBlendEnable;
@@ -17,19 +15,19 @@ public class BlendModeStorage {
 	public static void overrideBlend(BlendMode override) {
 		if (!blendLocked) {
 			// Only save the previous state if the blend mode wasn't already locked
-			GlStateManager.BlendState blendState = GlStateManagerAccessor.getBLEND();
+			GlStateManager.Blend blendState = GlStateManager.BLEND;
 
-			originalBlendEnable = ((BooleanStateAccessor) blendState.mode).isEnabled();
-			originalBlend = new BlendMode(blendState.srcRgb, blendState.dstRgb, blendState.srcAlpha, blendState.dstAlpha);
+			originalBlendEnable = blendState.state.enabled;
+			originalBlend = new BlendMode(blendState.sfactorRGB, blendState.dfactorRGB, blendState.sfactorAlpha, blendState.dfactorAlpha);
 		}
 
 		blendLocked = false;
 
 		if (override == null) {
-			GlStateManager._disableBlend();
+			GlStateManager.disableBlend();
 		} else {
-			GlStateManager._enableBlend();
-			GlStateManager._blendFuncSeparate(override.getSrcRgb(), override.getDstRgb(), override.getSrcAlpha(), override.getDstAlpha());
+			GlStateManager.enableBlend();
+			GlStateManager.blendFuncSeparate(override.getSrcRgb(), override.getDstRgb(), override.getSrcAlpha(), override.getDstAlpha());
 		}
 
 		blendLocked = true;
@@ -38,10 +36,10 @@ public class BlendModeStorage {
 	public static void overrideBufferBlend(int index, BlendMode override) {
 		if (!blendLocked) {
 			// Only save the previous state if the blend mode wasn't already locked
-			GlStateManager.BlendState blendState = GlStateManagerAccessor.getBLEND();
+			GlStateManager.Blend blendState = GlStateManager.BLEND;
 
-			originalBlendEnable = ((BooleanStateAccessor) blendState.mode).isEnabled();
-			originalBlend = new BlendMode(blendState.srcRgb, blendState.dstRgb, blendState.srcAlpha, blendState.dstAlpha);
+			originalBlendEnable = blendState.state.enabled;
+			originalBlend = new BlendMode(blendState.sfactorRGB, blendState.dfactorRGB, blendState.sfactorAlpha, blendState.dfactorAlpha);
 		}
 
 		if (override == null) {
@@ -70,12 +68,12 @@ public class BlendModeStorage {
 		blendLocked = false;
 
 		if (originalBlendEnable) {
-			GlStateManager._enableBlend();
+			GlStateManager.enableBlend();
 		} else {
-			GlStateManager._disableBlend();
+			GlStateManager.disableBlend();
 		}
 
-		GlStateManager._blendFuncSeparate(originalBlend.getSrcRgb(), originalBlend.getDstRgb(),
+		GlStateManager.blendFuncSeparate(originalBlend.getSrcRgb(), originalBlend.getDstRgb(),
 				originalBlend.getSrcAlpha(), originalBlend.getDstAlpha());
 	}
 }

@@ -1,8 +1,6 @@
 package net.coderbot.iris.gl.blending;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.coderbot.iris.mixin.GlStateManagerAccessor;
-import net.coderbot.iris.mixin.statelisteners.BooleanStateAccessor;
+import net.minecraft.client.render.platform.GlStateManager;
 
 public class AlphaTestStorage {
 	private static boolean originalAlphaTestEnable;
@@ -16,19 +14,19 @@ public class AlphaTestStorage {
 	public static void overrideAlphaTest(AlphaTest override) {
 		if (!alphaTestLocked) {
 			// Only save the previous state if the alpha test wasn't already locked
-			GlStateManager.AlphaState alphaState = GlStateManagerAccessor.getALPHA_TEST();
+			GlStateManager.Alpha alphaState = GlStateManager.ALPHA_TEST;
 
-			originalAlphaTestEnable = ((BooleanStateAccessor) alphaState.mode).isEnabled();
-			originalAlphaTest = new AlphaTest(AlphaTestFunction.fromGlId(alphaState.func).get(), alphaState.reference);
+			originalAlphaTestEnable = alphaState.state.enabled;
+			originalAlphaTest = new AlphaTest(AlphaTestFunction.fromGlId(alphaState.func).get(), alphaState.ref);
 		}
 
 		alphaTestLocked = false;
 
 		if (override == null) {
-			GlStateManager._disableAlphaTest();
+			GlStateManager.disableAlphaTest();
 		} else {
-			GlStateManager._enableAlphaTest();
-			GlStateManager._alphaFunc(override.getFunction().getGlId(), override.getReference());
+			GlStateManager.enableAlphaTest();
+			GlStateManager.alphaFunc(override.getFunction().getGlId(), override.getReference());
 		}
 
 		alphaTestLocked = true;
@@ -50,11 +48,11 @@ public class AlphaTestStorage {
 		alphaTestLocked = false;
 
 		if (originalAlphaTestEnable) {
-			GlStateManager._enableAlphaTest();
+			GlStateManager.enableAlphaTest();
 		} else {
-			GlStateManager._disableAlphaTest();
+			GlStateManager.disableAlphaTest();
 		}
 
-		GlStateManager._alphaFunc(originalAlphaTest.getFunction().getGlId(), originalAlphaTest.getReference());
+		GlStateManager.alphaFunc(originalAlphaTest.getFunction().getGlId(), originalAlphaTest.getReference());
 	}
 }

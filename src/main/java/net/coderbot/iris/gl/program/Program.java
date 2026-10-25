@@ -1,7 +1,8 @@
 package net.coderbot.iris.gl.program;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.shaders.ProgramManager;
+import org.lwjgl.opengl.GL20;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.GlResource;
 
 public final class Program extends GlResource {
@@ -18,7 +19,7 @@ public final class Program extends GlResource {
 	}
 
 	public void use() {
-		ProgramManager.glUseProgram(getGlId());
+		IrisRenderSystem.useProgram(getGlId());
 
 		uniforms.update();
 		samplers.update();
@@ -28,11 +29,11 @@ public final class Program extends GlResource {
 	public static void unbind() {
 		ProgramUniforms.clearActiveUniforms();
 		ProgramSamplers.clearActiveSamplers();
-		ProgramManager.glUseProgram(0);
+		IrisRenderSystem.useProgram(0);
 	}
 
 	public void destroyInternal() {
-		GlStateManager.glDeleteProgram(getGlId());
+		GL20.glDeleteProgram(getGlId());
 	}
 
 	/**

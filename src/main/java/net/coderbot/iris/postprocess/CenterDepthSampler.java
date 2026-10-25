@@ -1,8 +1,7 @@
 package net.coderbot.iris.postprocess;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
 import net.coderbot.iris.gl.program.Program;
@@ -36,15 +35,15 @@ public class CenterDepthSampler {
 	private boolean destroyed;
 
 	public CenterDepthSampler(IntSupplier depthSupplier, float halfLife) {
-		this.texture = GlStateManager._genTexture();
-		this.altTexture = GlStateManager._genTexture();
+		this.texture = GlStateManager.genTextures();
+		this.altTexture = GlStateManager.genTextures();
 		this.framebuffer = new GlFramebuffer();
 
 		// Fall back to a less precise format if the system doesn't support OpenGL 3
 		InternalTextureFormat format = GL.getCapabilities().OpenGL32 ? InternalTextureFormat.R32F : InternalTextureFormat.RGB16;
 		setupColorTexture(texture, format);
 		setupColorTexture(altTexture, format);
-		RenderSystem.bindTexture(0);
+		GlStateManager.bindTexture(0);
 
 		this.framebuffer.addColorAttachment(0, texture);
 		ProgramBuilder builder;
@@ -84,7 +83,7 @@ public class CenterDepthSampler {
 		this.framebuffer.bind();
 		this.program.use();
 
-		RenderSystem.viewport(0, 0, 1, 1);
+		GlStateManager.viewport(0, 0, 1, 1);
 
 		FullScreenQuadRenderer.INSTANCE.render();
 
@@ -95,7 +94,7 @@ public class CenterDepthSampler {
 		DepthCopyStrategy.fastest(false).copy(this.framebuffer, texture, null, altTexture, 1, 1);
 
 		//Reset viewport
-		Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
+		Minecraft.getInstance().getRenderTarget().bindWrite(true);
 	}
 
 	public void setupColorTexture(int texture, InternalTextureFormat format) {
@@ -116,8 +115,8 @@ public class CenterDepthSampler {
 	}
 
 	public void destroy() {
-		GlStateManager._deleteTexture(texture);
-		GlStateManager._deleteTexture(altTexture);
+		GlStateManager.deleteTextures(texture);
+		GlStateManager.deleteTextures(altTexture);
 		framebuffer.destroy();
 		program.destroy();
 		destroyed = true;

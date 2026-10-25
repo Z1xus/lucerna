@@ -1,13 +1,14 @@
 package net.coderbot.iris.gl.program;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.shaders.ProgramManager;
+import org.lwjgl.opengl.GL20;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.GlResource;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
-import net.coderbot.iris.vendored.joml.Vector2f;
-import net.coderbot.iris.vendored.joml.Vector3i;
+import org.joml.Vector2f;
+import org.joml.Vector3i;
 import org.lwjgl.opengl.GL43C;
 
 public final class ComputeProgram extends GlResource {
@@ -55,7 +56,7 @@ public final class ComputeProgram extends GlResource {
 	}
 
 	public void dispatch(float width, float height) {
-		ProgramManager.glUseProgram(getGlId());
+		IrisRenderSystem.useProgram(getGlId());
 		uniforms.update();
 		samplers.update();
 		images.update();
@@ -69,11 +70,11 @@ public final class ComputeProgram extends GlResource {
 
 	public static void unbind() {
 		ProgramUniforms.clearActiveUniforms();
-		ProgramManager.glUseProgram(0);
+		IrisRenderSystem.useProgram(0);
 	}
 
 	public void destroyInternal() {
-		GlStateManager.glDeleteProgram(getGlId());
+		GL20.glDeleteProgram(getGlId());
 	}
 
 	/**

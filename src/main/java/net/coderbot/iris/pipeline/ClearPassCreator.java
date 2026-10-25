@@ -1,7 +1,8 @@
 package net.coderbot.iris.pipeline;
 
+import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.coderbot.iris.rendertarget.RenderTarget;
@@ -9,8 +10,8 @@ import net.coderbot.iris.rendertarget.RenderTargets;
 import net.coderbot.iris.shaderpack.PackRenderTargetDirectives;
 import net.coderbot.iris.shaderpack.PackShadowDirectives;
 import net.coderbot.iris.shadows.ShadowRenderTargets;
-import net.coderbot.iris.vendored.joml.Vector2i;
-import net.coderbot.iris.vendored.joml.Vector4f;
+import org.joml.Vector2i;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL21C;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class ClearPassCreator {
 	public static ImmutableList<ClearPass> createClearPasses(RenderTargets renderTargets, boolean fullClear,
 															 PackRenderTargetDirectives renderTargetDirectives) {
-		final int maxDrawBuffers = GlStateManager._getInteger(GL21C.GL_MAX_DRAW_BUFFERS);
+		final int maxDrawBuffers = GL11.glGetInteger(GL21C.GL_MAX_DRAW_BUFFERS);
 
 		// Sort buffers by their clear color so we can group up glClear calls.
 		Map<Vector2i, Map<ClearPassInformation, IntList>> clearByColor = new HashMap<>();
@@ -82,7 +83,7 @@ public class ClearPassCreator {
 
 	public static ImmutableList<ClearPass> createShadowClearPasses(ShadowRenderTargets renderTargets, boolean fullClear,
 																   PackShadowDirectives renderTargetDirectives) {
-		final int maxDrawBuffers = GlStateManager._getInteger(GL21C.GL_MAX_DRAW_BUFFERS);
+		final int maxDrawBuffers = GL11.glGetInteger(GL21C.GL_MAX_DRAW_BUFFERS);
 
 		// Sort buffers by their clear color so we can group up glClear calls.
 		Map<Vector4f, IntList> clearByColor = new HashMap<>();

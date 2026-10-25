@@ -1,7 +1,8 @@
 package net.coderbot.iris.gl.program;
 
+import org.lwjgl.opengl.GL20;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.uniform.DynamicLocationalUniformHolder;
@@ -52,7 +53,7 @@ public class ProgramUniforms {
 	}
 
 	private static long getCurrentTick() {
-		return Objects.requireNonNull(Minecraft.getInstance().level).getGameTime();
+		return Objects.requireNonNull(Minecraft.getInstance().world).getTime();
 	}
 
 	public void update() {
@@ -180,7 +181,7 @@ public class ProgramUniforms {
 		public ProgramUniforms buildUniforms() {
 			// Check for any unsupported uniforms and warn about them so that we can easily figure out what uniforms we
 			// need to add.
-			int activeUniforms = GlStateManager.glGetProgrami(program, GL20C.GL_ACTIVE_UNIFORMS);
+			int activeUniforms = GL20.glGetProgrami(program, GL20C.GL_ACTIVE_UNIFORMS);
 			IntBuffer sizeBuf = BufferUtils.createIntBuffer(1);
 			IntBuffer typeBuf = BufferUtils.createIntBuffer(1);
 

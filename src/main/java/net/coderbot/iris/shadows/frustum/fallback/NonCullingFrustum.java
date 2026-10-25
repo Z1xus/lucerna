@@ -1,16 +1,21 @@
-package net.irisshaders.iris.shadows.frustum.fallback;
+package net.coderbot.iris.shadows.frustum.fallback;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.client.render.Culler;
+import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 
-public class NonCullingFrustum extends Frustum implements ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum {
+public class NonCullingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum {
+	private final Vector3d pos = new Vector3d();
+
 	public NonCullingFrustum() {
-		super(new Matrix4f(), new Matrix4f());
+	}
+
+	@Override
+	public void prepare(double cameraX, double cameraY, double cameraZ) {
+		pos.set(cameraX, cameraY, cameraZ);
 	}
 
 	// For Immersive Portals
@@ -21,16 +26,13 @@ public class NonCullingFrustum extends Frustum implements ViewportProvider, org.
 		return false;
 	}
 
-	public boolean isVisible(AABB box) {
+	public boolean isVisible(Box box) {
 		return true;
 	}
 
-    private final Vector3d pos = new Vector3d();
-
     @Override
     public Viewport sodium$createViewport() {
-        var camPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        return new Viewport(this, pos.set(camPos.x, camPos.y, camPos.z));
+        return new Viewport(this, pos);
     }
 
     @Override

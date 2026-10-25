@@ -1,4 +1,4 @@
-package net.irisshaders.iris.shadows.frustum.advanced;
+package net.coderbot.iris.shadows.frustum.advanced;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;

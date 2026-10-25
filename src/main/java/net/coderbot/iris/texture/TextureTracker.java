@@ -1,14 +1,13 @@
 package net.coderbot.iris.texture;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.state.StateUpdateNotifiers;
-import net.coderbot.iris.mixin.GlStateManagerAccessor;
 import net.coderbot.iris.pipeline.WorldRenderingPipeline;
-import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.render.texture.AbstractTexture;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL20C;
 
@@ -41,7 +40,7 @@ public class TextureTracker {
 		if (lockBindCallback) {
 			return;
 		}
-		if (GlStateManagerAccessor.getActiveTexture() == 0) {
+		if (GlStateManager.texture == 0) {
 			lockBindCallback = true;
 			if (bindTextureListener != null) {
 				bindTextureListener.run();

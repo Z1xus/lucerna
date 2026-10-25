@@ -1,23 +1,31 @@
 package net.coderbot.iris.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.texture.DynamicTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRenderer.class)
 public interface GameRendererAccessor {
-	@Accessor
-	boolean getRenderHand();
+	@Accessor("lightmapTexture")
+	DynamicTexture getLightMapTexture();
 
-	@Accessor
-	boolean getPanoramicMode();
+	@Accessor("renderDistance")
+	float getRenderDistance();
 
-	@Invoker
-	void invokeBobView(PoseStack poseStack, float tickDelta);
+	@Accessor("newCamPitch")
+	boolean shouldRenderHand();
 
-	@Invoker
-	void invokeBobHurt(PoseStack poseStack, float tickDelta);
+	@Invoker("getFov")
+	float invokeGetFov(float tickDelta, boolean fovChanged);
+
+	@Invoker("applyHurtCam")
+	void invokeApplyHurtCam(float tickDelta);
+
+	@Invoker("applyViewBobbing")
+	void invokeApplyViewBobbing(float tickDelta);
+
+	@Invoker("setupFog")
+	void invokeSetupFog(int mode, float tickDelta);
 }

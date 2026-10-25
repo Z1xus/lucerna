@@ -1,13 +1,14 @@
 package net.coderbot.iris.pipeline;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexBuffer;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix4f;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
+import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+
+import java.nio.FloatBuffer;
 
 /**
  * Renders the sky horizon. Vanilla Minecraft simply uses the "clear color" for its horizon, and then draws a plane
@@ -40,45 +41,47 @@ public class HorizonRenderer {
 	 * Sine of 22.5 degrees.
 	 */
 	private static final double SIN_22_5 = Math.sin(Math.toRadians(22.5));
-	private VertexBuffer buffer;
+	private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+	private int buffer;
+	private int vertexCount;
 	private int currentRenderDistance;
 
 	public HorizonRenderer() {
-		currentRenderDistance = Minecraft.getInstance().options.renderDistance;
+		currentRenderDistance = Minecraft.getInstance().options.viewDistance;
 
 		rebuildBuffer();
 	}
 
 	private void rebuildBuffer() {
-		if (this.buffer != null) {
-			this.buffer.close();
+		if (this.buffer != 0) {
+			GL15.glDeleteBuffers(this.buffer);
 		}
 
-		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-
 		// Build the horizon quads into a buffer
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION);
-		buildHorizon(currentRenderDistance * 16, buffer);
-		buffer.end();
+		FloatArrayList vertices = new FloatArrayList();
+		buildHorizon(currentRenderDistance * 16, vertices);
+		this.vertexCount = vertices.size() / 3;
 
-		this.buffer = new VertexBuffer(DefaultVertexFormat.POSITION);
-		this.buffer.bind();
-		this.buffer.upload(buffer);
-		VertexBuffer.unbind();
+		this.buffer = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.buffer);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices.toFloatArray(), GL15.GL_STATIC_DRAW);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 
-	private void buildQuad(VertexConsumer consumer, double x1, double z1, double x2, double z2) {
-		consumer.vertex(x1, BOTTOM, z1);
-		consumer.endVertex();
-		consumer.vertex(x1, TOP, z1);
-		consumer.endVertex();
-		consumer.vertex(x2, TOP, z2);
-		consumer.endVertex();
-		consumer.vertex(x2, BOTTOM, z2);
-		consumer.endVertex();
+	private static void vertex(FloatArrayList consumer, double x, double y, double z) {
+		consumer.add((float) x);
+		consumer.add((float) y);
+		consumer.add((float) z);
 	}
 
-	private void buildHalf(VertexConsumer consumer, double adjacent, double opposite, boolean invert) {
+	private void buildQuad(FloatArrayList consumer, double x1, double z1, double x2, double z2) {
+		vertex(consumer, x1, BOTTOM, z1);
+		vertex(consumer, x1, TOP, z1);
+		vertex(consumer, x2, TOP, z2);
+		vertex(consumer, x2, BOTTOM, z2);
+	}
+
+	private void buildHalf(FloatArrayList consumer, double adjacent, double opposite, boolean invert) {
 		if (invert) {
 			adjacent = -adjacent;
 			opposite = -opposite;
@@ -104,49 +107,41 @@ public class HorizonRenderer {
 	 * @param opposite the opposite side length of the a triangle with a hypotenuse extending from the center of the
 	 *                 octagon to a given vertex on the perimeter.
 	 */
-	private void buildOctagonalPrism(VertexConsumer consumer, double adjacent, double opposite) {
+	private void buildOctagonalPrism(FloatArrayList consumer, double adjacent, double opposite) {
 		buildHalf(consumer, adjacent, opposite, false);
 		buildHalf(consumer, adjacent, opposite, true);
 	}
 
-	private void buildRegularOctagonalPrism(VertexConsumer consumer, double radius) {
+	private void buildRegularOctagonalPrism(FloatArrayList consumer, double radius) {
 		buildOctagonalPrism(consumer, radius * COS_22_5, radius * SIN_22_5);
 	}
 
-	private void buildBottomPlane(VertexConsumer consumer, int radius) {
+	private void buildBottomPlane(FloatArrayList consumer, int radius) {
 		for (int x = -radius; x <= radius; x += 64) {
 			for (int z = -radius; z <= radius; z += 64) {
-				consumer.vertex(x + 64, BOTTOM, z);
-				consumer.endVertex();
-				consumer.vertex(x, BOTTOM, z);
-				consumer.endVertex();
-				consumer.vertex(x, BOTTOM, z + 64);
-				consumer.endVertex();
-				consumer.vertex(x + 64, BOTTOM, z + 64);
-				consumer.endVertex();
+				vertex(consumer, x + 64, BOTTOM, z);
+				vertex(consumer, x, BOTTOM, z);
+				vertex(consumer, x, BOTTOM, z + 64);
+				vertex(consumer, x + 64, BOTTOM, z + 64);
 			}
 		}
 	}
 
-	private void buildTopPlane(VertexConsumer consumer, int radius) {
+	private void buildTopPlane(FloatArrayList consumer, int radius) {
 		// You might be tempted to try to combine this with buildBottomPlane to avoid code duplication,
 		// but that won't work since the winding order has to be reversed or else one of the planes will be
 		// discarded by back face culling.
 		for (int x = -radius; x <= radius; x += 64) {
 			for (int z = -radius; z <= radius; z += 64) {
-				consumer.vertex(x + 64, TOP, z);
-				consumer.endVertex();
-				consumer.vertex(x + 64, TOP, z + 64);
-				consumer.endVertex();
-				consumer.vertex(x, TOP, z + 64);
-				consumer.endVertex();
-				consumer.vertex(x, TOP, z);
-				consumer.endVertex();
+				vertex(consumer, x + 64, TOP, z);
+				vertex(consumer, x + 64, TOP, z + 64);
+				vertex(consumer, x, TOP, z + 64);
+				vertex(consumer, x, TOP, z);
 			}
 		}
 	}
 
-	private void buildHorizon(int radius, VertexConsumer consumer) {
+	private void buildHorizon(int radius, FloatArrayList consumer) {
 		if (radius > 256) {
 			// Prevent the prism from getting too large, this causes issues on some shader packs that modify the vanilla
 			// sky if we don't do this.
@@ -164,19 +159,26 @@ public class HorizonRenderer {
 	}
 
 	public void renderHorizon(Matrix4f matrix) {
-		if (currentRenderDistance != Minecraft.getInstance().options.renderDistance) {
-			currentRenderDistance = Minecraft.getInstance().options.renderDistance;
+		if (currentRenderDistance != Minecraft.getInstance().options.viewDistance) {
+			currentRenderDistance = Minecraft.getInstance().options.viewDistance;
 			rebuildBuffer();
 		}
 
-		buffer.bind();
-		DefaultVertexFormat.POSITION.setupBufferState(0L);
-		buffer.draw(matrix, GL11.GL_QUADS);
-		DefaultVertexFormat.POSITION.clearBufferState();
-		VertexBuffer.unbind();
+		GlStateManager.pushMatrix();
+		matrix.get(matrixBuffer);
+		GL11.glLoadMatrixf(matrixBuffer);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
+		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+		GL11.glVertexPointer(3, GL11.GL_FLOAT, 12, 0L);
+		GL11.glDrawArrays(GL11.GL_QUADS, 0, vertexCount);
+		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+		GlStateManager.popMatrix();
 	}
 
 	public void destroy() {
-		buffer.close();
+		GL15.glDeleteBuffers(buffer);
 	}
 }

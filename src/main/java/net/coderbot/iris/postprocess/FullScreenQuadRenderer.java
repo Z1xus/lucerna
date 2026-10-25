@@ -1,10 +1,10 @@
 package net.coderbot.iris.postprocess;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import org.lwjgl.opengl.GL15;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20C;
 
 /**
@@ -29,40 +29,45 @@ public class FullScreenQuadRenderer {
 
 	@SuppressWarnings("deprecation")
 	public void begin() {
-		RenderSystem.disableDepthTest();
+		GlStateManager.disableDepthTest();
 
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
+		GlStateManager.matrixMode(GL11.GL_PROJECTION);
+		GlStateManager.pushMatrix();
+		GlStateManager.loadIdentity();
 		// scale the quad from [0, 1] to [-1, 1]
-		RenderSystem.translatef(-1.0F, -1.0F, 0.0F);
-		RenderSystem.scalef(2.0F, 2.0F, 0.0F);
+		GlStateManager.translatef(-1.0F, -1.0F, 0.0F);
+		GlStateManager.scalef(2.0F, 2.0F, 0.0F);
 
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
+		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+		GlStateManager.pushMatrix();
+		GlStateManager.loadIdentity();
 
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-		GlStateManager._glBindBuffer(GL20C.GL_ARRAY_BUFFER, quadBuffer);
-		DefaultVertexFormat.POSITION_TEX.setupBufferState(0L);
+		GL15.glBindBuffer(GL20C.GL_ARRAY_BUFFER, quadBuffer);
+		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+		GL11.glVertexPointer(3, GL11.GL_FLOAT, 20, 0L);
+		GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+		GL11.glTexCoordPointer(2, GL11.GL_FLOAT, 20, 12L);
 	}
 
 	public void renderQuad() {
-		GlStateManager._drawArrays(GL20C.GL_TRIANGLE_STRIP, 0, 4);
+		GL11.glDrawArrays(GL20C.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	@SuppressWarnings("deprecation")
 	public static void end() {
-		DefaultVertexFormat.POSITION_TEX.clearBufferState();
-		GlStateManager._glBindBuffer(GL20C.GL_ARRAY_BUFFER, 0);
+		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+		GL15.glBindBuffer(GL20C.GL_ARRAY_BUFFER, 0);
 
-		RenderSystem.enableDepthTest();
+		GlStateManager.enableDepthTest();
 
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
-		RenderSystem.popMatrix();
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		RenderSystem.popMatrix();
+		GlStateManager.matrixMode(GL11.GL_PROJECTION);
+		GlStateManager.popMatrix();
+		GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+		GlStateManager.popMatrix();
 	}
 
 	/**

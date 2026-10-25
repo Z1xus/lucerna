@@ -1,8 +1,8 @@
-package net.irisshaders.iris.shadows.frustum.advanced;
+package net.coderbot.iris.shadows.frustum.advanced;
 
-import net.irisshaders.iris.shadows.frustum.BoxCuller;
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.world.phys.AABB;
+import net.coderbot.iris.shadows.frustum.BoxCuller;
+import net.minecraft.client.render.Culler;
+import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.embeddedt.embeddium.impl.render.viewport.frustum.ShadowSearchFrustum;
@@ -29,7 +29,7 @@ import org.joml.Math;
  * are not sensitive to the specific internal ordering of planes and corners, in order to avoid potential bugs at the
  * cost of slightly more computations.</p>
  */
-public class AdvancedShadowCullingFrustum extends Frustum implements ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum, ShadowSearchFrustum {
+public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum, ShadowSearchFrustum {
 	private static final int MAX_CLIPPING_PLANES = 13;
 
 	protected final BoxCuller boxCuller;
@@ -67,14 +67,11 @@ public class AdvancedShadowCullingFrustum extends Frustum implements ViewportPro
 	public double x;
 	public double y;
 	public double z;
-	private int worldMinYDH;
-	private int worldMaxYDH;
 	private int planeCount = 0;
 
 	public AdvancedShadowCullingFrustum(Matrix4f playerView, Matrix4f playerProjection, Vector3f shadowLightVectorFromOrigin,
 										BoxCuller boxCuller) {
 		// We're overriding all of the methods, don't pass any matrices down.
-		super(new org.joml.Matrix4f(), new org.joml.Matrix4f());
 
 		this.shadowLightVectorFromOrigin = shadowLightVectorFromOrigin;
 		BaseClippingPlanes baseClippingPlanes = new BaseClippingPlanes(playerView, playerProjection);
@@ -280,7 +277,7 @@ public class AdvancedShadowCullingFrustum extends Frustum implements ViewportPro
 	}
 
 	@Override
-	public boolean isVisible(AABB aabb) {
+	public boolean isVisible(Box aabb) {
 		if (boxCuller != null && boxCuller.isCulled(aabb)) {
 			return false;
 		}
@@ -317,12 +314,12 @@ public class AdvancedShadowCullingFrustum extends Frustum implements ViewportPro
 	/**
 	 * Checks corner visibility.
 	 *
-	 * @param minX Minimum X value of the AABB.
-	 * @param minY Minimum Y value of the AABB.
-	 * @param minZ Minimum Z value of the AABB.
-	 * @param maxX Maximum X value of the AABB.
-	 * @param maxY Maximum Y value of the AABB.
-	 * @param maxZ Maximum Z value of the AABB.
+	 * @param minX Minimum X value of the Box.
+	 * @param minY Minimum Y value of the Box.
+	 * @param minZ Minimum Z value of the Box.
+	 * @param maxX Maximum X value of the Box.
+	 * @param maxY Maximum Y value of the Box.
+	 * @param maxZ Maximum Z value of the Box.
 	 * @return 0 if nothing is visible, 1 if everything is visible, 2 if only some corners are visible.
 	 */
 	protected int checkCornerVisibility(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
@@ -366,12 +363,12 @@ public class AdvancedShadowCullingFrustum extends Frustum implements ViewportPro
 	/**
 	 * Checks corner visibility.
 	 *
-	 * @param minX Minimum X value of the AABB.
-	 * @param minY Minimum Y value of the AABB.
-	 * @param minZ Minimum Z value of the AABB.
-	 * @param maxX Maximum X value of the AABB.
-	 * @param maxY Maximum Y value of the AABB.
-	 * @param maxZ Maximum Z value of the AABB.
+	 * @param minX Minimum X value of the Box.
+	 * @param minY Minimum Y value of the Box.
+	 * @param minZ Minimum Z value of the Box.
+	 * @param maxX Maximum X value of the Box.
+	 * @param maxY Maximum Y value of the Box.
+	 * @param maxZ Maximum Z value of the Box.
 	 * @return true if visible, false if not.
 	 */
 	public boolean checkCornerVisibilityBool(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {

@@ -1,17 +1,17 @@
 package net.coderbot.iris.uniforms;
 
-import com.mojang.math.Matrix4f;
 import net.coderbot.iris.gl.state.ValueUpdateNotifier;
-import net.coderbot.iris.vendored.joml.Vector3d;
 import net.minecraft.client.Minecraft;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
 
 public class CapturedRenderingState {
 	public static final CapturedRenderingState INSTANCE = new CapturedRenderingState();
 
 	private static final Vector3d ZERO_VECTOR_3d = new Vector3d();
 
-	private Matrix4f gbufferModelView;
-	private Matrix4f gbufferProjection;
+	private final Matrix4f gbufferModelView = new Matrix4f();
+	private final Matrix4f gbufferProjection = new Matrix4f();
 	private Vector3d fogColor;
 	private float tickDelta;
 	private int currentRenderedBlockEntity;
@@ -28,7 +28,7 @@ public class CapturedRenderingState {
 	}
 
 	public void setGbufferModelView(Matrix4f gbufferModelView) {
-		this.gbufferModelView = gbufferModelView.copy();
+		this.gbufferModelView.set(gbufferModelView);
 	}
 
 	public Matrix4f getGbufferProjection() {
@@ -36,11 +36,11 @@ public class CapturedRenderingState {
 	}
 
 	public void setGbufferProjection(Matrix4f gbufferProjection) {
-		this.gbufferProjection = gbufferProjection.copy();
+		this.gbufferProjection.set(gbufferProjection);
 	}
 
 	public Vector3d getFogColor() {
-		if (Minecraft.getInstance().level == null || fogColor == null) {
+		if (Minecraft.getInstance().world == null || fogColor == null) {
 			return ZERO_VECTOR_3d;
 		}
 

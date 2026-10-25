@@ -1,7 +1,6 @@
 package net.coderbot.iris.gl.program;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.coderbot.iris.gl.IrisRenderSystem;
 import net.coderbot.iris.gl.image.ImageHolder;
 import net.coderbot.iris.gl.sampler.SamplerHolder;
@@ -33,7 +32,6 @@ public class ProgramBuilder extends ProgramUniforms.Builder implements SamplerHo
 
 	public static ProgramBuilder begin(String name, @Nullable String vertexSource, @Nullable String geometrySource,
 									   @Nullable String fragmentSource, ImmutableSet<Integer> reservedTextureUnits) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
 		GlShader vertex;
 		GlShader geometry;
@@ -69,7 +67,6 @@ public class ProgramBuilder extends ProgramUniforms.Builder implements SamplerHo
 	}
 
 	public static ProgramBuilder beginCompute(String name, @Nullable String source, ImmutableSet<Integer> reservedTextureUnits) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
 		if (!IrisRenderSystem.supportsCompute()) {
 			throw new IllegalStateException("This PC does not support compute shaders, but it's attempting to be used???");

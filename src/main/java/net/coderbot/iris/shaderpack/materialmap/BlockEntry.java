@@ -23,6 +23,16 @@ public class BlockEntry {
 	 * @param entry The string representation of the entry. Must not be empty.
 	 */
 	@NotNull
+	public static final String LEGACY_METADATA = "<metadata>";
+
+	private static boolean isLegacyId(String part) {
+		return !part.isEmpty() && part.chars().allMatch(Character::isDigit);
+	}
+
+	private static boolean isLegacyMetadata(String part) {
+		return !part.isEmpty() && part.chars().allMatch(c -> Character.isDigit(c) || c == ',');
+	}
+
 	public static BlockEntry parse(@NotNull String entry) {
 		if (entry.isEmpty()) {
 			throw new IllegalArgumentException("Called BlockEntry::parse with an empty string");
@@ -34,6 +44,20 @@ public class BlockEntry {
 		// Trivial case: no states, no namespace
 		if (splitStates.length == 1) {
 			return new BlockEntry(new NamespacedId("minecraft", entry), Collections.emptyMap());
+		}
+
+		// Legacy OptiFine entries can use numeric block ids and metadata values, like "18:0,4,8" or "minecraft:leaves:0"
+		if (isLegacyId(splitStates[0]) || splitStates.length > 2 && isLegacyMetadata(splitStates[2])) {
+			boolean numeric = isLegacyId(splitStates[0]);
+			NamespacedId id = numeric ? new NamespacedId("minecraft", splitStates[0]) : new NamespacedId(splitStates[0], splitStates[1]);
+			Map<String, String> map = new HashMap<>();
+			int metadataIndex = numeric ? 1 : 2;
+
+			if (splitStates.length > metadataIndex) {
+				map.put(LEGACY_METADATA, splitStates[metadataIndex]);
+			}
+
+			return new BlockEntry(id, map);
 		}
 
 		// Less trivial case: no states involved, just a namespace
