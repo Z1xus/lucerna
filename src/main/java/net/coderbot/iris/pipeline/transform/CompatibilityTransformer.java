@@ -75,6 +75,11 @@ public class CompatibilityTransformer {
 			}
 		}
 
+		// writing both is a link error on strict drivers, optifine treats gl_FragColor as gl_FragData[0]
+		if (parameters.type == PatchShaderType.FRAGMENT && root.identifierIndex.has("gl_FragColor") && root.identifierIndex.has("gl_FragData")) {
+			root.replaceReferenceExpressions(t, "gl_FragColor", "gl_FragData[0]");
+		}
+
 		/**
 		 * Removes const storage qualifier from declarations in functions if they are
 		 * initialized with const parameters. Const parameters are immutable parameters
