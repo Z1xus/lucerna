@@ -4,9 +4,10 @@ import dev.rdh.argentum.impl.Argentum;
 import dev.rdh.argentum.impl.config.ArgentumConfig;
 
 // these argentum renderers draw with their own programs, so they are off while a shader pack is loaded
+// entity instancing stays on, it draws through the pack programs, see InstancedEntityPrograms
 public final class ArgentumCompat {
 	private static boolean applied;
-	private static boolean entityInstancing;
+	private static boolean instancingDisabled;
 	private static boolean fasterClouds;
 	private static boolean fasterWeather;
 	private static boolean fasterEndPortals;
@@ -43,18 +44,30 @@ public final class ArgentumCompat {
 	}
 
 	private static void disable(ArgentumConfig config) {
-		entityInstancing = config.entityInstancing;
 		fasterClouds = config.fasterClouds;
 		fasterWeather = config.fasterWeather;
 		fasterEndPortals = config.fasterEndPortals;
-		config.entityInstancing = false;
 		config.fasterClouds = false;
 		config.fasterWeather = false;
 		config.fasterEndPortals = false;
 	}
 
+	// for shader packs whose entity program cannot draw argentum's instanced models
+	public static void disableEntityInstancing() {
+		ArgentumConfig config = Argentum.CONFIG;
+
+		if (applied && !instancingDisabled && config.entityInstancing) {
+			instancingDisabled = true;
+			config.entityInstancing = false;
+		}
+	}
+
 	private static void restore(ArgentumConfig config) {
-		config.entityInstancing = entityInstancing;
+		if (instancingDisabled) {
+			instancingDisabled = false;
+			config.entityInstancing = true;
+		}
+
 		config.fasterClouds = fasterClouds;
 		config.fasterWeather = fasterWeather;
 		config.fasterEndPortals = fasterEndPortals;

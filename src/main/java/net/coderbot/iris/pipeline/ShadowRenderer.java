@@ -2,6 +2,7 @@ package net.coderbot.iris.pipeline;
 
 import com.google.common.collect.ImmutableList;
 import dev.rdh.argentum.impl.ext.WorldRendererExtension;
+import dev.rdh.argentum.impl.render.entity.instancing.EntityInstancing;
 import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
 import net.coderbot.iris.Iris;
 import net.coderbot.iris.gl.IrisRenderSystem;
@@ -32,6 +33,7 @@ import net.minecraft.client.render.world.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.player.PlayerEntity;
 import net.minecraft.util.profiler.Profiler;
+import org.embeddedt.embeddium.impl.gl.device.CommandList;
 import org.embeddedt.embeddium.impl.gl.device.RenderDevice;
 import org.embeddedt.embeddium.impl.render.chunk.ChunkRenderMatrices;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
@@ -376,10 +378,24 @@ public class ShadowRenderer {
 
 		client.gameRenderer.enableLightMap();
 
+		// argentum instances the entity models, flushed while the shadow matrices are still loaded
+		EntityInstancing instancing = EntityInstancing.current();
+		boolean instanced = instancing != null && instancing.resumeBatch();
+
 		if (shouldRenderEntities) {
 			renderEntities(dispatcher, entityShadowFrustum, cameraX, cameraY, cameraZ, tickDelta);
 		} else if (shouldRenderPlayer) {
 			renderPlayerEntity(dispatcher, entityShadowFrustum, cameraX, cameraY, cameraZ, tickDelta);
+		}
+
+		if (instanced) {
+			RenderDevice.enterManagedCode();
+
+			try (CommandList commandList = RenderDevice.INSTANCE.createCommandList()) {
+				instancing.flush(commandList);
+			} finally {
+				RenderDevice.exitManagedCode();
+			}
 		}
 
 		profiler.swap("blockentities");

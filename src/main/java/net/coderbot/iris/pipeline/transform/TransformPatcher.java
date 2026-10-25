@@ -160,6 +160,9 @@ public class TransformPatcher {
 						case SODIUM_TERRAIN:
 							SodiumTerrainTransformer.transform(transformer, tree, root, parameters);
 							break;
+						case INSTANCED_ENTITY:
+							InstancedEntityTransformer.transform(transformer, tree, root, parameters);
+							break;
 						case COMPOSITE:
 							CompositeTransformer.transform(transformer, tree, root);
 							break;
@@ -214,6 +217,10 @@ public class TransformPatcher {
 
 	public static Map<PatchShaderType, String> patchSodiumTerrain(String vertex, String geometry, String fragment) {
 		return transform(vertex, geometry, fragment, new Parameters(Patch.SODIUM_TERRAIN));
+	}
+
+	public static Map<PatchShaderType, String> patchInstancedEntity(String vertex, String fragment) {
+		return transform(vertex, null, fragment, new Parameters(Patch.INSTANCED_ENTITY));
 	}
 
 	public static Map<PatchShaderType, String> patchComposite(String vertex, String geometry, String fragment) {

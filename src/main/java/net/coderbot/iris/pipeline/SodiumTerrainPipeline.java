@@ -2,6 +2,7 @@ package net.coderbot.iris.pipeline;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import net.coderbot.iris.Iris;
 import net.coderbot.iris.compat.celeritas.IrisTerrainPass;
 import net.coderbot.iris.gl.blending.AlphaTest;
 import net.coderbot.iris.gl.blending.AlphaTestOverride;
@@ -72,6 +73,8 @@ public class SodiumTerrainPipeline {
 	private final ProgramSet programSet;
 	private final Map<IrisTerrainPass, PassInfo> passInfoMap = new EnumMap<>(IrisTerrainPass.class);
 	private final Map<IrisTerrainPass, Optional<ProgramSource>> programSources = new EnumMap<>(IrisTerrainPass.class);
+	private final PassInfo entityPassInfo = new PassInfo();
+	private final PassInfo shadowEntityPassInfo = new PassInfo();
 
 	private final IntFunction<ProgramSamplers> createTerrainSamplers;
 	private final IntFunction<ProgramSamplers> createShadowSamplers;
@@ -112,6 +115,16 @@ public class SodiumTerrainPipeline {
 				int[] drawBuffers = programSources.get(pass).map(source -> source.getDirectives().getDrawBuffers()).orElse(new int[] {0});
 				info.framebuffer = targets.createGbufferFramebuffer(flipped, drawBuffers);
 			}
+		}
+
+		Optional<ProgramSource> entitySource = first(programSet.getGbuffersEntities(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
+		int[] entityDrawBuffers = entitySource.map(source -> source.getDirectives().getDrawBuffers()).orElse(new int[] {0});
+		entityPassInfo.framebuffer = targets.createGbufferFramebuffer(flippedAfterPrepare, entityDrawBuffers);
+		patchEntityShaders(entityPassInfo, entitySource, ProgramId.Entities);
+
+		if (createShadowSamplers != null) {
+			shadowEntityPassInfo.framebuffer = shadowFramebuffer.get();
+			patchEntityShaders(shadowEntityPassInfo, programSet.getShadow(), ProgramId.Shadow);
 		}
 
 		this.createTerrainSamplers = createTerrainSamplers;
@@ -156,6 +169,32 @@ public class SodiumTerrainPipeline {
 					result.get(PatchShaderType.VERTEX), result.get(PatchShaderType.GEOMETRY), result.get(PatchShaderType.FRAGMENT));
 			});
 		}
+	}
+
+	private static void patchEntityShaders(PassInfo info, Optional<ProgramSource> source, ProgramId programId) {
+		source.filter(sources -> !sources.getGeometrySource().isPresent()).ifPresent(sources -> {
+			info.blendModeOverride = sources.getDirectives().getBlendModeOverride().orElse(programId.getBlendModeOverride());
+			info.bufferOverrides = new ArrayList<>();
+			sources.getDirectives().getBufferBlendOverrides().forEach(information -> {
+				int index = Ints.indexOf(sources.getDirectives().getDrawBuffers(), information.getIndex());
+				if (index > -1) {
+					info.bufferOverrides.add(new BufferBlendOverride(index, information.getBlendMode()));
+				}
+			});
+
+			try {
+				Map<PatchShaderType, String> result = TransformPatcher.patchInstancedEntity(sources.getVertexSource().orElse(null), sources.getFragmentSource().orElse(null));
+				info.sources.putAll(result);
+				PatchedShaderPrinter.debugPatchedShaders(sources.getName() + "_instanced", result.get(PatchShaderType.VERTEX), null, result.get(PatchShaderType.FRAGMENT));
+			} catch (RuntimeException e) {
+				// argentum draws these entities with display lists instead
+				Iris.logger.warn("Failed to patch " + sources.getName() + " for instanced entities", e);
+			}
+		});
+	}
+
+	public PassInfo getEntityPassInfo(boolean shadow) {
+		return shadow ? shadowEntityPassInfo : entityPassInfo;
 	}
 
 	public ProgramUniforms initUniforms(int programId) {

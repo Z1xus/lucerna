@@ -3,5 +3,6 @@ package net.coderbot.iris.pipeline.transform;
 enum Patch {
 	ATTRIBUTES,
 	SODIUM_TERRAIN,
+	INSTANCED_ENTITY,
 	COMPOSITE
 }

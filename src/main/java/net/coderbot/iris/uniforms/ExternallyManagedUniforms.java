@@ -17,6 +17,20 @@ public class ExternallyManagedUniforms {
 		uniformHolder.externallyManagedUniform("iris_NormalMatrix", UniformType.MAT3);
 		uniformHolder.externallyManagedUniform("u_RegionOffset", UniformType.VEC3);
 		addFloat(uniformHolder, "iris_currentAlphaTest");
+
+		// argentum instanced entities, see InstancedEntityTransformer
+		for (String name : new String[] { "uTexture", "uLightmap", "uBoxInstancing", "uGlintPass", "uChargePass", "uItemGlintPass", "uAlphaPass", "uEyeLight", "uLit", "uLightmapped", "u_FogShape" }) {
+			uniformHolder.externallyManagedUniform(name, UniformType.INT);
+		}
+
+		addMat4(uniformHolder, "uItemGlintMatrix");
+		addMat4(uniformHolder, "uItemGlintMatrix1");
+		uniformHolder.externallyManagedUniform("uLightDirection0", UniformType.VEC3);
+		uniformHolder.externallyManagedUniform("uLightDirection1", UniformType.VEC3);
+		addVec4(uniformHolder, "u_FogColor");
+		addFloat(uniformHolder, "u_FogDensity");
+		addFloat(uniformHolder, "u_FogStart");
+		addFloat(uniformHolder, "u_FogEnd");
 	}
 
 	private static void addMat4(UniformHolder uniformHolder, String name) {
