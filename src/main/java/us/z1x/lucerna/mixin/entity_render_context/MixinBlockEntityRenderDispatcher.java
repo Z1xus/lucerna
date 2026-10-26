@@ -34,7 +34,8 @@ public class MixinBlockEntityRenderDispatcher {
 
         Object2IntMap<BlockState> blockStateIds = BlockRenderingSettings.INSTANCE.getBlockStateIds();
 
-        if (blockStateIds != null) {
+        // block entities drawn as items have no world to read the block from
+        if (blockStateIds != null && blockEntity.hasWorld()) {
             Block block = blockEntity.getBlock();
             CapturedRenderingState.INSTANCE.setCurrentBlockEntity(blockStateIds.getInt(block.getStateFromMetadata(blockEntity.getBlockMetadata())));
         }
