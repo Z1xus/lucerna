@@ -419,9 +419,16 @@ public class ShadowRenderer {
 
         profiler.swap("translucent terrain");
 
+        // entity items and their glint leave their own blend state, so set the one vanilla uses for translucents
+        GlStateManager.enableBlend();
+        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+
         if (shouldRenderTerrain && shouldRenderTranslucent) {
             worldRenderer.render(BlockLayer.TRANSLUCENT, tickDelta, 0, camera);
         }
+
+        GlStateManager.disableBlend();
 
         debugStringTerrain = renderer.getChunksDebugString();
 

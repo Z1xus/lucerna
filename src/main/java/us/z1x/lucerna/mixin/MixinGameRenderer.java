@@ -169,6 +169,8 @@ public abstract class MixinGameRenderer {
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         HandRenderer.INSTANCE.renderSolid(tickDelta, lucerna$pipeline);
+        // the item glint leaves a different alpha blend func, so restore the one vanilla set for translucents
+        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
         GlStateManager.enableBlend();
         GlStateManager.depthMask(false);
 
