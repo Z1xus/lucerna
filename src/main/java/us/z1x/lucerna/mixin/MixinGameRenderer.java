@@ -217,6 +217,12 @@ public abstract class MixinGameRenderer {
         lucerna$pipeline.setPhase(WorldRenderingPhase.NONE);
     }
 
+    // vanilla skips the sky below 4 chunks, but packs expect the sky pass at any render distance
+    @ModifyExpressionValue(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "FIELD", target = "Lnet/minecraft/client/options/GameOptions;viewDistance:I"))
+    private int lucerna$alwaysRenderSky(int viewDistance) {
+        return IrisApi.getInstance().isShaderPackInUse() ? Math.max(viewDistance, 4) : viewDistance;
+    }
+
     // the hand goes into the gbuffers before the translucent terrain, so skip the vanilla hand pass
     @ModifyExpressionValue(method = LUCERNA_RENDER_WORLD_PASS, at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;newCamPitch:Z"))
     private boolean lucerna$skipVanillaHand(boolean renderHand) {
