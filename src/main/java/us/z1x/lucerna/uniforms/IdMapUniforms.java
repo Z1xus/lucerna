@@ -42,14 +42,23 @@ public final class IdMapUniforms {
 
         public void update() {
             LocalClientPlayerEntity player = Minecraft.getInstance().player;
-            ItemStack heldStack = player == null ? null : player.getItemInHand();
-            Item heldItem = heldStack == null ? null : heldStack.getItem();
 
-            if (heldItem == null) {
+            if (player == null) {
                 intID = -1;
                 lightValue = 0;
                 return;
             }
+
+            ItemStack heldStack = player.getItemInHand();
+
+            // 1.8.9 has no air item, but iris reports an empty hand as minecraft:air
+            if (heldStack == null) {
+                intID = itemIdMap.applyAsInt(new NamespacedId("minecraft", "air"));
+                lightValue = 0;
+                return;
+            }
+
+            Item heldItem = heldStack.getItem();
 
             Identifier heldItemId = Item.REGISTRY.getKey(heldItem);
             intID = itemIdMap.applyAsInt(new NamespacedId(heldItemId.getNamespace(), heldItemId.getPath()));
