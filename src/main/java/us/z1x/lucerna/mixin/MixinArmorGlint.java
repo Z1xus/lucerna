@@ -1,0 +1,21 @@
+package us.z1x.lucerna.mixin;
+
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
+import us.z1x.lucerna.layer.GbufferPrograms;
+import net.minecraft.client.render.entity.layer.AbstractArmorLayer;
+import net.minecraft.client.render.model.Model;
+import net.minecraft.entity.living.LivingEntity;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(AbstractArmorLayer.class)
+public class MixinArmorGlint {
+    @WrapMethod(method = "renderEnchantmentGlint")
+    private void lucerna$renderGlint(LivingEntity entity, Model model, float limbAngle, float limbDistance, float tickDelta, float age, float headYaw,
+                                     float headPitch, float scale, Operation<Void> original) {
+        GbufferPrograms.setupSpecialRenderCondition(SpecialCondition.GLINT);
+        original.call(entity, model, limbAngle, limbDistance, tickDelta, age, headYaw, headPitch, scale);
+        GbufferPrograms.teardownSpecialRenderCondition(SpecialCondition.GLINT);
+    }
+}
