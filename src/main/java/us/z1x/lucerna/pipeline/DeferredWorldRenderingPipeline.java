@@ -51,6 +51,8 @@ import us.z1x.lucerna.shaderpack.ProgramSource;
 import us.z1x.lucerna.shaderpack.loading.ProgramId;
 import us.z1x.lucerna.shaderpack.texture.TextureStage;
 import us.z1x.lucerna.shadows.ShadowRenderTargets;
+import us.z1x.lucerna.texture.pbr.PBRTextureManager;
+import us.z1x.lucerna.texture.pbr.PBRTextures;
 import us.z1x.lucerna.uniforms.CapturedRenderingState;
 import us.z1x.lucerna.uniforms.CommonUniforms;
 import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
@@ -1308,5 +1310,14 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
     @Override
     public void onBindTexture(int id) {
+        PBRTextures textures = PBRTextureManager.INSTANCE.getTextures(id);
+        int normal = textures.normal() != 0 ? textures.normal() : defaultNormal.getGlId();
+        int specular = textures.specular() != 0 ? textures.specular() : defaultSpecular.getGlId();
+
+        if (normal != currentNormalTexture || specular != currentSpecularTexture) {
+            currentNormalTexture = normal;
+            currentSpecularTexture = specular;
+            PBRTextureManager.notifyTexturesChanged();
+        }
     }
 }

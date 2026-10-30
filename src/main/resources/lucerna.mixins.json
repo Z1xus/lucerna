@@ -8,6 +8,7 @@
   },
   "client": [
     "GameRendererAccessor",
+    "MixinAbstractTexture",
     "MixinBufferUploader",
     "MixinEntityRenderer",
     "MixinGLX",
@@ -24,6 +25,8 @@
     "MixinRenderTarget",
     "MixinShadowNameTags",
     "MixinSpecialConditions",
+    "MixinTextureAtlasSprite",
+    "MixinTextureManager",
     "MixinTitleScreen",
     "MixinVertexBuffer",
     "MixinWorldRenderer",

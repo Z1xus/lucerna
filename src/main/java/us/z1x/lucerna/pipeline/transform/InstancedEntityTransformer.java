@@ -37,7 +37,6 @@ class InstancedEntityTransformer {
         String out = modern ? "out" : "varying";
 
         replaceAttribute(t, tree, root, "mc_Entity", "vec4(-1.0, -1.0, 0.0, 1.0)");
-        replaceAttribute(t, tree, root, "at_tangent", "vec4(1.0, 0.0, 0.0, 1.0)");
         replaceAttribute(t, tree, root, "at_midBlock", "vec4(0.0)");
         removeUniform(t, root, "entityColor");
 
@@ -91,6 +90,12 @@ class InstancedEntityTransformer {
         int midTexCoord = removeAttribute(t, root, "mc_midTexCoord");
         if (midTexCoord >= 0) {
             root.replaceReferenceExpressions(t, "mc_midTexCoord", "vec4(lucerna_texture(), 0.0, 1.0)" + SWIZZLES[midTexCoord]);
+        }
+
+        // instanced models have no tangent stream, so take any axis in the face plane
+        int tangent = removeAttribute(t, root, "at_tangent");
+        if (tangent >= 0) {
+            root.replaceReferenceExpressions(t, "at_tangent", "vec4(normalize(cross(vec3(0.0, 1.0, 0.001), lucerna_normal())), 1.0)" + SWIZZLES[tangent]);
         }
 
         root.rename("ftransform", "lucerna_ftransform");

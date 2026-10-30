@@ -1,6 +1,7 @@
 package us.z1x.lucerna.gl.shader;
 
 import com.google.common.collect.ImmutableList;
+import us.z1x.lucerna.texture.pbr.PBRTextureManager;
 import us.z1x.lucerna.gui.option.IrisVideoSettings;
 import us.z1x.lucerna.pipeline.HandRenderer;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
@@ -48,6 +49,19 @@ public class StandardMacros {
 
         define(standardDefines, "MC_NORMAL_MAP");
         define(standardDefines, "MC_SPECULAR_MAP");
+        String format = PBRTextureManager.INSTANCE.getFormat();
+
+        if (format != null) {
+            String[] parts = format.split("/");
+            String name = "MC_TEXTURE_FORMAT_" + parts[0].toUpperCase(Locale.ROOT).replace('-', '_');
+
+            define(standardDefines, name);
+
+            if (parts.length > 1) {
+                define(standardDefines, name + "_" + parts[1].replaceAll("[.-]", "_"));
+            }
+        }
+
         define(standardDefines, "MC_RENDER_QUALITY", Float.toString(IrisVideoSettings.renderQuality));
         define(standardDefines, "MC_SHADOW_QUALITY", Float.toString(IrisVideoSettings.shadowQuality));
         define(standardDefines, "MC_HAND_DEPTH", Float.toString(HandRenderer.DEPTH));
