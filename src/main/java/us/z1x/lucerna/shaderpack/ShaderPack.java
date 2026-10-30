@@ -120,10 +120,13 @@ public class ShaderPack {
         List<String> invalidFeatureFlags = invalidFlagList.stream().map(FeatureFlags::getHumanReadableName).collect(Collectors.toList());
 
         if (!invalidFeatureFlags.isEmpty()) {
-            if (Minecraft.getInstance().screen instanceof ShaderPackScreen) {
-                Minecraft.getInstance().openScreen(new FeatureMissingErrorScreen(Minecraft.getInstance().screen, I18n.translate("iris.unsupported.pack"), I18n.translate("iris.unsupported.pack.description", FeatureFlags.getInvalidStatus(invalidFlagList), invalidFeatureFlags.stream()
-                    .collect(Collectors.joining(", ", ": ", ".")))));
-            }
+            // packs also load on a worker thread
+            Minecraft.getInstance().executeTask((Runnable) () -> {
+                if (Minecraft.getInstance().screen instanceof ShaderPackScreen) {
+                    Minecraft.getInstance().openScreen(new FeatureMissingErrorScreen(Minecraft.getInstance().screen, I18n.translate("iris.unsupported.pack"), I18n.translate("iris.unsupported.pack.description", FeatureFlags.getInvalidStatus(invalidFlagList), invalidFeatureFlags.stream()
+                        .collect(Collectors.joining(", ", ": ", ".")))));
+                }
+            });
             // reloading here would close the zip this pack is still read from, so let the loader fall back instead
             throw new IllegalStateException("The shader pack needs unsupported features: " + String.join(", ", invalidFeatureFlags));
         }

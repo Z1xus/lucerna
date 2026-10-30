@@ -5,16 +5,20 @@ import us.z1x.lucerna.compat.argentum.ArgentumCompat;
 import us.z1x.lucerna.config.IrisConfig;
 import us.z1x.lucerna.gl.GLDebug;
 import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.program.ProgramPool;
 import us.z1x.lucerna.gl.shader.StandardMacros;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.pipeline.DeferredWorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.FixedFunctionWorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.PipelineManager;
+import us.z1x.lucerna.pipeline.PipelineSources;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import us.z1x.lucerna.shaderpack.DimensionId;
 import us.z1x.lucerna.shaderpack.OptionalBoolean;
 import us.z1x.lucerna.shaderpack.ProgramSet;
 import us.z1x.lucerna.shaderpack.ShaderPack;
+import us.z1x.lucerna.shaderpack.StringPair;
 import us.z1x.lucerna.shaderpack.discovery.ShaderpackDirectoryManager;
 import us.z1x.lucerna.shaderpack.option.OptionSet;
 import us.z1x.lucerna.shaderpack.option.Profile;
@@ -30,6 +34,7 @@ import net.minecraft.text.Formatting;
 import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -43,9 +48,12 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 import java.util.zip.ZipError;
 import java.util.zip.ZipException;
@@ -56,6 +64,9 @@ public class Iris {
     public static final String MODNAME = "Lucerna";
 
     public static final IrisLogging logger = new IrisLogging(MODNAME);
+
+    private static CompletableFuture<PreparedPack> pendingReload;
+    private static PreparedPack submittedPack;
 
     private static Path shaderpacksDirectory;
     private static ShaderpackDirectoryManager shaderpacksDirectoryManager;
@@ -120,6 +131,7 @@ public class Iris {
         }
 
         IrisRenderSystem.initRenderer();
+        ProgramPool.INSTANCE.init();
         GLDebug.initRenderer();
 
         setDebug(irisConfig.areDebugOptionsEnabled());
@@ -144,7 +156,7 @@ public class Iris {
     public static void handleKeybinds(Minecraft minecraft) {
         if (reloadKeybind.consumeClick()) {
             try {
-                reload();
+                reloadInBackground();
 
                 if (minecraft.player != null) {
                     minecraft.player.addMessage(new TranslatableText("iris.shaders.reloaded"));
@@ -212,14 +224,25 @@ public class Iris {
             return;
         }
 
-        if (!loadExternalShaderpack(externalName.get())) {
+        Map<String, String> queued = new HashMap<>(shaderPackOptionQueue);
+        boolean reset = resetShaderPackOptions;
+
+        clearShaderPackOptionQueue();
+        resetShaderPackOptions = false;
+
+        LoadedPack loaded = readShaderpack(externalName.get(), queued, reset, StandardMacros.createStandardEnvironmentDefines());
+
+        if (loaded != null) {
+            installShaderpack(loaded);
+        } else {
             logger.warn("Falling back to normal rendering without shaders because the shaderpack could not be loaded");
             setShadersDisabled();
             fallback = true;
         }
     }
 
-    private static boolean loadExternalShaderpack(String name) {
+    @Nullable
+    private static LoadedPack readShaderpack(String name, Map<String, String> queuedOptions, boolean resetOptions, Iterable<StringPair> environmentDefines) {
         Path shaderPackRoot;
         Path shaderPackConfigTxt;
 
@@ -229,41 +252,43 @@ public class Iris {
         } catch (InvalidPathException e) {
             logger.error("Failed to load the shaderpack \"{}\" because it contains invalid characters in its path", name);
 
-            return false;
+            return null;
         }
 
         Path shaderPackPath;
+        FileSystem zip = null;
 
         if (shaderPackRoot.toString().endsWith(".zip")) {
             Optional<Path> optionalPath;
 
             try {
-                optionalPath = loadExternalZipShaderpack(shaderPackRoot);
+                zip = FileSystems.newFileSystem(shaderPackRoot, Iris.class.getClassLoader());
+                optionalPath = findShadersDirectory(zip);
             } catch (FileSystemNotFoundException | NoSuchFileException e) {
                 logger.error("Failed to load the shaderpack \"{}\" because it does not exist in your shaderpacks folder!", name);
 
-                return false;
+                return null;
             } catch (ZipException e) {
                 logger.error("The shaderpack \"{}\" appears to be corrupted, please try downloading it again!", name);
 
-                return false;
+                return null;
             } catch (IOException e) {
                 logger.error("Failed to load the shaderpack \"{}\"!", name);
                 logger.error("", e);
 
-                return false;
+                return null;
             }
 
             if (optionalPath.isPresent()) {
                 shaderPackPath = optionalPath.get();
             } else {
                 logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
-                return false;
+                return null;
             }
         } else {
             if (!Files.exists(shaderPackRoot)) {
                 logger.error("Failed to load the shaderpack \"{}\" because it does not exist!", name);
-                return false;
+                return null;
             }
 
             shaderPackPath = shaderPackRoot.resolve("shaders");
@@ -271,51 +296,51 @@ public class Iris {
 
         if (!Files.exists(shaderPackPath)) {
             logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
-            return false;
+            return null;
         }
 
         Map<String, String> changedConfigs = tryReadConfigProperties(shaderPackConfigTxt)
                 .map(properties -> (Map<String, String>) (Map) properties)
                 .orElse(new HashMap<>());
 
-        changedConfigs.putAll(shaderPackOptionQueue);
-        clearShaderPackOptionQueue();
+        changedConfigs.putAll(queuedOptions);
 
-        if (resetShaderPackOptions) {
+        if (resetOptions) {
             changedConfigs.clear();
         }
-        resetShaderPackOptions = false;
 
         try {
-            currentPack = new ShaderPack(shaderPackPath, changedConfigs, StandardMacros.createStandardEnvironmentDefines());
+            ShaderPack pack = new ShaderPack(shaderPackPath, changedConfigs, environmentDefines);
 
-            MutableOptionValues changedConfigsValues = currentPack.getShaderPackOptions().getOptionValues().mutableCopy();
+            MutableOptionValues changedConfigsValues = pack.getShaderPackOptions().getOptionValues().mutableCopy();
 
             Properties configsToSave = new Properties();
             changedConfigsValues.getBooleanValues().forEach((k, v) -> configsToSave.setProperty(k, Boolean.toString(v)));
             changedConfigsValues.getStringValues().forEach(configsToSave::setProperty);
 
             tryUpdateConfigPropertiesFile(shaderPackConfigTxt, configsToSave);
+
+            return new LoadedPack(name, pack, zip);
         } catch (Exception e) {
             logger.error("Failed to load the shaderpack \"{}\"!", name);
             logger.error("", e);
 
-            return false;
+            return null;
         }
 
-        fallback = false;
-        currentPackName = name;
-        ArgentumCompat.setShadersActive(true);
-
-        logger.info("Using shaderpack: " + name);
-
-        return true;
     }
 
-    private static Optional<Path> loadExternalZipShaderpack(Path shaderpackPath) throws IOException {
-        FileSystem zipSystem = FileSystems.newFileSystem(shaderpackPath, Iris.class.getClassLoader());
-        zipFileSystem = zipSystem;
+    private static void installShaderpack(LoadedPack loaded) {
+        currentPack = loaded.pack();
+        zipFileSystem = loaded.zip();
+        fallback = false;
+        currentPackName = loaded.name();
+        ArgentumCompat.setShadersActive(true);
 
+        logger.info("Using shaderpack: " + loaded.name());
+    }
+
+    private static Optional<Path> findShadersDirectory(FileSystem zipSystem) throws IOException {
         Path root = zipSystem.getRootDirectories().iterator().next();
 
         Path potentialShaderDir = zipSystem.getPath("shaders");
@@ -475,7 +500,96 @@ public class Iris {
         return resetShaderPackOptions;
     }
 
+    // keeps the current pack on screen until the new one is linked, so applying a pack never freezes the game
+    public static void reloadInBackground() throws IOException {
+        Optional<String> name = irisConfig.getShaderPackName();
+
+        if (Minecraft.getInstance().world == null || !irisConfig.areShadersEnabled() || name.isEmpty()) {
+            reload();
+            return;
+        }
+
+        cancelBackgroundReload();
+
+        Map<String, String> queued = new HashMap<>(shaderPackOptionQueue);
+        boolean reset = resetShaderPackOptions;
+        Iterable<StringPair> defines = StandardMacros.createStandardEnvironmentDefines();
+        DimensionId dimension = getCurrentDimension();
+
+        clearShaderPackOptionQueue();
+        resetShaderPackOptions = false;
+
+        pendingReload = CompletableFuture.supplyAsync(() -> {
+            LoadedPack loaded = readShaderpack(name.get(), queued, reset, defines);
+
+            return loaded == null ? null : new PreparedPack(loaded, PipelineSources.collect(loaded.pack().getProgramSet(dimension)));
+        });
+    }
+
+    public static void tickBackgroundReload() {
+        if (pendingReload == null || !pendingReload.isDone()) {
+            return;
+        }
+
+        PreparedPack prepared;
+
+        try {
+            prepared = pendingReload.join();
+        } catch (CompletionException e) {
+            logger.error("Failed to prepare the shader pack in the background", e);
+            prepared = null;
+        }
+
+        try {
+            if (prepared == null) {
+                pendingReload = null;
+                reload();
+            } else if (prepared != submittedPack) {
+                submittedPack = prepared;
+                ProgramPool.INSTANCE.submit(prepared.sources());
+            } else if (ProgramPool.INSTANCE.tick()) {
+                swapShaderpack(prepared.pack());
+            }
+        } catch (IOException e) {
+            logger.error("Failed to reload the shader pack", e);
+        }
+    }
+
+    private static void swapShaderpack(LoadedPack loaded) throws IOException {
+        pendingReload = null;
+        submittedPack = null;
+
+        boolean hadPack = isShaderPackActive();
+
+        destroyEverything();
+        installShaderpack(loaded);
+        finishReload(hadPack);
+        ProgramPool.INSTANCE.clear();
+
+        if (Minecraft.getInstance().screen instanceof ShaderPackScreen screen) {
+            screen.refreshForChangedPack();
+        }
+    }
+
+    private static void cancelBackgroundReload() {
+        if (pendingReload != null) {
+            pendingReload.thenAccept(prepared -> {
+                if (prepared != null && prepared.pack().zip() != null) {
+                    try {
+                        prepared.pack().zip().close();
+                    } catch (IOException e) {
+                        logger.error("Failed to close zip file system?", e);
+                    }
+                }
+            });
+            pendingReload = null;
+            submittedPack = null;
+            ProgramPool.INSTANCE.clear();
+        }
+    }
+
     public static void reload() throws IOException {
+        cancelBackgroundReload();
         irisConfig.initialize();
 
         boolean hadPack = isShaderPackActive();
@@ -483,7 +597,10 @@ public class Iris {
         destroyEverything();
 
         loadShaderpack();
+        finishReload(hadPack);
+    }
 
+    private static void finishReload(boolean hadPack) {
         // argentum's section manager only gets a shadow pass while a shader pack is loaded
         if (hadPack != isShaderPackActive() && Minecraft.getInstance().worldRenderer != null) {
             Minecraft.getInstance().worldRenderer.reload();
@@ -625,5 +742,11 @@ public class Iris {
         }
 
         return shaderpacksDirectoryManager;
+    }
+
+    private record LoadedPack(String name, ShaderPack pack, @Nullable FileSystem zip) {
+    }
+
+    private record PreparedPack(LoadedPack pack, List<Map<PatchShaderType, String>> sources) {
     }
 }

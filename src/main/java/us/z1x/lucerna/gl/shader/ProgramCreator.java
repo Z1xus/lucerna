@@ -13,13 +13,17 @@ import org.lwjgl.opengl.KHRDebug;
 public class ProgramCreator {
     private static final Logger LOGGER = LogManager.getLogger(ProgramCreator.class);
 
-    public static int create(String name, GlShader... shaders) {
-        int program = GL20.glCreateProgram();
-
+    public static void bindAttributes(int program) {
         IrisRenderSystem.bindAttributeLocation(program, 11, "mc_Entity");
         IrisRenderSystem.bindAttributeLocation(program, 12, "mc_midTexCoord");
         IrisRenderSystem.bindAttributeLocation(program, 13, "at_tangent");
         IrisRenderSystem.bindAttributeLocation(program, 14, "at_midBlock");
+    }
+
+    public static int create(String name, GlShader... shaders) {
+        int program = GL20.glCreateProgram();
+
+        bindAttributes(program);
 
         for (GlShader shader : shaders) {
             GL20.glAttachShader(program, shader.getHandle());

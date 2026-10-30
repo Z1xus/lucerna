@@ -25,7 +25,7 @@ public class IrisApiV0ConfigImpl implements IrisApiConfig {
         }
 
         try {
-            Iris.reload();
+            Iris.reloadInBackground();
         } catch (IOException e) {
             Iris.logger.error("Error reloading shader pack while applying changes!", e);
         }

@@ -22,6 +22,7 @@ public class IrisRenderSystem {
     private static DSAAccess dsaState;
     private static boolean hasMultibind;
     private static boolean supportsCompute;
+    private static boolean supportsBufferBlending;
     private static int drawFramebuffer = -1;
     private static int readFramebuffer = -1;
 
@@ -43,7 +44,8 @@ public class IrisRenderSystem {
             hasMultibind = false;
         }
 
-        supportsCompute = supportsCompute();
+        supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL;
+        supportsBufferBlending = GL.getCapabilities().GL_ARB_draw_buffers_blend || GL.getCapabilities().OpenGL40;
     }
 
     public static void getIntegerv(int pname, int[] params) {
@@ -216,7 +218,7 @@ public class IrisRenderSystem {
     }
 
     public static boolean supportsBufferBlending() {
-        return GL.getCapabilities().GL_ARB_draw_buffers_blend || GL.getCapabilities().OpenGL40;
+        return supportsBufferBlending;
     }
 
     public static void disableBufferBlend(int buffer) {
@@ -514,6 +516,6 @@ public class IrisRenderSystem {
     }
 
     public static boolean supportsCompute() {
-        return GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL;
+        return supportsCompute;
     }
 }

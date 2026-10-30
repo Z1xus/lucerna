@@ -166,7 +166,7 @@ public class TransformPatcher {
 
     private static final Pattern VERSION_PATTERN = Pattern.compile("^.*#version\\s+(\\d+)", Pattern.DOTALL);
 
-    private static Map<PatchShaderType, String> transform(String vertex, String geometry, String fragment, Parameters parameters) {
+    private static synchronized Map<PatchShaderType, String> transform(String vertex, String geometry, String fragment, Parameters parameters) {
         if (vertex == null && geometry == null && fragment == null) {
             return null;
         }

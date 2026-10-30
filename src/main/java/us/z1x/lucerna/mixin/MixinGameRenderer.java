@@ -92,6 +92,11 @@ public abstract class MixinGameRenderer {
     @Shadow
     public abstract void disableLightMap();
 
+    @Inject(method = "render(FJ)V", at = @At("HEAD"))
+    private void lucerna$tickBackgroundReload(float tickDelta, long renderTimeLimit, CallbackInfo ci) {
+        Iris.tickBackgroundReload();
+    }
+
     @Inject(method = "setupClearColor", at = @At("RETURN"))
     private void lucerna$captureFogColor(float tickDelta, CallbackInfo ci) {
         CapturedRenderingState.INSTANCE.setFogColor(fogRed, fogGreen, fogBlue);

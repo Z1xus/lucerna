@@ -122,6 +122,28 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     private final FrameUpdateNotifier updateNotifier;
     private final CenterDepthSampler centerDepthSampler;
 
+    // [(textured=false,lightmap=false), (textured=true,lightmap=false), (textured=true,lightmap=true)]
+    private static final ProgramId[] PROGRAM_IDS = {
+        ProgramId.Basic, ProgramId.Textured, ProgramId.TexturedLit,
+        ProgramId.SkyBasic, ProgramId.SkyTextured, ProgramId.SkyTextured,
+        null, null, ProgramId.Terrain,
+        null, null, ProgramId.Water,
+        null, ProgramId.Clouds, ProgramId.Clouds,
+        null, ProgramId.DamagedBlock, ProgramId.DamagedBlock,
+        ProgramId.Block, ProgramId.Block, ProgramId.Block,
+        ProgramId.BeaconBeam, ProgramId.BeaconBeam, ProgramId.BeaconBeam,
+        ProgramId.Entities, ProgramId.Entities, ProgramId.Entities,
+        ProgramId.EntitiesTrans, ProgramId.EntitiesTrans, ProgramId.EntitiesTrans,
+        null, ProgramId.ArmorGlint, ProgramId.ArmorGlint,
+        null, ProgramId.SpiderEyes, ProgramId.SpiderEyes,
+        ProgramId.Hand, ProgramId.Hand, ProgramId.Hand,
+        ProgramId.HandWater, ProgramId.HandWater, ProgramId.HandWater,
+        null, null, ProgramId.Weather,
+        // world border uses textured_lit even though it has no lightmap
+        null, ProgramId.TexturedLit, ProgramId.TexturedLit,
+        ProgramId.Shadow, ProgramId.Shadow, ProgramId.Shadow
+    };
+
     private final ImmutableSet<Integer> flippedBeforeShadow;
     private final ImmutableSet<Integer> flippedAfterPrepare;
     private final ImmutableSet<Integer> flippedAfterTranslucent;
@@ -275,32 +297,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 customTextureManager.getCustomTextureIdMap(TextureStage.COMPOSITE_AND_FINAL),
                 this.compositeRenderer.getFlippedAtLeastOnceFinal(), customUniforms);
 
-        // [(textured=false,lightmap=false), (textured=true,lightmap=false), (textured=true,lightmap=true)]
-        ProgramId[] ids = new ProgramId[] {
-                ProgramId.Basic, ProgramId.Textured, ProgramId.TexturedLit,
-                ProgramId.SkyBasic, ProgramId.SkyTextured, ProgramId.SkyTextured,
-                null, null, ProgramId.Terrain,
-                null, null, ProgramId.Water,
-                null, ProgramId.Clouds, ProgramId.Clouds,
-                null, ProgramId.DamagedBlock, ProgramId.DamagedBlock,
-                ProgramId.Block, ProgramId.Block, ProgramId.Block,
-                ProgramId.BeaconBeam, ProgramId.BeaconBeam, ProgramId.BeaconBeam,
-                ProgramId.Entities, ProgramId.Entities, ProgramId.Entities,
-                ProgramId.EntitiesTrans, ProgramId.EntitiesTrans, ProgramId.EntitiesTrans,
-                null, ProgramId.ArmorGlint, ProgramId.ArmorGlint,
-                null, ProgramId.SpiderEyes, ProgramId.SpiderEyes,
-                ProgramId.Hand, ProgramId.Hand, ProgramId.Hand,
-                ProgramId.HandWater, ProgramId.HandWater, ProgramId.HandWater,
-                null, null, ProgramId.Weather,
-                // world border uses textured_lit even though it has no lightmap
-                null, ProgramId.TexturedLit, ProgramId.TexturedLit,
-                ProgramId.Shadow, ProgramId.Shadow, ProgramId.Shadow
-        };
-
-        if (ids.length != RenderCondition.values().length * 3) {
-            throw new IllegalStateException("Program ID table length mismatch");
-        }
-
         ProgramFallbackResolver resolver = new ProgramFallbackResolver(programs);
 
         Map<PassKey, Pass> cachedPasses = new HashMap<>();
@@ -308,23 +304,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         this.shadowComputes = createShadowComputes(programs.getShadowCompute(), programs);
 
         this.table = new ProgramTable<>((condition, availability) -> {
-            int idx;
-
-            if (availability.texture && availability.lightmap) {
-                idx = 2;
-            } else if (availability.texture) {
-                idx = 1;
-            } else {
-                idx = 0;
-            }
-
-            ProgramId id = ids[condition.ordinal() * 3 + idx];
-
-            if (id == null) {
-                id = ids[idx];
-            }
-
-            ProgramId finalId = id;
+            ProgramId id = programIdFor(condition, availability);
 
             return cachedPasses.computeIfAbsent(new PassKey(id, availability), p -> {
                 ProgramSource source = resolver.resolveNullable(p.id());
@@ -346,7 +326,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 }
 
                 try {
-                    return createPass(source, availability, condition == RenderCondition.SHADOW, finalId);
+                    return createPass(source, availability, condition == RenderCondition.SHADOW, id);
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to create pass for " + source.getName() + " for rendering condition "
                         + condition + " specialized to input availability " + availability, e);
@@ -618,6 +598,13 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         return new Pass(null, framebufferBeforeTranslucents, framebufferAfterTranslucents, null,
             null, Collections.emptyList(), false);
+    }
+
+    public static ProgramId programIdFor(RenderCondition condition, InputAvailability availability) {
+        int index = availability.texture ? availability.lightmap ? 2 : 1 : 0;
+        ProgramId id = PROGRAM_IDS[condition.ordinal() * 3 + index];
+
+        return id != null ? id : PROGRAM_IDS[index];
     }
 
     private Pass createPass(ProgramSource source, InputAvailability availability, boolean shadow, ProgramId id) {

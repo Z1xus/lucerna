@@ -25,7 +25,7 @@ public final class IrisOptionPage {
         public void save() {
             try {
                 Iris.getIrisConfig().save();
-                Iris.reload();
+                Iris.reloadInBackground();
             } catch (IOException e) {
                 Iris.logger.error("Failed to apply the shader video settings", e);
             }

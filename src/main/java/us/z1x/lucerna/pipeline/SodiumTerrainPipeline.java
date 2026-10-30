@@ -92,7 +92,7 @@ public class SodiumTerrainPipeline {
         this.customUniforms = customUniforms;
         this.programSet = programSet;
 
-        Optional<ProgramSource> terrainSource = first(programSet.getGbuffersTerrain(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
+        Optional<ProgramSource> terrainSource = terrainSource(programSet);
 
         programSources.put(IrisTerrainPass.GBUFFER_SOLID, terrainSource);
         programSources.put(IrisTerrainPass.GBUFFER_CUTOUT, terrainSource);
@@ -115,7 +115,7 @@ public class SodiumTerrainPipeline {
             }
         }
 
-        Optional<ProgramSource> entitySource = first(programSet.getGbuffersEntities(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
+        Optional<ProgramSource> entitySource = entitySource(programSet);
         int[] entityDrawBuffers = entitySource.map(source -> source.getDirectives().getDrawBuffers()).orElse(new int[] {0});
         entityPassInfo.framebuffer = targets.createGbufferFramebuffer(flippedAfterPrepare, entityDrawBuffers);
         Map<String, String> textureRenames = programSet.getPack().getCustomTexturePatching(TextureStage.GBUFFERS_AND_SHADOW);
@@ -132,6 +132,28 @@ public class SodiumTerrainPipeline {
         this.createShadowImages = createShadowImages;
 
         patchShaders();
+    }
+
+    // fills the patch cache from a worker thread, so the pipeline finds these sources ready
+    public static void patchAhead(ProgramSet programSet) {
+        Map<String, String> textureRenames = programSet.getPack().getCustomTexturePatching(TextureStage.GBUFFERS_AND_SHADOW);
+        Optional<ProgramSource> terrain = terrainSource(programSet);
+
+        for (Optional<ProgramSource> source : List.of(terrain, first(programSet.getGbuffersWater(), terrain), programSet.getShadow())) {
+            source.ifPresent(sources -> TransformPatcher.patchSodiumTerrain(sources.getVertexSource().orElse(null), sources.getGeometrySource().orElse(null), sources.getFragmentSource().orElse(null), textureRenames));
+        }
+
+        for (Optional<ProgramSource> source : List.of(entitySource(programSet), programSet.getShadow())) {
+            source.filter(sources -> !sources.getGeometrySource().isPresent()).ifPresent(sources -> TransformPatcher.patchInstancedEntity(sources.getVertexSource().orElse(null), sources.getFragmentSource().orElse(null), textureRenames));
+        }
+    }
+
+    private static Optional<ProgramSource> terrainSource(ProgramSet programSet) {
+        return first(programSet.getGbuffersTerrain(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
+    }
+
+    private static Optional<ProgramSource> entitySource(ProgramSet programSet) {
+        return first(programSet.getGbuffersEntities(), programSet.getGbuffersTexturedLit(), programSet.getGbuffersTextured(), programSet.getGbuffersBasic());
     }
 
     private void patchShaders() {
