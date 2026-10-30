@@ -76,7 +76,7 @@ jobs:
           name: Lucerna ${{ steps.release.outputs.version }}
           version: ${{ steps.release.outputs.version }}
           changelog: ${{ steps.release.outputs.notes }}
-          loaders: fabric
+          loaders: ornithe
           game-versions: 1.8.9
           environment: client_only
           files: lucerna-${{ steps.release.outputs.version }}.jar
