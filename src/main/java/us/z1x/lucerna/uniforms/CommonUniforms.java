@@ -32,6 +32,8 @@ import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector4i;
 
+import java.util.function.Predicate;
+
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.ONCE;
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_TICK;
@@ -125,6 +127,14 @@ public final class CommonUniforms {
             // 1.8.9 has no darkness effect
             .uniform1f(PER_FRAME, "darknessFactor", () -> 0.0F)
             .uniform1f(PER_FRAME, "darknessLightFactor", () -> 0.0F)
+            // 1.8.9 has no end flash
+            .uniform1f(ONCE, "endFlashIntensity", () -> 0.0F)
+            .uniform1b(PER_TICK, "is_sneaking", () -> cameraEntityIs(Entity::isSneaking))
+            .uniform1b(PER_TICK, "is_sprinting", () -> cameraEntityIs(Entity::isSprinting))
+            .uniform1b(PER_TICK, "is_invisible", () -> cameraEntityIs(Entity::isInvisible))
+            .uniform1b(PER_TICK, "is_burning", () -> cameraEntityIs(Entity::isOnFire))
+            .uniform1b(PER_TICK, "is_on_ground", () -> cameraEntityIs(entity -> entity.onGround))
+            .uniform1b(PER_TICK, "is_hurt", () -> cameraEntityIs(entity -> entity instanceof LivingEntity living && living.damagedTimer > 0))
             // optifine's default alpha test reference
             .uniform1f(ONCE, "alphaTestRef", () -> 0.1F)
             // 1.8.9 fog is spherical, modern packs read the shape
@@ -140,6 +150,12 @@ public final class CommonUniforms {
             .uniform1f(PER_TICK, "wetness", new SmoothedFloat(directives.getWetnessHalfLife(), directives.getDrynessHalfLife(), CommonUniforms::getRainStrength, updateNotifier))
             .uniform3d(PER_FRAME, "skyColor", CommonUniforms::getSkyColor)
             .uniform3d(PER_FRAME, "fogColor", CapturedRenderingState.INSTANCE::getFogColor);
+    }
+
+    private static boolean cameraEntityIs(Predicate<Entity> condition) {
+        Entity camera = client.getCamera();
+
+        return camera != null && condition.test(camera);
     }
 
     private static Vector3d getSkyColor() {

@@ -28,6 +28,11 @@ import us.z1x.lucerna.uniforms.CommonUniforms;
 import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
 import us.z1x.lucerna.uniforms.HardcodedCustomUniforms;
 import us.z1x.lucerna.uniforms.custom.cached.CachedUniform;
+import us.z1x.lucerna.texture.TextureInfoCache;
+import us.z1x.lucerna.texture.TextureInfoCache.TextureInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.texture.TextureAtlas;
+import org.joml.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -339,6 +344,10 @@ public class CustomUniforms implements FunctionContext {
                 inputs.uniform1f(UniformUpdateFrequency.ONCE, "pi", () -> (float) Math.PI);
             }
 
+            inputs.uniform2i(UniformUpdateFrequency.PER_FRAME, "atlasSize", () -> {
+                TextureInfo info = TextureInfoCache.INSTANCE.getInfo(Minecraft.getInstance().getTextureManager().get(TextureAtlas.BLOCKS_LOCATION).getGlId());
+                return new Vector2i(info.getWidth(), info.getHeight());
+            });
             inputs.uniform1b(UniformUpdateFrequency.ONCE, "true", () -> true);
             inputs.uniform1b(UniformUpdateFrequency.ONCE, "false", () -> false);
             CustomUniformFixedInputUniformsHolder.Builder hardcoded = new CustomUniformFixedInputUniformsHolder.Builder();

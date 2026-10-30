@@ -145,9 +145,7 @@ public class ShaderPack {
         List<String> disabledPrograms = new ArrayList<>();
         this.profile.current.ifPresent(profile -> disabledPrograms.addAll(profile.disabledPrograms));
         shaderProperties.getConditionallyEnabledPrograms().forEach((program, shaderOption) -> {
-            if ("true".equals(shaderOption)) return;
-
-            if ("false".equals(shaderOption) || !this.shaderPackOptions.getOptionValues().getBooleanValueOrDefault(shaderOption)) {
+            if (!ProgramCondition.evaluate(shaderOption, this.shaderPackOptions.getOptionValues())) {
                 disabledPrograms.add(program);
             }
         });
