@@ -96,11 +96,16 @@ public class IrisObjectSelectionList<E extends IrisObjectSelectionList.Entry> ex
         if (this.isMouseInList(mouseY)) {
             int index = this.getEntryAt(mouseX, mouseY);
 
-            if (index >= 0 && this.entries.get(index).mouseClicked(mouseX, mouseY, button)) {
-                this.focused = this.entries.get(index);
-                this.setScrolling(false);
+            if (index >= 0 && index < this.entries.size()) {
+                // a click can open a submenu, which rebuilds the entries
+                E entry = this.entries.get(index);
 
-                return true;
+                if (entry.mouseClicked(mouseX, mouseY, button)) {
+                    this.focused = entry;
+                    this.setScrolling(false);
+
+                    return true;
+                }
             }
         }
 

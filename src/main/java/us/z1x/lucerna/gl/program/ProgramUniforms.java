@@ -11,6 +11,7 @@ import us.z1x.lucerna.gl.uniform.UniformType;
 import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBShaderImageLoadStore;
 import org.lwjgl.opengl.GL20;
@@ -54,7 +55,9 @@ public class ProgramUniforms {
     }
 
     private static long getCurrentTick() {
-        return Objects.requireNonNull(Minecraft.getInstance().world).getTime();
+        ClientWorld world = Minecraft.getInstance().world;
+
+        return world == null ? 0 : world.getTime();
     }
 
     public void update() {
