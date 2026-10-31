@@ -43,11 +43,11 @@ public class LucernaChunkProgramOverrides {
             info.sources().forEach((type, source) -> {
                 if (source != null) {
                     ShaderType shaderType = SHADER_TYPES.get(type);
-                    shaders.add(new GlShader(shaderType, "iris:celeritas-terrain-" + pass.toString().toLowerCase(Locale.ROOT) + "." + shaderType.fileExtension, source));
+                    shaders.add(new GlShader(shaderType, "lucerna:celeritas-terrain-" + pass.toString().toLowerCase(Locale.ROOT) + "." + shaderType.fileExtension, source));
                 }
             });
 
-            GlProgram.Builder builder = GlProgram.builder("iris:chunk_shader_for_" + pass.getName());
+            GlProgram.Builder builder = GlProgram.builder("lucerna:chunk_shader_for_" + pass.getName());
             shaders.forEach(builder::attachShader);
 
             int i = 0;

@@ -20,6 +20,6 @@ public class MixinSpecialConditions {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void lucerna$endSpecialCondition(CallbackInfo ci) {
-        GbufferPrograms.teardownSpecialRenderCondition(null);
+        GbufferPrograms.teardownSpecialRenderCondition();
     }
 }

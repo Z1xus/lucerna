@@ -16,6 +16,6 @@ public class MixinArmorGlint {
                                      float headPitch, float scale, Operation<Void> original) {
         GbufferPrograms.setupSpecialRenderCondition(SpecialCondition.GLINT);
         original.call(entity, model, limbAngle, limbDistance, tickDelta, age, headYaw, headPitch, scale);
-        GbufferPrograms.teardownSpecialRenderCondition(SpecialCondition.GLINT);
+        GbufferPrograms.teardownSpecialRenderCondition();
     }
 }

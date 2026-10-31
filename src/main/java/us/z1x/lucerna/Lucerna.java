@@ -260,77 +260,93 @@ public class Lucerna {
             return null;
         }
 
-        Path shaderPackPath;
         FileSystem zip = null;
+        LoadedPack loaded = null;
 
-        if (shaderPackRoot.toString().endsWith(".zip")) {
-            Optional<Path> optionalPath;
+        try {
+            Path shaderPackPath;
+
+            if (shaderPackRoot.toString().endsWith(".zip")) {
+                Optional<Path> optionalPath;
+
+                try {
+                    zip = FileSystems.newFileSystem(shaderPackRoot, Lucerna.class.getClassLoader());
+                    optionalPath = findShadersDirectory(zip);
+                } catch (FileSystemNotFoundException | NoSuchFileException e) {
+                    logger.error("Failed to load the shaderpack \"{}\" because it does not exist in your shaderpacks folder!", name);
+
+                    return null;
+                } catch (ZipException e) {
+                    logger.error("The shaderpack \"{}\" appears to be corrupted, please try downloading it again!", name);
+
+                    return null;
+                } catch (IOException e) {
+                    logger.error("Failed to load the shaderpack \"{}\"!", name, e);
+
+                    return null;
+                }
+
+                if (optionalPath.isPresent()) {
+                    shaderPackPath = optionalPath.get();
+                } else {
+                    logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
+                    return null;
+                }
+            } else {
+                if (!Files.exists(shaderPackRoot)) {
+                    logger.error("Failed to load the shaderpack \"{}\" because it does not exist!", name);
+                    return null;
+                }
+
+                shaderPackPath = shaderPackRoot.resolve("shaders");
+            }
+
+            if (!Files.exists(shaderPackPath)) {
+                logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
+                return null;
+            }
+
+            Optional<Properties> savedOptions = tryReadConfigProperties(shaderPackConfigTxt);
+
+            if (savedOptions.isEmpty()) {
+                return null;
+            }
+
+            Map<String, String> changedConfigs = (Map<String, String>) (Map) savedOptions.get();
+
+            changedConfigs.putAll(queuedOptions);
+
+            if (resetOptions) {
+                changedConfigs.clear();
+            }
 
             try {
-                zip = FileSystems.newFileSystem(shaderPackRoot, Lucerna.class.getClassLoader());
-                optionalPath = findShadersDirectory(zip);
-            } catch (FileSystemNotFoundException | NoSuchFileException e) {
-                logger.error("Failed to load the shaderpack \"{}\" because it does not exist in your shaderpacks folder!", name);
+                ShaderPack pack = new ShaderPack(shaderPackPath, changedConfigs, environmentDefines);
 
-                return null;
-            } catch (ZipException e) {
-                logger.error("The shaderpack \"{}\" appears to be corrupted, please try downloading it again!", name);
+                MutableOptionValues changedConfigsValues = pack.getShaderPackOptions().getOptionValues().mutableCopy();
 
-                return null;
-            } catch (IOException e) {
+                Properties configsToSave = new Properties();
+                changedConfigsValues.getBooleanValues().forEach((k, v) -> configsToSave.setProperty(k, Boolean.toString(v)));
+                changedConfigsValues.getStringValues().forEach(configsToSave::setProperty);
+
+                tryUpdateConfigPropertiesFile(shaderPackConfigTxt, configsToSave);
+
+                loaded = new LoadedPack(name, pack, zip);
+                return loaded;
+            } catch (Exception e) {
                 logger.error("Failed to load the shaderpack \"{}\"!", name, e);
 
                 return null;
             }
-
-            if (optionalPath.isPresent()) {
-                shaderPackPath = optionalPath.get();
-            } else {
-                logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
-                return null;
+        } finally {
+            if (loaded == null && zip != null) {
+                try {
+                    zip.close();
+                } catch (IOException e) {
+                    logger.warn("Failed to close the shaderpack \"{}\"", name, e);
+                }
             }
-        } else {
-            if (!Files.exists(shaderPackRoot)) {
-                logger.error("Failed to load the shaderpack \"{}\" because it does not exist!", name);
-                return null;
-            }
-
-            shaderPackPath = shaderPackRoot.resolve("shaders");
         }
-
-        if (!Files.exists(shaderPackPath)) {
-            logger.error("Could not load the shaderpack \"{}\" because it appears to lack a \"shaders\" directory", name);
-            return null;
-        }
-
-        Map<String, String> changedConfigs = tryReadConfigProperties(shaderPackConfigTxt)
-                .map(properties -> (Map<String, String>) (Map) properties)
-                .orElse(new HashMap<>());
-
-        changedConfigs.putAll(queuedOptions);
-
-        if (resetOptions) {
-            changedConfigs.clear();
-        }
-
-        try {
-            ShaderPack pack = new ShaderPack(shaderPackPath, changedConfigs, environmentDefines);
-
-            MutableOptionValues changedConfigsValues = pack.getShaderPackOptions().getOptionValues().mutableCopy();
-
-            Properties configsToSave = new Properties();
-            changedConfigsValues.getBooleanValues().forEach((k, v) -> configsToSave.setProperty(k, Boolean.toString(v)));
-            changedConfigsValues.getStringValues().forEach(configsToSave::setProperty);
-
-            tryUpdateConfigPropertiesFile(shaderPackConfigTxt, configsToSave);
-
-            return new LoadedPack(name, pack, zip);
-        } catch (Exception e) {
-            logger.error("Failed to load the shaderpack \"{}\"!", name, e);
-
-            return null;
-        }
-
     }
 
     private static void installShaderpack(LoadedPack loaded) {
@@ -397,6 +413,7 @@ public class Lucerna {
                 // optifine specifies iso-8859-1 for config properties, so no utf-8 workaround is needed
                 properties.load(is);
             } catch (IOException e) {
+                logger.error("Failed to read the shaderpack options from {}", path, e);
                 return Optional.empty();
             }
         }
@@ -418,6 +435,7 @@ public class Lucerna {
                 properties.store(out, null);
             }
         } catch (IOException e) {
+            logger.warn("Failed to save the shaderpack options to {}", path, e);
         }
     }
 

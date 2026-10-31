@@ -198,9 +198,19 @@ public final class PBRTextureManager {
         int id = 0;
 
         for (TextureAtlasSprite sprite : atlas.stitchedSprites.values()) {
-            BufferedImage image = read(manager, type.append(atlas.getResourceId(new Identifier(sprite.getName()), 0)));
+            Identifier location = type.append(atlas.getResourceId(new Identifier(sprite.getName()), 0));
+            BufferedImage image = read(manager, location);
 
             if (image == null) {
+                continue;
+            }
+
+            int width = sprite.getWidth();
+            int height = sprite.getHeight();
+            int frameHeight = Math.max(1, image.getWidth() * height / width);
+
+            if (image.getHeight() < frameHeight || image.getHeight() % frameHeight != 0) {
+                Lucerna.logger.warn("Ignoring {} because its height is not a multiple of the frame height {}", location, frameHeight);
                 continue;
             }
 
@@ -208,10 +218,7 @@ public final class PBRTextureManager {
                 id = createAtlas(atlasWidth, atlasHeight, mipLevels, type, labSpecular);
             }
 
-            int width = sprite.getWidth();
-            int height = sprite.getHeight();
-            int frameHeight = Math.max(1, image.getWidth() * height / width);
-            int frames = Math.max(1, image.getHeight() / frameHeight);
+            int frames = image.getHeight() / frameHeight;
             int[][][] levels = new int[frames][][];
 
             for (int frame = 0; frame < frames; frame++) {

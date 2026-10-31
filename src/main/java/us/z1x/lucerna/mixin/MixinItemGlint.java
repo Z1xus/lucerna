@@ -15,6 +15,6 @@ public class MixinItemGlint {
     private void lucerna$renderGlint(BakedModel model, Operation<Void> original) {
         GbufferPrograms.setupSpecialRenderCondition(SpecialCondition.GLINT);
         original.call(model);
-        GbufferPrograms.teardownSpecialRenderCondition(SpecialCondition.GLINT);
+        GbufferPrograms.teardownSpecialRenderCondition();
     }
 }

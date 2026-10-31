@@ -7,9 +7,6 @@ import us.z1x.lucerna.pipeline.WorldRenderingPhase;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 
 public class GbufferPrograms {
-    private static boolean entities;
-    private static boolean blockEntities;
-    private static boolean outline;
     private static Runnable phaseChangeListener;
 
     public static WorldRenderingPhase getCurrentPhase() {
@@ -19,14 +16,6 @@ public class GbufferPrograms {
             return pipeline.getPhase();
         } else {
             return WorldRenderingPhase.NONE;
-        }
-    }
-
-    private static void setPhase(WorldRenderingPhase phase) {
-        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
-
-        if (pipeline != null) {
-            pipeline.setPhase(phase);
         }
     }
 
@@ -48,7 +37,7 @@ public class GbufferPrograms {
         Lucerna.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(override));
     }
 
-    public static void teardownSpecialRenderCondition(SpecialCondition override) {
+    public static void teardownSpecialRenderCondition() {
         Lucerna.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(null));
     }
 
