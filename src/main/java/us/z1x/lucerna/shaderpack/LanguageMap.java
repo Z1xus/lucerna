@@ -8,12 +8,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public class LanguageMap {
@@ -52,10 +50,6 @@ public class LanguageMap {
                 translationMaps.put(currentLangCode, builder.build());
             });
         }
-    }
-
-    public Set<String> getLanguages() {
-        return Collections.unmodifiableSet(translationMaps.keySet());
     }
 
     public Map<String, String> getTranslations(String language) {

@@ -2,7 +2,6 @@ package us.z1x.lucerna.uniforms.custom.cached;
 
 import kroppeb.stareval.function.FunctionReturn;
 import us.z1x.lucerna.gl.IrisRenderSystem;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.parsing.VectorType;
 import org.joml.Vector2i;
 
@@ -10,8 +9,8 @@ import java.util.function.Supplier;
 
 public class Int2VectorCachedUniform extends VectorCachedUniform<Vector2i> {
 
-    public Int2VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Vector2i> supplier) {
-        super(name, updateFrequency, new Vector2i(), supplier);
+    public Int2VectorCachedUniform(String name, Supplier<Vector2i> supplier) {
+        super(name, new Vector2i(), supplier);
     }
 
     @Override

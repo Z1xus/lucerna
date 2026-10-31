@@ -52,24 +52,6 @@ public class PropertiesPreprocessor {
         }
     }
 
-    public static String preprocessSource(String source, Iterable<StringPair> environmentDefines) {
-        if (source.contains(PropertyCollectingListener.PROPERTY_MARKER)) {
-            throw new RuntimeException("Some shader author is trying to exploit internal Iris implementation details, stop!");
-        }
-
-        Preprocessor preprocessor = new Preprocessor();
-
-        try {
-            for (StringPair envDefine : environmentDefines) {
-                preprocessor.addMacro(envDefine.getKey(), envDefine.getValue());
-            }
-        } catch (LexerException e) {
-            Iris.logger.error("Failed to define the environment macros", e);
-        }
-
-        return process(preprocessor, source);
-    }
-
     private static String process(Preprocessor preprocessor, String source) {
         preprocessor.setListener(new PropertiesCommentListener());
         PropertyCollectingListener listener = new PropertyCollectingListener();

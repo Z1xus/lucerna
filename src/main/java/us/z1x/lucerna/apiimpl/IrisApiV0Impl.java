@@ -48,5 +48,4 @@ public class IrisApiV0Impl implements IrisApi {
     public IrisApiConfig getConfig() {
         return CONFIG;
     }
-
 }

@@ -720,21 +720,6 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         isPostChain = false;
     }
 
-    @Override
-    public void setIsMainBound(boolean bound) {
-        isMainBound = bound;
-
-        if (!isRenderingWorld || isRenderingFullScreenPass || isPostChain) {
-            return;
-        }
-
-        if (bound) {
-            current = null;
-        } else {
-            beginPass(null);
-        }
-    }
-
     private static boolean usesAttribute(@Nullable Program program, String name) {
         return program != null && GL20C.glGetAttribLocation(program.getProgramId(), name) != -1;
     }

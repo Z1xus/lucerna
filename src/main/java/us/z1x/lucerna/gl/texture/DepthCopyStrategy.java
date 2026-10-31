@@ -14,11 +14,6 @@ public interface DepthCopyStrategy {
         }
 
         @Override
-        public boolean needsDestFramebuffer() {
-            return false;
-        }
-
-        @Override
         public void copy(GlFramebuffer sourceFb, int sourceTexture, GlFramebuffer destFb, int destTexture, int width, int height) {
             sourceFb.bindAsReadBuffer();
 
@@ -38,11 +33,6 @@ public interface DepthCopyStrategy {
         }
 
         @Override
-        public boolean needsDestFramebuffer() {
-            return true;
-        }
-
-        @Override
         public void copy(GlFramebuffer sourceFb, int sourceTexture, GlFramebuffer destFb, int destTexture, int width, int height) {
             IrisRenderSystem.blitFramebuffer(sourceFb.getId(), destFb.getId(), 0, 0, width, height,
                 0, 0, width, height,
@@ -53,11 +43,6 @@ public interface DepthCopyStrategy {
 
     class Gl43CopyImage implements DepthCopyStrategy {
         private Gl43CopyImage() {
-        }
-
-        @Override
-        public boolean needsDestFramebuffer() {
-            return false;
         }
 
         @Override
@@ -94,8 +79,6 @@ public interface DepthCopyStrategy {
             return new Gl20CopyTexture();
         }
     }
-
-    boolean needsDestFramebuffer();
 
     // may clobber the read and draw framebuffer bindings but must keep texture bindings
     // destFb can be null when needsDestFramebuffer is false

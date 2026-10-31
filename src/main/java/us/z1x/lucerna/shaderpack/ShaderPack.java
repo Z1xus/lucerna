@@ -240,10 +240,6 @@ public class ShaderPack {
         return profile.current.map(p -> p.name).orElse("Custom");
     }
 
-    public String getProfileInfo() {
-        return profileInfo;
-    }
-
     @Nullable
     private static ProgramSet loadOverrides(boolean has, AbsolutePackPath path, Function<AbsolutePackPath, String> sourceProvider,
                                             ShaderProperties shaderProperties, ShaderPack pack) {

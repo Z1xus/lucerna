@@ -4,15 +4,14 @@ import kroppeb.stareval.function.FunctionReturn;
 import kroppeb.stareval.function.Type;
 import us.z1x.lucerna.gl.IrisRenderSystem;
 import us.z1x.lucerna.gl.uniform.FloatSupplier;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 
 public class FloatCachedUniform extends CachedUniform {
 
     final private FloatSupplier supplier;
     private float cached;
 
-    public FloatCachedUniform(String name, UniformUpdateFrequency updateFrequency, FloatSupplier supplier) {
-        super(name, updateFrequency);
+    public FloatCachedUniform(String name, FloatSupplier supplier) {
+        super(name);
         this.supplier = supplier;
     }
 

@@ -1,7 +1,6 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
 import us.z1x.lucerna.gl.IrisRenderSystem;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.parsing.VectorType;
 import org.joml.Vector4f;
 
@@ -9,8 +8,8 @@ import java.util.function.Supplier;
 
 public class Float4VectorCachedUniform extends VectorCachedUniform<Vector4f> {
 
-    public Float4VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Vector4f> supplier) {
-        super(name, updateFrequency, new Vector4f(), supplier);
+    public Float4VectorCachedUniform(String name, Supplier<Vector4f> supplier) {
+        super(name, new Vector4f(), supplier);
     }
 
     @Override

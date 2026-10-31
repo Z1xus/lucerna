@@ -156,12 +156,6 @@ public class RenderTarget {
             return this;
         }
 
-        public Builder setPixelType(PixelType pixelType) {
-            this.type = pixelType;
-
-            return this;
-        }
-
         public RenderTarget build() {
             return new RenderTarget(this);
         }

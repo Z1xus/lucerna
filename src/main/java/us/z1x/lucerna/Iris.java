@@ -15,15 +15,12 @@ import us.z1x.lucerna.pipeline.PipelineSources;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import us.z1x.lucerna.shaderpack.DimensionId;
-import us.z1x.lucerna.shaderpack.OptionalBoolean;
 import us.z1x.lucerna.shaderpack.ProgramSet;
 import us.z1x.lucerna.shaderpack.ShaderPack;
 import us.z1x.lucerna.shaderpack.StringPair;
 import us.z1x.lucerna.shaderpack.discovery.ShaderpackDirectoryManager;
-import us.z1x.lucerna.shaderpack.option.OptionSet;
 import us.z1x.lucerna.shaderpack.option.Profile;
 import us.z1x.lucerna.shaderpack.option.values.MutableOptionValues;
-import us.z1x.lucerna.shaderpack.option.values.OptionValues;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
@@ -460,34 +457,7 @@ public class Iris {
         getShaderPackOptionQueue().putAll(profile.optionValues);
     }
 
-    public static void queueShaderPackOptionsFromProperties(Properties properties) {
-        queueDefaultShaderPackOptionValues();
-
-        properties.stringPropertyNames().forEach(key ->
-                getShaderPackOptionQueue().put(key, properties.getProperty(key)));
-    }
-
     // unlike resetShaderPackOptions, this does not need a pack reload
-    public static void queueDefaultShaderPackOptionValues() {
-        clearShaderPackOptionQueue();
-
-        getCurrentPack().ifPresent(pack -> {
-            OptionSet options = pack.getShaderPackOptions().getOptionSet();
-            OptionValues values = pack.getShaderPackOptions().getOptionValues();
-
-            options.getStringOptions().forEach((key, mOpt) -> {
-                if (values.getStringValue(key).isPresent()) {
-                    getShaderPackOptionQueue().put(key, mOpt.getOption().getDefaultValue());
-                }
-            });
-            options.getBooleanOptions().forEach((key, mOpt) -> {
-                if (values.getBooleanValue(key) != OptionalBoolean.DEFAULT) {
-                    getShaderPackOptionQueue().put(key, Boolean.toString(mOpt.getOption().getDefaultValue()));
-                }
-            });
-        });
-    }
-
     public static void clearShaderPackOptionQueue() {
         getShaderPackOptionQueue().clear();
     }
@@ -708,24 +678,6 @@ public class Iris {
         }
 
         return irisVersion.getFriendlyString();
-    }
-
-    public static String getFormattedVersion() {
-        Formatting color;
-        String version = getVersion();
-
-        if (version.endsWith("-development-environment")) {
-            color = Formatting.GOLD;
-            version = version.replace("-development-environment", " (Development Environment)");
-        } else if (version.endsWith("-dirty") || version.contains("unknown") || version.endsWith("-nogit")) {
-            color = Formatting.RED;
-        } else if (version.contains("+rev.")) {
-            color = Formatting.LIGHT_PURPLE;
-        } else {
-            color = Formatting.GREEN;
-        }
-
-        return color + version;
     }
 
     public static Path getShaderpacksDirectory() {

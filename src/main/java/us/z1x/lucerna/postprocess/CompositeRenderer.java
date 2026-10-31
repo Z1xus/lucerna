@@ -24,7 +24,6 @@ import us.z1x.lucerna.shaderpack.PackDirectives;
 import us.z1x.lucerna.shaderpack.PackRenderTargetDirectives;
 import us.z1x.lucerna.shaderpack.ProgramDirectives;
 import us.z1x.lucerna.shaderpack.ProgramSource;
-import us.z1x.lucerna.shaderpack.texture.TextureStage;
 import us.z1x.lucerna.shadows.ShadowRenderTargets;
 import us.z1x.lucerna.uniforms.CommonUniforms;
 import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
@@ -139,7 +138,6 @@ public class CompositeRenderer {
             pass.framebuffer = framebuffer;
             pass.viewportScale = directives.getViewportScale();
             pass.mipmappedBuffers = directives.getMipmappedBuffers();
-            pass.flippedAtLeastOnce = flippedAtLeastOnceSnapshot;
 
             passes.add(pass);
         }
@@ -182,7 +180,6 @@ public class CompositeRenderer {
         Program program;
         ComputeProgram[] computes;
         GlFramebuffer framebuffer;
-        ImmutableSet<Integer> flippedAtLeastOnce;
         ImmutableSet<Integer> stageReadsFromAlt;
         ImmutableSet<Integer> mipmappedBuffers;
         float viewportScale;

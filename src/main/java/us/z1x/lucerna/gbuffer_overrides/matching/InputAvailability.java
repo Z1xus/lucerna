@@ -13,10 +13,6 @@ public class InputAvailability {
         this.overlay = overlay;
     }
 
-    public InputAvailability withoutOverlay() {
-        return new InputAvailability(texture, lightmap, false);
-    }
-
     public static InputAvailability unpack(int packed) {
         return new InputAvailability((packed & 1) == 1, (packed & 2) == 2, (packed & 4) == 4);
     }

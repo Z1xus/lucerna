@@ -275,16 +275,6 @@ public class DispatchingDirectiveHolder implements DirectiveHolder {
     }
 
     @Override
-    public void acceptConstVec2Directive(String name, Consumer<Vector2f> consumer) {
-        vec2ConstVariables.put(name, consumer);
-    }
-
-    @Override
-    public void acceptConstIVec3Directive(String name, Consumer<Vector3i> consumer) {
-        ivec3ConstVariables.put(name, consumer);
-    }
-
-    @Override
     public void acceptConstVec4Directive(String name, Consumer<Vector4f> consumer) {
         vec4ConstVariables.put(name, consumer);
     }

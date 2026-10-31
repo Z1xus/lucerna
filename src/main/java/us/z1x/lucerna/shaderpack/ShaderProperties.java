@@ -48,7 +48,6 @@ import java.util.function.Consumer;
 public class ShaderProperties {
     private CloudSetting cloudSetting = CloudSetting.DEFAULT;
     private OptionalBoolean oldHandLight = OptionalBoolean.DEFAULT;
-    private OptionalBoolean dynamicHandLight = OptionalBoolean.DEFAULT;
     private OptionalBoolean oldLighting = OptionalBoolean.DEFAULT;
     private OptionalBoolean shadowTerrain = OptionalBoolean.DEFAULT;
     private OptionalBoolean shadowTranslucent = OptionalBoolean.DEFAULT;
@@ -59,15 +58,9 @@ public class ShaderProperties {
     private OptionalBoolean sun = OptionalBoolean.DEFAULT;
     private OptionalBoolean moon = OptionalBoolean.DEFAULT;
     private OptionalBoolean vignette = OptionalBoolean.DEFAULT;
-    private OptionalBoolean backFaceSolid = OptionalBoolean.DEFAULT;
-    private OptionalBoolean backFaceCutout = OptionalBoolean.DEFAULT;
-    private OptionalBoolean backFaceCutoutMipped = OptionalBoolean.DEFAULT;
-    private OptionalBoolean backFaceTranslucent = OptionalBoolean.DEFAULT;
     private OptionalBoolean rainDepth = OptionalBoolean.DEFAULT;
     private OptionalBoolean concurrentCompute = OptionalBoolean.DEFAULT;
-    private OptionalBoolean beaconBeamDepth = OptionalBoolean.DEFAULT;
     private OptionalBoolean separateAo = OptionalBoolean.DEFAULT;
-    private OptionalBoolean frustumCulling = OptionalBoolean.DEFAULT;
     private OptionalBoolean shadowCulling = OptionalBoolean.DEFAULT;
     private OptionalBoolean shadowEnabled = OptionalBoolean.DEFAULT;
     private OptionalBoolean particlesBeforeDeferred = OptionalBoolean.DEFAULT;
@@ -132,7 +125,6 @@ public class ShaderProperties {
             }
 
             handleBooleanDirective(key, value, "oldHandLight", bool -> oldHandLight = bool);
-            handleBooleanDirective(key, value, "dynamicHandLight", bool -> dynamicHandLight = bool);
             handleBooleanDirective(key, value, "oldLighting", bool -> oldLighting = bool);
             handleBooleanDirective(key, value, "shadowTerrain", bool -> shadowTerrain = bool);
             handleBooleanDirective(key, value, "shadowTranslucent", bool -> shadowTranslucent = bool);
@@ -143,15 +135,9 @@ public class ShaderProperties {
             handleBooleanDirective(key, value, "sun", bool -> sun = bool);
             handleBooleanDirective(key, value, "moon", bool -> moon = bool);
             handleBooleanDirective(key, value, "vignette", bool -> vignette = bool);
-            handleBooleanDirective(key, value, "backFace.solid", bool -> backFaceSolid = bool);
-            handleBooleanDirective(key, value, "backFace.cutout", bool -> backFaceCutout = bool);
-            handleBooleanDirective(key, value, "backFace.cutoutMipped", bool -> backFaceCutoutMipped = bool);
-            handleBooleanDirective(key, value, "backFace.translucent", bool -> backFaceTranslucent = bool);
             handleBooleanDirective(key, value, "rain.depth", bool -> rainDepth = bool);
             handleBooleanDirective(key, value, "allowConcurrentCompute", bool -> concurrentCompute = bool);
-            handleBooleanDirective(key, value, "beacon.beam.depth", bool -> beaconBeamDepth = bool);
             handleBooleanDirective(key, value, "separateAo", bool -> separateAo = bool);
-            handleBooleanDirective(key, value, "frustum.culling", bool -> frustumCulling = bool);
             handleBooleanDirective(key, value, "shadow.culling", bool -> shadowCulling = bool);
             handleBooleanDirective(key, value, "shadow.enabled", bool -> shadowEnabled = bool);
             handleBooleanDirective(key, value, "particles.before.deferred", bool -> particlesBeforeDeferred = bool);
@@ -525,10 +511,6 @@ public class ShaderProperties {
         return oldHandLight;
     }
 
-    public OptionalBoolean getDynamicHandLight() {
-        return dynamicHandLight;
-    }
-
     public OptionalBoolean getOldLighting() {
         return oldLighting;
     }
@@ -569,36 +551,12 @@ public class ShaderProperties {
         return vignette;
     }
 
-    public OptionalBoolean getBackFaceSolid() {
-        return backFaceSolid;
-    }
-
-    public OptionalBoolean getBackFaceCutout() {
-        return backFaceCutout;
-    }
-
-    public OptionalBoolean getBackFaceCutoutMipped() {
-        return backFaceCutoutMipped;
-    }
-
-    public OptionalBoolean getBackFaceTranslucent() {
-        return backFaceTranslucent;
-    }
-
     public OptionalBoolean getRainDepth() {
         return rainDepth;
     }
 
-    public OptionalBoolean getBeaconBeamDepth() {
-        return beaconBeamDepth;
-    }
-
     public OptionalBoolean getSeparateAo() {
         return separateAo;
-    }
-
-    public OptionalBoolean getFrustumCulling() {
-        return frustumCulling;
     }
 
     public OptionalBoolean getShadowCulling() {

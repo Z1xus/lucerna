@@ -50,7 +50,6 @@ public class IdMap {
             blockRenderTypeMap = parseRenderTypeMap(blockProperties, "layer.", "block.properties");
         });
 
-
         if (blockPropertiesMap == null) {
             blockPropertiesMap = new Int2ObjectOpenHashMap<>();
             LegacyIdMap.addLegacyValues(blockPropertiesMap);

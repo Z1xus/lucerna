@@ -186,18 +186,6 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
         return this.isVisible(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ) != 0;
     }
 
-    public int fastAabbTest(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        if (boxCuller != null && boxCuller.isCulled(minX, minY, minZ, maxX, maxY, maxZ)) {
-            return 0;
-        }
-
-        return isVisible(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return false;
-    }
-
     protected int isVisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         float f = (float) (minX - this.x);
         float g = (float) (minY - this.y);
@@ -243,16 +231,6 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
         }
 
         return 2;
-    }
-
-    public boolean checkCornerVisibilityBool(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        for (int i = 0; i < planeCount; ++i) {
-            if (planes[i].x * (planes[i].x < 0 ? minX : maxX) + planes[i].y * (planes[i].y < 0 ? minY : maxY) + planes[i].z * (planes[i].z < 0 ? minZ : maxZ) < -planes[i].w) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override

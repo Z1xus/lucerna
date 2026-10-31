@@ -151,29 +151,6 @@ public final class GLDebug {
         }
     }
 
-    public static int disableDebugMessages() {
-        GLCapabilities caps = GL.getCapabilities();
-        if (caps.OpenGL43) {
-            GL43C.glDebugMessageCallback(null, 0L);
-            return 1;
-        } else if (caps.GL_KHR_debug) {
-            KHRDebug.glDebugMessageCallback(null, 0L);
-            if (caps.OpenGL30 && (GL43C.glGetInteger(33310) & 2) == 0) {
-                GL43C.glDisable(37600);
-            }
-            return 1;
-        } else if (caps.GL_ARB_debug_output) {
-            ARBDebugOutput.glDebugMessageCallbackARB(null, 0L);
-            return 1;
-        } else if (caps.GL_AMD_debug_output) {
-            AMDDebugOutput.glDebugMessageCallbackAMD(null, 0L);
-            return 1;
-        } else {
-            Iris.logger.info("[GL] No debug output implementation is available, cannot disable debug info.");
-            return 0;
-        }
-    }
-
     private static void printDetail(PrintStream stream, String type, String message) {
         stream.printf("\t%s: %s\n", type, message);
     }
@@ -332,8 +309,6 @@ public final class GLDebug {
 
     private static interface DebugState {
         void nameObject(int id, int object, String name);
-        void pushGroup(int id, String name);
-        void popGroup();
     }
 
     private static class KHRDebugState implements DebugState {
@@ -343,33 +318,11 @@ public final class GLDebug {
         public void nameObject(int id, int object, String name) {
             KHRDebug.glObjectLabel(id, object, name);
         }
-
-        @Override
-        public void pushGroup(int id, String name) {
-            KHRDebug.glPushDebugGroup(KHRDebug.GL_DEBUG_SOURCE_APPLICATION, id, name);
-            hasGroup = true;
-        }
-
-        @Override
-        public void popGroup() {
-            if (hasGroup) {
-                KHRDebug.glPopDebugGroup();
-                hasGroup = false;
-            }
-        }
     }
 
     private static class UnsupportedDebugState implements DebugState {
         @Override
         public void nameObject(int id, int object, String name) {
-        }
-
-        @Override
-        public void pushGroup(int id, String name) {
-        }
-
-        @Override
-        public void popGroup() {
         }
     }
 

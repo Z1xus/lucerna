@@ -74,16 +74,8 @@ public class GlFramebuffer extends GlResource {
         IrisRenderSystem.readBuffer(getGlId(), GL30C.GL_COLOR_ATTACHMENT0 + buffer);
     }
 
-    public int getColorAttachment(int index) {
-        return attachments.get(index);
-    }
-
     public boolean hasDepthAttachment() {
         return hasDepthAttachment;
-    }
-
-    public int getColorAttachmentFramebuffer() {
-        return getGlId();
     }
 
     public void bind() {
@@ -92,10 +84,6 @@ public class GlFramebuffer extends GlResource {
 
     public void bindAsReadBuffer() {
         IrisRenderSystem.bindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, getGlId());
-    }
-
-    public void bindAsDrawBuffer() {
-        IrisRenderSystem.bindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, getGlId());
     }
 
     protected void destroyInternal() {

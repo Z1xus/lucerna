@@ -41,10 +41,6 @@ public class IrisConfig {
         }
     }
 
-    public boolean isInternal() {
-        return false;
-    }
-
     public Optional<String> getShaderPackName() {
         return Optional.ofNullable(shaderPackName);
     }
@@ -63,10 +59,6 @@ public class IrisConfig {
 
     public boolean areDebugOptionsEnabled() {
         return enableDebugOptions;
-    }
-
-    public boolean shouldDisableUpdateMessage() {
-        return disableUpdateMessage;
     }
 
     public void setDebugEnabled(boolean enabled) {

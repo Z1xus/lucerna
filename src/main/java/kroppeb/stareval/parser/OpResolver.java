@@ -15,10 +15,6 @@ abstract class OpResolver<T> {
             map = new Object2ObjectOpenHashMap<>();
         }
 
-        public void singleChar(T op) {
-            multiChar("", op);
-        }
-
         public void multiChar(String trailing, T op) {
             T previous = map.put(trailing, op);
 

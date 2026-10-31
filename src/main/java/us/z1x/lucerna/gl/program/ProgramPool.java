@@ -1,6 +1,5 @@
 package us.z1x.lucerna.gl.program;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
 import us.z1x.lucerna.gl.shader.ProgramCreator;
 import us.z1x.lucerna.gl.shader.ShaderType;
 import us.z1x.lucerna.gl.shader.ShaderWorkarounds;

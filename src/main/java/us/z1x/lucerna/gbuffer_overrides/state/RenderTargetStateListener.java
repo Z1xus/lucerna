@@ -9,14 +9,8 @@ public interface RenderTargetStateListener {
         @Override
         public void endPostChain() {
         }
-
-        @Override
-        public void setIsMainBound(boolean bound) {
-        }
     };
 
     void beginPostChain();
     void endPostChain();
-
-    void setIsMainBound(boolean bound);
 }

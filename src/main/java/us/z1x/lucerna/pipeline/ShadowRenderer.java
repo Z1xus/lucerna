@@ -43,7 +43,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.ARBTextureSwizzle;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20C;

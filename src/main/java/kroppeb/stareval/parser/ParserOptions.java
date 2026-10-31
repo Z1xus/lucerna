@@ -103,10 +103,6 @@ public final class ParserOptions {
             this.binaryOpResolvers.computeIfAbsent(first, (c) -> new OpResolver.Builder<>()).multiChar(trailing, op);
         }
 
-        public void setTokenRules(TokenRules tokenRules) {
-            this.tokenRules = tokenRules;
-        }
-
         public ParserOptions build() {
             return new ParserOptions(
                 buildOpResolvers(this.unaryOpResolvers),

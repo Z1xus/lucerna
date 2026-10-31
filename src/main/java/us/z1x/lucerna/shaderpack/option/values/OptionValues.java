@@ -27,6 +27,6 @@ public interface OptionValues {
     int getOptionsChanged();
 
     MutableOptionValues mutableCopy();
-    ImmutableOptionValues toImmutable();
+
     OptionSet getOptionSet();
 }

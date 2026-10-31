@@ -47,11 +47,6 @@ public class BlockRenderingSettings {
     }
 
     @Nullable
-    public Map<Block, BlockLayer> getBlockTypeIds() {
-        return blockTypeIds;
-    }
-
-    @Nullable
     public Object2IntFunction<NamespacedId> getEntityIds() {
         return entityIds;
     }
@@ -125,10 +120,6 @@ public class BlockRenderingSettings {
 
         this.reloadRequired = true;
         this.useSeparateAo = useSeparateAo;
-    }
-
-    public boolean shouldUseExtendedVertexFormat() {
-        return useExtendedVertexFormat;
     }
 
     public void setUseExtendedVertexFormat(boolean useExtendedVertexFormat) {

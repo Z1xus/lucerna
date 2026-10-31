@@ -3,7 +3,6 @@ package us.z1x.lucerna.uniforms.custom.cached;
 import kroppeb.stareval.function.FunctionReturn;
 import kroppeb.stareval.function.Type;
 import us.z1x.lucerna.gl.IrisRenderSystem;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 
 import java.util.function.BooleanSupplier;
 
@@ -12,8 +11,8 @@ public class BooleanCachedUniform extends CachedUniform {
     final private BooleanSupplier supplier;
     private boolean cached;
 
-    public BooleanCachedUniform(String name, UniformUpdateFrequency updateFrequency, BooleanSupplier supplier) {
-        super(name, updateFrequency);
+    public BooleanCachedUniform(String name, BooleanSupplier supplier) {
+        super(name);
         this.supplier = supplier;
     }
 

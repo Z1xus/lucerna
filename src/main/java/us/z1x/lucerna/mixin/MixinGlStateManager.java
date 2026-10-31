@@ -4,7 +4,6 @@ import us.z1x.lucerna.Iris;
 import us.z1x.lucerna.gbuffer_overrides.state.StateTracker;
 import us.z1x.lucerna.gl.blending.AlphaTestStorage;
 import us.z1x.lucerna.gl.blending.BlendModeStorage;
-import us.z1x.lucerna.gl.blending.DepthColorStorage;
 import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.samplers.IrisSamplers;
@@ -210,22 +209,6 @@ public class MixinGlStateManager {
     private static void lucerna$alphaFuncLock(int function, float reference, CallbackInfo ci) {
         if (AlphaTestStorage.isAlphaTestLocked()) {
             AlphaTestStorage.deferAlphaFunc(function, reference);
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "depthMask", at = @At("HEAD"), cancellable = true)
-    private static void lucerna$depthMaskLock(boolean enable, CallbackInfo ci) {
-        if (DepthColorStorage.isDepthColorLocked()) {
-            DepthColorStorage.deferDepthEnable(enable);
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "colorMask", at = @At("HEAD"), cancellable = true)
-    private static void lucerna$colorMaskLock(boolean red, boolean green, boolean blue, boolean alpha, CallbackInfo ci) {
-        if (DepthColorStorage.isDepthColorLocked()) {
-            DepthColorStorage.deferColorMask(red, green, blue, alpha);
             ci.cancel();
         }
     }

@@ -158,10 +158,6 @@ public class CustomTextureManager {
         }
     }
 
-    public EnumMap<TextureStage, Object2ObjectMap<String, IntSupplier>> getCustomTextureIdMap() {
-        return customTextureIdMap;
-    }
-
     public Object2ObjectMap<String, IntSupplier> getCustomTextureIdMap(TextureStage stage) {
         return customTextureIdMap.getOrDefault(stage, Object2ObjectMaps.emptyMap());
     }

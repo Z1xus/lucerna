@@ -54,8 +54,8 @@ public class OptionSet {
             }
         }
 
-        public void addBooleanOption(OptionLocation location, BooleanOption option) {
-            addBooleanOption(new MergedBooleanOption(location, option));
+        public void addBooleanOption(BooleanOption option) {
+            addBooleanOption(new MergedBooleanOption(option));
         }
 
         public void addBooleanOption(MergedBooleanOption proposed) {
@@ -79,8 +79,8 @@ public class OptionSet {
             booleanOptions.put(option.getName(), merged);
         }
 
-        public void addStringOption(OptionLocation location, StringOption option) {
-            addStringOption(new MergedStringOption(location, option));
+        public void addStringOption(StringOption option) {
+            addStringOption(new MergedStringOption(option));
         }
 
         public void addStringOption(MergedStringOption proposed) {

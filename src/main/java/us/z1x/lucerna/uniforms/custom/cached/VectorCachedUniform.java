@@ -3,7 +3,6 @@ package us.z1x.lucerna.uniforms.custom.cached;
 import kroppeb.stareval.function.FunctionReturn;
 import kroppeb.stareval.function.Type;
 import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -13,8 +12,8 @@ public abstract class VectorCachedUniform<T> extends CachedUniform {
     final protected T cached;
     final private Supplier<T> supplier;
 
-    public VectorCachedUniform(String name, UniformUpdateFrequency updateFrequency, T cache, Supplier<@NotNull T> supplier) {
-        super(name, updateFrequency);
+    public VectorCachedUniform(String name, T cache, Supplier<@NotNull T> supplier) {
+        super(name);
         this.supplier = supplier;
         this.cached = cache;
     }

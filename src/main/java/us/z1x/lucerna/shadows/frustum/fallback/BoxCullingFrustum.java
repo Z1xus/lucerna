@@ -24,10 +24,6 @@ public class BoxCullingFrustum implements Culler, ViewportProvider, Frustum {
         boxCuller.setPosition(cameraX, cameraY, cameraZ);
     }
 
-    public boolean canDetermineInvisible(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return false;
-    }
-
     public boolean isVisible(Box box) {
         return !boxCuller.isCulled(box);
     }

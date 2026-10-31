@@ -59,10 +59,6 @@ public class FunctionResolver {
             this.addFunction(name, function);
         }
 
-        public <T extends TypedFunction> void addDynamic(String name, Type returnType, Supplier<T> function) {
-            this.addDynamicFunction(name, returnType, function);
-        }
-
         public void addDynamicFunction(String name, Type returnType, Supplier<? extends TypedFunction> function) {
             this.dynamicFunctions
                 .computeIfAbsent(name, (n) -> new Object2ObjectLinkedOpenHashMap<>())
@@ -88,5 +84,4 @@ public class FunctionResolver {
             return new FunctionResolver(functions, this.dynamicFunctions);
         }
     }
-
 }

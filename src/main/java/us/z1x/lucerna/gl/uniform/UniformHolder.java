@@ -1,7 +1,6 @@
 package us.z1x.lucerna.gl.uniform;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3i;
 import org.joml.Vector3d;
@@ -23,8 +22,6 @@ public interface UniformHolder {
     UniformHolder uniform1i(UniformUpdateFrequency updateFrequency, String name, IntSupplier value);
 
     UniformHolder uniform1b(UniformUpdateFrequency updateFrequency, String name, BooleanSupplier value);
-
-    UniformHolder uniform2f(UniformUpdateFrequency updateFrequency, String name, Supplier<Vector2f> value);
 
     UniformHolder uniform2i(UniformUpdateFrequency updateFrequency, String name, Supplier<Vector2i> value);
 

@@ -1,7 +1,6 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
 import us.z1x.lucerna.gl.IrisRenderSystem;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.parsing.MatrixType;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
@@ -12,8 +11,8 @@ import java.util.function.Supplier;
 public class Float4MatrixCachedUniform extends VectorCachedUniform<Matrix4f> {
     final private FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 
-    public Float4MatrixCachedUniform(String name, UniformUpdateFrequency updateFrequency, Supplier<Matrix4f> supplier) {
-        super(name, updateFrequency, new Matrix4f(), supplier);
+    public Float4MatrixCachedUniform(String name, Supplier<Matrix4f> supplier) {
+        super(name, new Matrix4f(), supplier);
     }
 
     @Override

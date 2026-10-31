@@ -12,58 +12,6 @@ public class GbufferPrograms {
     private static boolean outline;
     private static Runnable phaseChangeListener;
 
-    private static void checkReentrancy() {
-        if (entities || blockEntities || outline) {
-            throw new IllegalStateException("GbufferPrograms in weird state, tried to call begin function when entities = "
-                + entities + ", blockEntities = " + blockEntities + ", outline = " + outline);
-        }
-    }
-
-    public static void beginEntities() {
-        checkReentrancy();
-        setPhase(WorldRenderingPhase.ENTITIES);
-        entities = true;
-    }
-
-    public static void endEntities() {
-        if (!entities) {
-            throw new IllegalStateException("GbufferPrograms in weird state, tried to call endEntities when entities = false");
-        }
-
-        setPhase(WorldRenderingPhase.NONE);
-        entities = false;
-    }
-
-    public static void beginOutline() {
-        checkReentrancy();
-        setPhase(WorldRenderingPhase.OUTLINE);
-        outline = true;
-    }
-
-    public static void endOutline() {
-        if (!outline) {
-            throw new IllegalStateException("GbufferPrograms in weird state, tried to call endOutline when outline = false");
-        }
-
-        setPhase(WorldRenderingPhase.NONE);
-        outline = false;
-    }
-
-    public static void beginBlockEntities() {
-        checkReentrancy();
-        setPhase(WorldRenderingPhase.BLOCK_ENTITIES);
-        blockEntities = true;
-    }
-
-    public static void endBlockEntities() {
-        if (!blockEntities) {
-            throw new IllegalStateException("GbufferPrograms in weird state, tried to call endBlockEntities when blockEntities = false");
-        }
-
-        setPhase(WorldRenderingPhase.NONE);
-        blockEntities = false;
-    }
-
     public static WorldRenderingPhase getCurrentPhase() {
         WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
 

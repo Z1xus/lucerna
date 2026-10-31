@@ -8,7 +8,6 @@ import org.lwjgl.opengl.ARBDirectStateAccess;
 import org.lwjgl.opengl.EXTShaderImageLoadStore;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.opengl.GL45C;
@@ -20,7 +19,6 @@ import java.nio.IntBuffer;
 
 public class IrisRenderSystem {
     private static DSAAccess dsaState;
-    private static boolean hasMultibind;
     private static boolean supportsCompute;
     private static boolean supportsBufferBlending;
     private static int drawFramebuffer = -1;
@@ -38,22 +36,8 @@ public class IrisRenderSystem {
             Iris.logger.info("DSA support not detected.");
         }
 
-        if (GL.getCapabilities().OpenGL45 || GL.getCapabilities().GL_ARB_multi_bind) {
-            hasMultibind = true;
-        } else {
-            hasMultibind = false;
-        }
-
         supportsCompute = GL.getCapabilities().glDispatchCompute != MemoryUtil.NULL;
         supportsBufferBlending = GL.getCapabilities().GL_ARB_draw_buffers_blend || GL.getCapabilities().OpenGL40;
-    }
-
-    public static void getIntegerv(int pname, int[] params) {
-        GL30C.glGetIntegerv(pname, params);
-    }
-
-    public static void getFloatv(int pname, float[] params) {
-        GL30C.glGetFloatv(pname, params);
     }
 
     public static void generateMipmaps(int texture, int mipmapTarget) {
@@ -109,10 +93,6 @@ public class IrisRenderSystem {
         GL30C.glUniform4i(location, v0, v1, v2, v3);
     }
 
-    public static int getAttribLocation(int programId, String name) {
-        return GL30C.glGetAttribLocation(programId, name);
-    }
-
     public static int getUniformLocation(int programId, String name) {
         return GL30C.glGetUniformLocation(programId, name);
     }
@@ -151,10 +131,6 @@ public class IrisRenderSystem {
 
     public static String getActiveUniform(int program, int index, int size, IntBuffer type, IntBuffer name) {
         return GL30C.glGetActiveUniform(program, index, size, type, name);
-    }
-
-    public static void readPixels(int x, int y, int width, int height, int format, int type, float[] pixels) {
-        GL30C.glReadPixels(x, y, width, height, format, type, pixels);
     }
 
     public static void bufferData(int target, float[] data, int usage) {
@@ -203,10 +179,6 @@ public class IrisRenderSystem {
         GL30C.glGetProgramiv(program, value, storage);
     }
 
-    public static void dispatchCompute(int workX, int workY, int workZ) {
-        GL45C.glDispatchCompute(workX, workY, workZ);
-    }
-
     public static void dispatchCompute(Vector3i workGroups) {
         GL45C.glDispatchCompute(workGroups.x, workGroups.y, workGroups.z);
     }
@@ -235,21 +207,6 @@ public class IrisRenderSystem {
 
     public static void bindTextureToUnit(int unit, int texture) {
         dsaState.bindTextureToUnit(unit, texture);
-    }
-
-    @Deprecated
-    public static void setupProjectionMatrix(float[] matrix) {
-        GlStateManager.matrixMode(GL11.GL_PROJECTION);
-        GlStateManager.pushMatrix();
-        GL20.glLoadMatrixf(matrix);
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-    }
-
-    @Deprecated
-    public static void restoreProjectionMatrix() {
-        GlStateManager.matrixMode(GL11.GL_PROJECTION);
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
     }
 
     public static void blitFramebuffer(int source, int dest, int offsetX, int offsetY, int width, int height, int offsetX2, int offsetY2, int width2, int height2, int bufferChoice, int filter) {
