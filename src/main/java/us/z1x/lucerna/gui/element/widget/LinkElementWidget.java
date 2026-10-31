@@ -1,11 +1,11 @@
 package us.z1x.lucerna.gui.element.widget;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.TextRenderer;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.shaderpack.option.menu.OptionMenuLinkElement;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.TextRenderer;
 
 import java.util.Optional;
 

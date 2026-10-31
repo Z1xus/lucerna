@@ -1,8 +1,8 @@
 package us.z1x.lucerna.gl.program;
 
+import org.lwjgl.opengl.GL20;
 import us.z1x.lucerna.gl.GlResource;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
-import org.lwjgl.opengl.GL20;
 
 public final class Program extends GlResource {
     private final ProgramUniforms uniforms;

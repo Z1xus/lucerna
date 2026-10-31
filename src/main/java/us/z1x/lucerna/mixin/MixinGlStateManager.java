@@ -1,14 +1,5 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gbufferoverrides.state.StateTracker;
-import us.z1x.lucerna.gl.blending.AlphaTestStorage;
-import us.z1x.lucerna.gl.blending.BlendModeStorage;
-import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.samplers.LucernaSamplers;
-import us.z1x.lucerna.texture.TextureInfoCache;
-import us.z1x.lucerna.texture.TextureTracker;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,6 +9,15 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gbufferoverrides.state.StateTracker;
+import us.z1x.lucerna.gl.blending.AlphaTestStorage;
+import us.z1x.lucerna.gl.blending.BlendModeStorage;
+import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.samplers.LucernaSamplers;
+import us.z1x.lucerna.texture.TextureInfoCache;
+import us.z1x.lucerna.texture.TextureTracker;
 
 @Mixin(GlStateManager.class)
 public class MixinGlStateManager {

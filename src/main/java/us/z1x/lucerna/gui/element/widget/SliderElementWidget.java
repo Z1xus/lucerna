@@ -1,13 +1,13 @@
 package us.z1x.lucerna.gui.element.widget;
 
-import us.z1x.lucerna.gui.GuiUtil;
-import us.z1x.lucerna.shaderpack.option.menu.OptionMenuStringOptionElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Formatting;
 import net.minecraft.util.math.MathHelper;
+import us.z1x.lucerna.gui.GuiUtil;
+import us.z1x.lucerna.shaderpack.option.menu.OptionMenuStringOptionElement;
 
 public class SliderElementWidget extends StringElementWidget {
     private static final int PREVIEW_SLIDER_WIDTH = 4;

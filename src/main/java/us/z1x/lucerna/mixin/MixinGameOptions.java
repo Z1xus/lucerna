@@ -1,7 +1,5 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 
 @Mixin(GameOptions.class)
 public class MixinGameOptions {

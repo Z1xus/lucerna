@@ -1,8 +1,5 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.uniform.UniformHolder;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
-import us.z1x.lucerna.uniforms.transforms.SmoothedFloat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -11,6 +8,9 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.SwampBiome;
 import org.joml.Math;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
+import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
+import us.z1x.lucerna.uniforms.transforms.SmoothedFloat;
 
 // expressions copied from bsl and complementary
 public class HardcodedCustomUniforms {
@@ -132,7 +132,7 @@ public class HardcodedCustomUniforms {
         float difX = (float) (tracker.getCurrentCameraPosition().x - tracker.getPreviousCameraPosition().x);
         float difY = (float) (tracker.getCurrentCameraPosition().y - tracker.getPreviousCameraPosition().y);
         float difZ = (float) (tracker.getCurrentCameraPosition().z - tracker.getPreviousCameraPosition().z);
-        return Math.sqrt(difX*difX + difY*difY + difZ*difZ);
+        return Math.sqrt(difX * difX + difY * difY + difZ * difZ);
     }
 
     private static SmoothedFloat getStarter(CameraUniforms.CameraPositionTracker tracker, FrameUpdateNotifier notifier) {
@@ -152,11 +152,11 @@ public class HardcodedCustomUniforms {
     }
 
     private static float getTimeBrightness() {
-        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * 2.0),0.0);
+        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * 2.0), 0.0);
     }
 
     private static float getMoonBrightness() {
-        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * (-2.0)),0.0);
+        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * (-2.0)), 0.0);
     }
 
     private static float getShadowFade() {

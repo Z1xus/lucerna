@@ -2,13 +2,13 @@ package us.z1x.lucerna.texture;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.client.render.texture.AbstractTexture;
+import org.jetbrains.annotations.Nullable;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.texture.pbr.PBRTextureManager;
-import net.minecraft.client.render.platform.GlStateManager;
-import net.minecraft.client.render.texture.AbstractTexture;
-import org.jetbrains.annotations.Nullable;
 
 public class TextureTracker {
     public static final TextureTracker INSTANCE = new TextureTracker();

@@ -1,15 +1,15 @@
 package us.z1x.lucerna.gl.program;
 
-import us.z1x.lucerna.gl.shader.ProgramCreator;
-import us.z1x.lucerna.gl.shader.ShaderType;
-import us.z1x.lucerna.gl.shader.ShaderWorkarounds;
-import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import org.lwjgl.opengl.ARBParallelShaderCompile;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.opengl.KHRParallelShaderCompile;
+import us.z1x.lucerna.gl.shader.ProgramCreator;
+import us.z1x.lucerna.gl.shader.ShaderType;
+import us.z1x.lucerna.gl.shader.ShaderWorkarounds;
+import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

@@ -1,10 +1,10 @@
 package us.z1x.lucerna.shaderpack;
 
 import com.google.common.collect.ImmutableList;
+import org.joml.Vector4f;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.texture.InternalTextureFormat;
 import us.z1x.lucerna.gui.option.LucernaVideoSettings;
-import org.joml.Vector4f;
 
 import java.util.Optional;
 

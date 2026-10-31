@@ -1,14 +1,14 @@
 package us.z1x.lucerna.rendertarget;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.shaderpack.texture.CustomTextureData;
 import net.minecraft.client.render.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.shaderpack.texture.CustomTextureData;
 
+import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class NativeImageBackedCustomTexture extends DynamicTexture {
     public NativeImageBackedCustomTexture(CustomTextureData.PngData textureData) throws IOException {

@@ -1,5 +1,8 @@
 package us.z1x.lucerna.gui.element.widget;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Formatting;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
@@ -9,9 +12,6 @@ import us.z1x.lucerna.shaderpack.option.Profile;
 import us.z1x.lucerna.shaderpack.option.ProfileSet;
 import us.z1x.lucerna.shaderpack.option.menu.OptionMenuProfileElement;
 import us.z1x.lucerna.shaderpack.option.values.OptionValues;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Formatting;
 
 import java.util.Optional;
 

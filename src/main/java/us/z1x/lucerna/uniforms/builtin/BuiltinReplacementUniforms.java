@@ -1,9 +1,9 @@
 package us.z1x.lucerna.uniforms.builtin;
 
+import org.joml.Matrix4f;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
-import org.joml.Matrix4f;
 
 public class BuiltinReplacementUniforms {
     // mimics the GL_TEXTURE matrix that GameRenderer sets on the lightmap unit

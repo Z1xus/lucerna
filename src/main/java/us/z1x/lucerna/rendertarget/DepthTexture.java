@@ -1,11 +1,11 @@
 package us.z1x.lucerna.rendertarget;
 
-import us.z1x.lucerna.gl.GlResource;
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.gl.texture.DepthBufferFormat;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
+import us.z1x.lucerna.gl.GlResource;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.gl.texture.DepthBufferFormat;
 
 public class DepthTexture extends GlResource {
     public DepthTexture(int width, int height, DepthBufferFormat format) {

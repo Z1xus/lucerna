@@ -1,10 +1,10 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.uniform.UniformHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
 
 import java.util.Objects;
 

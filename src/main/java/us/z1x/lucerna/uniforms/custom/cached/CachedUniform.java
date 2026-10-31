@@ -1,14 +1,14 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import us.z1x.lucerna.parsing.VectorType;
 import us.z1x.lucerna.stareval.expression.Expression;
 import us.z1x.lucerna.stareval.expression.VariableExpression;
 import us.z1x.lucerna.stareval.function.FunctionContext;
 import us.z1x.lucerna.stareval.function.FunctionReturn;
 import us.z1x.lucerna.stareval.function.Type;
-import us.z1x.lucerna.parsing.VectorType;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public abstract class CachedUniform implements VariableExpression {
     private final String name;

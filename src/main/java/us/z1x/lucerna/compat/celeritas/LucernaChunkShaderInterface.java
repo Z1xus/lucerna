@@ -1,17 +1,5 @@
 package us.z1x.lucerna.compat.celeritas;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gl.blending.BlendModeOverride;
-import us.z1x.lucerna.gl.blending.BufferBlendOverride;
-import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
-import us.z1x.lucerna.gl.program.ProgramImages;
-import us.z1x.lucerna.gl.program.ProgramSamplers;
-import us.z1x.lucerna.gl.program.ProgramUniforms;
-import us.z1x.lucerna.mixin.GameRendererAccessor;
-import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.samplers.LucernaSamplers;
-import us.z1x.lucerna.shadows.ShadowRenderingState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.TextureAtlas;
@@ -29,6 +17,18 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.opengl.GL13;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.blending.BlendModeOverride;
+import us.z1x.lucerna.gl.blending.BufferBlendOverride;
+import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
+import us.z1x.lucerna.gl.program.ProgramImages;
+import us.z1x.lucerna.gl.program.ProgramSamplers;
+import us.z1x.lucerna.gl.program.ProgramUniforms;
+import us.z1x.lucerna.mixin.GameRendererAccessor;
+import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.samplers.LucernaSamplers;
+import us.z1x.lucerna.shadows.ShadowRenderingState;
 
 import java.util.List;
 

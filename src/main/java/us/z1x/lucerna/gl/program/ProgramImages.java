@@ -1,12 +1,12 @@
 package us.z1x.lucerna.gl.program;
 
 import com.google.common.collect.ImmutableList;
+import org.lwjgl.opengl.GL20;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.image.ImageBinding;
 import us.z1x.lucerna.gl.image.ImageHolder;
 import us.z1x.lucerna.gl.image.ImageLimits;
 import us.z1x.lucerna.gl.texture.InternalTextureFormat;
-import org.lwjgl.opengl.GL20;
 
 import java.util.ArrayList;
 import java.util.List;

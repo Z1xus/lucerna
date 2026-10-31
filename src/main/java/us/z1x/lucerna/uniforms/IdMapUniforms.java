@@ -1,16 +1,16 @@
 package us.z1x.lucerna.uniforms;
 
 import it.unimi.dsi.fastutil.objects.Object2IntFunction;
-import us.z1x.lucerna.gl.uniform.UniformHolder;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
-import us.z1x.lucerna.shaderpack.IdMap;
-import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.Identifier;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
+import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
+import us.z1x.lucerna.shaderpack.IdMap;
+import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
 
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 

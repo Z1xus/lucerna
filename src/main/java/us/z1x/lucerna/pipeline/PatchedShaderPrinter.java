@@ -1,7 +1,7 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.Lucerna;
 import net.fabricmc.loader.api.FabricLoader;
+import us.z1x.lucerna.Lucerna;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

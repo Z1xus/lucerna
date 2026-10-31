@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.joml.Vector3i;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.function.Supplier;
 

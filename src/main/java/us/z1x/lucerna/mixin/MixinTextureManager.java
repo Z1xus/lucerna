@@ -1,12 +1,12 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.texture.pbr.PBRTextureManager;
 import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.resource.manager.ResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.texture.pbr.PBRTextureManager;
 
 @Mixin(TextureManager.class)
 public class MixinTextureManager {

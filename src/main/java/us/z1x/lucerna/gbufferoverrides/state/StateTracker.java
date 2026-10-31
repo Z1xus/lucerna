@@ -1,8 +1,8 @@
 package us.z1x.lucerna.gbufferoverrides.state;
 
+import net.minecraft.client.render.platform.GlStateManager;
 import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
 import us.z1x.lucerna.samplers.LucernaSamplers;
-import net.minecraft.client.render.platform.GlStateManager;
 
 public class StateTracker {
     public static final StateTracker INSTANCE = new StateTracker();

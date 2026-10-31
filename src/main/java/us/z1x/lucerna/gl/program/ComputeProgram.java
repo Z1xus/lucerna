@@ -1,14 +1,13 @@
 package us.z1x.lucerna.gl.program;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gl.GlResource;
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import org.joml.Vector2f;
 import org.joml.Vector3i;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL43C;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.GlResource;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 
 public final class ComputeProgram extends GlResource {
     private final ProgramUniforms uniforms;

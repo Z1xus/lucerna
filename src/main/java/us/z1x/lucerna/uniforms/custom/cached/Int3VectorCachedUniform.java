@@ -1,9 +1,9 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import us.z1x.lucerna.stareval.function.FunctionReturn;
-import us.z1x.lucerna.parsing.VectorType;
 import org.joml.Vector3i;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.parsing.VectorType;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
 
 import java.util.function.Supplier;
 

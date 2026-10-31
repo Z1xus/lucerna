@@ -1,5 +1,12 @@
 package us.z1x.lucerna.gui.element;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.TextRenderer;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Formatting;
+import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
@@ -8,13 +15,6 @@ import us.z1x.lucerna.gui.element.widget.OptionMenuConstructor;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.shaderpack.ShaderPack;
 import us.z1x.lucerna.shaderpack.option.menu.OptionMenuContainer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.TextRenderer;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Formatting;
-import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

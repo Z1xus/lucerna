@@ -1,16 +1,16 @@
 package us.z1x.lucerna.compat.celeritas;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.pipeline.transform.PatchShaderType;
-import us.z1x.lucerna.shadows.ShadowRenderingState;
 import org.embeddedt.embeddium.impl.gl.GlObject;
 import org.embeddedt.embeddium.impl.gl.shader.GlProgram;
 import org.embeddedt.embeddium.impl.gl.shader.GlShader;
 import org.embeddedt.embeddium.impl.gl.shader.ShaderType;
 import org.embeddedt.embeddium.impl.render.chunk.terrain.TerrainRenderPass;
 import org.jetbrains.annotations.Nullable;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.pipeline.transform.PatchShaderType;
+import us.z1x.lucerna.shadows.ShadowRenderingState;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

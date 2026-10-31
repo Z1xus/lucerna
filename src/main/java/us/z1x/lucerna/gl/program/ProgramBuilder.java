@@ -1,6 +1,7 @@
 package us.z1x.lucerna.gl.program;
 
 import com.google.common.collect.ImmutableSet;
+import org.jetbrains.annotations.Nullable;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.image.ImageHolder;
 import us.z1x.lucerna.gl.sampler.SamplerHolder;
@@ -9,7 +10,6 @@ import us.z1x.lucerna.gl.shader.ProgramCreator;
 import us.z1x.lucerna.gl.shader.ShaderType;
 import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import us.z1x.lucerna.gl.texture.InternalTextureFormat;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;
 

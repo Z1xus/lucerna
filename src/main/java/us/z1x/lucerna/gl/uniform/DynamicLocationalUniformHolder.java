@@ -1,9 +1,9 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
 import org.joml.Vector4i;
+import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;

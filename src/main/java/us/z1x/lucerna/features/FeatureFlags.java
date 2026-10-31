@@ -1,8 +1,8 @@
 package us.z1x.lucerna.features;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.resource.language.I18n;
 import org.apache.commons.lang3.text.WordUtils;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;

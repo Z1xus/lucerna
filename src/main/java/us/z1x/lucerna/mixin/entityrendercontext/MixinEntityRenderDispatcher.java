@@ -2,9 +2,6 @@ package us.z1x.lucerna.mixin.entityrendercontext;
 
 import it.unimi.dsi.fastutil.objects.Object2IntFunction;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
-import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
-import us.z1x.lucerna.uniforms.CapturedRenderingState;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entities;
 import net.minecraft.entity.Entity;
@@ -15,6 +12,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
+import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
+import us.z1x.lucerna.uniforms.CapturedRenderingState;
 
 import java.util.Locale;
 import java.util.Map;

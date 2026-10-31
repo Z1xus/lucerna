@@ -10,6 +10,8 @@ import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL12C;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.blending.AlphaTest;
@@ -27,8 +29,6 @@ import us.z1x.lucerna.shaderpack.option.ShaderPackOptions;
 import us.z1x.lucerna.shaderpack.preprocessor.PropertiesPreprocessor;
 import us.z1x.lucerna.shaderpack.texture.TextureStage;
 import us.z1x.lucerna.uniforms.custom.CustomUniforms;
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL12C;
 
 import java.io.IOException;
 import java.io.StringReader;

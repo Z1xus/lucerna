@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
+import org.joml.Vector3f;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.parsing.VectorType;
-import org.joml.Vector3f;
 
 import java.util.function.Supplier;
 

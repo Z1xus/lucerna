@@ -1,8 +1,8 @@
 package us.z1x.lucerna.shaderpack;
 
-import us.z1x.lucerna.Lucerna;
 import org.joml.Vector2f;
 import org.joml.Vector3i;
+import us.z1x.lucerna.Lucerna;
 
 public class ComputeDirectiveParser {
     public static void setComputeWorkGroups(ComputeSource source, ConstDirectiveParser.ConstDirective directive) {

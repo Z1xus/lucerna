@@ -2,13 +2,13 @@
 
 package us.z1x.lucerna.gl.shader;
 
-import us.z1x.lucerna.gl.GLDebug;
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.KHRDebug;
+import us.z1x.lucerna.gl.GLDebug;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 public class ProgramCreator {
     private static final Logger LOGGER = LogManager.getLogger(ProgramCreator.class);

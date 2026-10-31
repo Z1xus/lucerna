@@ -1,11 +1,11 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.platform.GLX;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 @Mixin(GLX.class)
 public class MixinGLX {

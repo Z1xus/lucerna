@@ -1,12 +1,12 @@
 package us.z1x.lucerna.gui.element;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gui.GuiUtil;
-import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Formatting;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gui.GuiUtil;
+import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 
 import java.util.Collection;
 import java.util.function.Function;

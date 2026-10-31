@@ -3,6 +3,7 @@ package us.z1x.lucerna.shadows;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.lwjgl.opengl.GL30C;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import us.z1x.lucerna.gl.texture.DepthBufferFormat;
@@ -11,7 +12,6 @@ import us.z1x.lucerna.gl.texture.InternalTextureFormat;
 import us.z1x.lucerna.rendertarget.DepthTexture;
 import us.z1x.lucerna.rendertarget.RenderTarget;
 import us.z1x.lucerna.shaderpack.PackShadowDirectives;
-import org.lwjgl.opengl.GL30C;
 
 import java.util.ArrayList;
 import java.util.Arrays;

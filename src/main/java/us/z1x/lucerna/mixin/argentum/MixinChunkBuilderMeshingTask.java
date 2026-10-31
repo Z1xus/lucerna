@@ -2,9 +2,6 @@ package us.z1x.lucerna.mixin.argentum;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.rdh.argentum.impl.render.terrain.compile.task.ChunkBuilderMeshingTask;
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.compat.celeritas.TerrainBlockContext;
-import us.z1x.lucerna.compat.celeritas.TerrainContextRanges;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.client.render.block.BlockLayer;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +11,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.compat.celeritas.TerrainBlockContext;
+import us.z1x.lucerna.compat.celeritas.TerrainContextRanges;
 
 @Mixin(ChunkBuilderMeshingTask.class)
 public class MixinChunkBuilderMeshingTask {

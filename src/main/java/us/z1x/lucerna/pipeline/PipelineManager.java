@@ -1,13 +1,13 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
-import us.z1x.lucerna.shaderpack.DimensionId;
-import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL20C;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
+import us.z1x.lucerna.shaderpack.DimensionId;
+import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 
 import java.util.HashMap;
 import java.util.Map;

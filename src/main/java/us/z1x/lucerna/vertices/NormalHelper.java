@@ -16,10 +16,10 @@ package us.z1x.lucerna.vertices;
  * limitations under the License.
  */
 
-import us.z1x.lucerna.vertices.views.QuadView;
-import us.z1x.lucerna.vertices.views.TriView;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import us.z1x.lucerna.vertices.views.QuadView;
+import us.z1x.lucerna.vertices.views.TriView;
 
 public abstract class NormalHelper {
     private NormalHelper() {

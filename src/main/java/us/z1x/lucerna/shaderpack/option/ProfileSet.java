@@ -1,8 +1,8 @@
 package us.z1x.lucerna.shaderpack.option;
 
+import org.jetbrains.annotations.Nullable;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.shaderpack.option.values.OptionValues;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;

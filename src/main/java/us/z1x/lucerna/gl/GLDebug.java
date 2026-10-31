@@ -5,7 +5,6 @@
 
 package us.z1x.lucerna.gl;
 
-import us.z1x.lucerna.Lucerna;
 import org.lwjgl.opengl.AMDDebugOutput;
 import org.lwjgl.opengl.ARBDebugOutput;
 import org.lwjgl.opengl.GL;
@@ -16,6 +15,7 @@ import org.lwjgl.opengl.GLDebugMessageARBCallback;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.opengl.KHRDebug;
 import org.lwjgl.system.APIUtil;
+import us.z1x.lucerna.Lucerna;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
@@ -164,7 +164,7 @@ public final class GLDebug {
     }
 
     private static String getDebugSource(int source) {
-        switch(source) {
+        switch (source) {
             case 33350:
                 return "API";
             case 33351:
@@ -183,7 +183,7 @@ public final class GLDebug {
     }
 
     private static String getDebugType(int type) {
-        switch(type) {
+        switch (type) {
             case 33356:
                 return "ERROR";
             case 33357:
@@ -204,7 +204,7 @@ public final class GLDebug {
     }
 
     private static String getDebugSeverity(int severity) {
-        switch(severity) {
+        switch (severity) {
             case 33387:
                 return "NOTIFICATION";
             case 37190:
@@ -219,7 +219,7 @@ public final class GLDebug {
     }
 
     private static String getSourceARB(int source) {
-        switch(source) {
+        switch (source) {
             case 33350:
                 return "API";
             case 33351:
@@ -238,7 +238,7 @@ public final class GLDebug {
     }
 
     private static String getTypeARB(int type) {
-        switch(type) {
+        switch (type) {
             case 33356:
                 return "ERROR";
             case 33357:
@@ -257,7 +257,7 @@ public final class GLDebug {
     }
 
     private static String getSeverityARB(int severity) {
-        switch(severity) {
+        switch (severity) {
             case 37190:
                 return "HIGH";
             case 37191:
@@ -270,7 +270,7 @@ public final class GLDebug {
     }
 
     private static String getCategoryAMD(int category) {
-        switch(category) {
+        switch (category) {
             case 37193:
                 return "API ERROR";
             case 37194:
@@ -293,7 +293,7 @@ public final class GLDebug {
     }
 
     private static String getSeverityAMD(int severity) {
-        switch(severity) {
+        switch (severity) {
             case 37190:
                 return "HIGH";
             case 37191:

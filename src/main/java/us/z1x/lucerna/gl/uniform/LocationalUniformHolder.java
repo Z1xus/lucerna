@@ -2,9 +2,9 @@ package us.z1x.lucerna.gl.uniform;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
-import org.joml.Vector3i;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector4f;
 
 import java.util.OptionalInt;

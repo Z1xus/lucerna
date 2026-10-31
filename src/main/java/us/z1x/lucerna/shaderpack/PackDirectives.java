@@ -7,9 +7,9 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.joml.Vector2i;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.texture.TextureScaleOverride;
-import org.joml.Vector2i;
 
 import java.util.List;
 import java.util.Set;

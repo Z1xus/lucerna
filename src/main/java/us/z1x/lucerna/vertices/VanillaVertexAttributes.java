@@ -1,12 +1,12 @@
 package us.z1x.lucerna.vertices;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.VertexFormat;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.system.MemoryUtil;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.nio.ByteBuffer;
 

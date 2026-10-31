@@ -2,13 +2,13 @@ package us.z1x.lucerna.gl.framebuffer;
 
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL30C;
 import us.z1x.lucerna.gl.GlResource;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.texture.DepthBufferFormat;
 import us.z1x.lucerna.texture.TextureInfoCache;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL30C;
 
 public class GlFramebuffer extends GlResource {
     private final Int2IntMap attachments;

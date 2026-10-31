@@ -1,9 +1,9 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
+import org.jetbrains.annotations.NotNull;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.stareval.function.FunctionReturn;
 import us.z1x.lucerna.stareval.function.Type;
-import us.z1x.lucerna.Lucerna;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 

@@ -1,6 +1,5 @@
 package us.z1x.lucerna.gui.option;
 
-import us.z1x.lucerna.Lucerna;
 import org.embeddedt.embeddium.impl.gui.framework.TextComponent;
 import org.taumc.celeritas.api.options.OptionIdentifier;
 import org.taumc.celeritas.api.options.control.ControlValueFormatter;
@@ -10,6 +9,7 @@ import org.taumc.celeritas.api.options.structure.OptionImpact;
 import org.taumc.celeritas.api.options.structure.OptionImpl;
 import org.taumc.celeritas.api.options.structure.OptionPage;
 import org.taumc.celeritas.api.options.structure.OptionStorage;
+import us.z1x.lucerna.Lucerna;
 
 import java.io.IOException;
 import java.util.Collections;

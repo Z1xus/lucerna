@@ -1,9 +1,5 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.uniforms.CapturedRenderingState;
-import us.z1x.lucerna.vertices.VanillaVertexAttributes;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.BufferUploader;
@@ -11,6 +7,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.uniforms.CapturedRenderingState;
+import us.z1x.lucerna.vertices.VanillaVertexAttributes;
 
 @Mixin(BufferUploader.class)
 public class MixinBufferUploader {

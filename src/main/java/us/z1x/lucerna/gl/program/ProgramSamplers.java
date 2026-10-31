@@ -3,14 +3,14 @@ package us.z1x.lucerna.gl.program;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import net.minecraft.client.render.platform.GlStateManager;
+import org.lwjgl.opengl.GL20C;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.sampler.SamplerBinding;
 import us.z1x.lucerna.gl.sampler.SamplerHolder;
 import us.z1x.lucerna.gl.sampler.SamplerLimits;
 import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import us.z1x.lucerna.shaderpack.PackRenderTargetDirectives;
-import net.minecraft.client.render.platform.GlStateManager;
-import org.lwjgl.opengl.GL20C;
 
 import java.util.ArrayList;
 import java.util.List;

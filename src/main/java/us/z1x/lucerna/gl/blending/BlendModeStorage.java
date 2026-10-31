@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.blending;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.platform.GlStateManager;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 public class BlendModeStorage {
     private static boolean originalBlendEnable;

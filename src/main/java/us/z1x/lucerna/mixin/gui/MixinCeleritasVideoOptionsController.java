@@ -1,8 +1,5 @@
 package us.z1x.lucerna.mixin.gui;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gui.option.LucernaOptionPage;
-import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import net.minecraft.client.Minecraft;
 import org.embeddedt.embeddium.impl.gui.CeleritasVideoOptionsController;
 import org.embeddedt.embeddium.impl.gui.frame.tab.Tab;
@@ -14,6 +11,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.taumc.celeritas.api.options.OptionIdentifier;
 import org.taumc.celeritas.api.options.structure.OptionPage;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gui.option.LucernaOptionPage;
+import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 
 import java.util.ArrayList;
 import java.util.List;

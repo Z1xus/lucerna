@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms.transforms;
 
-import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
 
 import java.util.function.Supplier;
 

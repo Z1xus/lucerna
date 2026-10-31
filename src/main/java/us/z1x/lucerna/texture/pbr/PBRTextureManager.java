@@ -2,10 +2,6 @@ package us.z1x.lucerna.texture.pbr;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
-import us.z1x.lucerna.texture.TextureInfoCache;
-import us.z1x.lucerna.texture.TextureTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.AbstractTexture;
@@ -19,6 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.system.MemoryUtil;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
+import us.z1x.lucerna.texture.TextureInfoCache;
+import us.z1x.lucerna.texture.TextureTracker;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;

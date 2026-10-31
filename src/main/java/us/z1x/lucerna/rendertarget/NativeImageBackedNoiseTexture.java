@@ -1,8 +1,8 @@
 package us.z1x.lucerna.rendertarget;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11C;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.Random;
 

@@ -1,9 +1,9 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.uniform.UniformHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
 
 import java.util.HashMap;
 import java.util.Locale;

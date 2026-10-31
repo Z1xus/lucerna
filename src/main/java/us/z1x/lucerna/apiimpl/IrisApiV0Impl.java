@@ -1,13 +1,13 @@
 package us.z1x.lucerna.apiimpl;
 
+import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.api.v0.IrisApiConfig;
+import net.minecraft.client.gui.screen.Screen;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.pipeline.FixedFunctionWorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.shadows.ShadowRenderingState;
-import net.irisshaders.iris.api.v0.IrisApi;
-import net.irisshaders.iris.api.v0.IrisApiConfig;
-import net.minecraft.client.gui.screen.Screen;
 
 public class IrisApiV0Impl implements IrisApi {
     public static final IrisApiV0Impl INSTANCE = new IrisApiV0Impl();

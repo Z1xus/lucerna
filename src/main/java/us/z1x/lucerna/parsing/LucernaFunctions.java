@@ -1,5 +1,12 @@
 package us.z1x.lucerna.parsing;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
+import org.joml.Vector4i;
 import us.z1x.lucerna.stareval.expression.Expression;
 import us.z1x.lucerna.stareval.function.AbstractTypedFunction;
 import us.z1x.lucerna.stareval.function.B2BFunction;
@@ -23,13 +30,6 @@ import us.z1x.lucerna.stareval.function.TypedFunction;
 import us.z1x.lucerna.stareval.function.TypedFunction.Parameter;
 import us.z1x.lucerna.stareval.function.V2FFunction;
 import us.z1x.lucerna.stareval.function.V2IFunction;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
-import org.joml.Vector4f;
-import org.joml.Vector4i;
 
 import java.util.Arrays;
 import java.util.Random;

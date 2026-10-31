@@ -2,6 +2,7 @@ package us.z1x.lucerna.samplers;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.client.render.texture.AbstractTexture;
 import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
 import us.z1x.lucerna.gl.image.CustomImage;
 import us.z1x.lucerna.gl.sampler.SamplerHolder;
@@ -11,7 +12,6 @@ import us.z1x.lucerna.rendertarget.RenderTarget;
 import us.z1x.lucerna.rendertarget.RenderTargets;
 import us.z1x.lucerna.shaderpack.PackRenderTargetDirectives;
 import us.z1x.lucerna.shadows.ShadowRenderTargets;
-import net.minecraft.client.render.texture.AbstractTexture;
 
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;

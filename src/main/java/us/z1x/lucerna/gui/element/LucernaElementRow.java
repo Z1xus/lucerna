@@ -1,8 +1,8 @@
 package us.z1x.lucerna.gui.element;
 
-import us.z1x.lucerna.gui.GuiUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.TextRenderer;
+import us.z1x.lucerna.gui.GuiUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

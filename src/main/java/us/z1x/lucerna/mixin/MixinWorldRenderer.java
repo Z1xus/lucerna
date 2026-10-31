@@ -2,10 +2,6 @@ package us.z1x.lucerna.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.pipeline.CloudRenderer;
-import us.z1x.lucerna.pipeline.WorldRenderingPhase;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Culler;
@@ -30,6 +26,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.pipeline.CloudRenderer;
+import us.z1x.lucerna.pipeline.WorldRenderingPhase;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {

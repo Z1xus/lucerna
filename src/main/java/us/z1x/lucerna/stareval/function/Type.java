@@ -1,10 +1,10 @@
 package us.z1x.lucerna.stareval.function;
 
-import us.z1x.lucerna.stareval.expression.ConstantExpression;
-import us.z1x.lucerna.stareval.function.TypedFunction.Parameter;
 import us.z1x.lucerna.gl.uniform.UniformType;
 import us.z1x.lucerna.parsing.MatrixType;
 import us.z1x.lucerna.parsing.VectorType;
+import us.z1x.lucerna.stareval.expression.ConstantExpression;
+import us.z1x.lucerna.stareval.function.TypedFunction.Parameter;
 
 public abstract class Type {
     public static Boolean Boolean = new Boolean();

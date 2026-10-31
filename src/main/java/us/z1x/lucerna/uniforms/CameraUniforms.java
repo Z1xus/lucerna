@@ -1,11 +1,11 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.uniform.UniformHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
 
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.ONCE;
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;

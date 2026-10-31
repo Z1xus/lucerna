@@ -1,14 +1,5 @@
 package us.z1x.lucerna.gui.screen;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gui.GuiUtil;
-import us.z1x.lucerna.gui.NavigationController;
-import us.z1x.lucerna.gui.element.LucernaObjectSelectionList;
-import us.z1x.lucerna.gui.element.ShaderPackOptionList;
-import us.z1x.lucerna.gui.element.ShaderPackSelectionList;
-import us.z1x.lucerna.gui.element.widget.AbstractElementWidget;
-import us.z1x.lucerna.gui.element.widget.CommentedElementWidget;
-import us.z1x.lucerna.shaderpack.ShaderPack;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -20,6 +11,15 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gui.GuiUtil;
+import us.z1x.lucerna.gui.NavigationController;
+import us.z1x.lucerna.gui.element.LucernaObjectSelectionList;
+import us.z1x.lucerna.gui.element.ShaderPackOptionList;
+import us.z1x.lucerna.gui.element.ShaderPackSelectionList;
+import us.z1x.lucerna.gui.element.widget.AbstractElementWidget;
+import us.z1x.lucerna.gui.element.widget.CommentedElementWidget;
+import us.z1x.lucerna.shaderpack.ShaderPack;
 
 import java.util.ArrayList;
 import java.util.HashSet;

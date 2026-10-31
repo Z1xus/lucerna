@@ -1,16 +1,5 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
-import us.z1x.lucerna.gl.uniform.DynamicUniformHolder;
-import us.z1x.lucerna.gl.uniform.UniformHolder;
-import us.z1x.lucerna.layer.GbufferPrograms;
-import us.z1x.lucerna.shaderpack.IdMap;
-import us.z1x.lucerna.shaderpack.PackDirectives;
-import us.z1x.lucerna.texture.TextureInfoCache;
-import us.z1x.lucerna.texture.TextureInfoCache.TextureInfo;
-import us.z1x.lucerna.texture.TextureTracker;
-import us.z1x.lucerna.uniforms.transforms.SmoothedFloat;
-import us.z1x.lucerna.uniforms.transforms.SmoothedVec2f;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -31,6 +20,17 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector4i;
+import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
+import us.z1x.lucerna.gl.uniform.DynamicUniformHolder;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
+import us.z1x.lucerna.layer.GbufferPrograms;
+import us.z1x.lucerna.shaderpack.IdMap;
+import us.z1x.lucerna.shaderpack.PackDirectives;
+import us.z1x.lucerna.texture.TextureInfoCache;
+import us.z1x.lucerna.texture.TextureInfoCache.TextureInfo;
+import us.z1x.lucerna.texture.TextureTracker;
+import us.z1x.lucerna.uniforms.transforms.SmoothedFloat;
+import us.z1x.lucerna.uniforms.transforms.SmoothedVec2f;
 
 import java.util.function.Predicate;
 
@@ -144,7 +144,7 @@ public final class CommonUniforms {
             .uniform2i(PER_FRAME, "eyeBrightness", CommonUniforms::getEyeBrightness)
             .uniform2i(PER_FRAME, "eyeBrightnessSmooth", () -> {
                 Vector2f smoothed = eyeBrightnessSmooth.get();
-                return new Vector2i((int) smoothed.x(),(int) smoothed.y());
+                return new Vector2i((int) smoothed.x(), (int) smoothed.y());
             })
             .uniform1f(PER_TICK, "rainStrength", CommonUniforms::getRainStrength)
             .uniform1f(PER_TICK, "wetness", new SmoothedFloat(directives.getWetnessHalfLife(), directives.getDrynessHalfLife(), CommonUniforms::getRainStrength, updateNotifier))

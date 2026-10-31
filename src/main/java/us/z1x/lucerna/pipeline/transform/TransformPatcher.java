@@ -14,10 +14,10 @@ import io.github.douira.glsl_transformer.cst.token_filter.ChannelFilter;
 import io.github.douira.glsl_transformer.cst.token_filter.TokenChannel;
 import io.github.douira.glsl_transformer.cst.token_filter.TokenFilter;
 import io.github.douira.glsl_transformer.util.LRUCache;
-import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
-import us.z1x.lucerna.pipeline.PatchedShaderPrinter;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
+import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
+import us.z1x.lucerna.pipeline.PatchedShaderPrinter;
 
 import java.util.EnumMap;
 import java.util.Map;

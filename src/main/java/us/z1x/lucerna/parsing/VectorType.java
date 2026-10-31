@@ -1,13 +1,13 @@
 package us.z1x.lucerna.parsing;
 
-import us.z1x.lucerna.stareval.function.FunctionReturn;
-import us.z1x.lucerna.stareval.function.Type;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector4f;
 import org.joml.Vector4i;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.Type;
 
 import java.util.Arrays;
 import java.util.Objects;

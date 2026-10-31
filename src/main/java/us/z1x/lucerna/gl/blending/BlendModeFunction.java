@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.blending;
 
-import us.z1x.lucerna.Lucerna;
 import org.lwjgl.opengl.GL11;
+import us.z1x.lucerna.Lucerna;
 
 import java.util.Optional;
 

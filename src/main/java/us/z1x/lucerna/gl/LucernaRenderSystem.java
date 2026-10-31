@@ -1,6 +1,5 @@
 package us.z1x.lucerna.gl;
 
-import us.z1x.lucerna.Lucerna;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3i;
@@ -12,6 +11,7 @@ import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.opengl.GL45C;
 import org.lwjgl.system.MemoryUtil;
+import us.z1x.lucerna.Lucerna;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

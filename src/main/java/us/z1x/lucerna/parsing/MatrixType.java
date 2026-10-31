@@ -1,8 +1,8 @@
 package us.z1x.lucerna.parsing;
 
-import us.z1x.lucerna.stareval.function.Type;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import us.z1x.lucerna.stareval.function.Type;
 
 import java.util.function.Supplier;
 

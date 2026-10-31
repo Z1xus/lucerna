@@ -1,9 +1,9 @@
 package us.z1x.lucerna.shadows;
 
-import us.z1x.lucerna.uniforms.CameraUniforms;
-import us.z1x.lucerna.uniforms.CelestialUniforms;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import us.z1x.lucerna.uniforms.CameraUniforms;
+import us.z1x.lucerna.uniforms.CelestialUniforms;
 
 public class ShadowMatrices {
     private static final float NEAR = 0.05f;

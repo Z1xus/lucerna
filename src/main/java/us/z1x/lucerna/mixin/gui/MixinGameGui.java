@@ -1,8 +1,5 @@
 package us.z1x.lucerna.mixin.gui;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gui.screen.HudHideable;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GameGui;
 import net.minecraft.client.render.Window;
@@ -12,6 +9,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gui.screen.HudHideable;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 
 @Mixin(GameGui.class)
 public class MixinGameGui {

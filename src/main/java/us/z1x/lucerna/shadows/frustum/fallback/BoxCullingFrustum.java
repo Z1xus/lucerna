@@ -1,12 +1,12 @@
 package us.z1x.lucerna.shadows.frustum.fallback;
 
-import us.z1x.lucerna.shadows.frustum.BoxCuller;
 import net.minecraft.client.render.Culler;
 import net.minecraft.util.math.Box;
 import org.embeddedt.embeddium.impl.render.viewport.Viewport;
 import org.embeddedt.embeddium.impl.render.viewport.ViewportProvider;
 import org.embeddedt.embeddium.impl.render.viewport.frustum.Frustum;
 import org.joml.Vector3d;
+import us.z1x.lucerna.shadows.frustum.BoxCuller;
 
 public class BoxCullingFrustum implements Culler, ViewportProvider, Frustum {
     private final BoxCuller boxCuller;

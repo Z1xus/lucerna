@@ -1,8 +1,8 @@
 package us.z1x.lucerna.gl.uniform;
 
+import org.joml.Vector2i;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
-import org.joml.Vector2i;
 
 import java.util.function.Supplier;
 

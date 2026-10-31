@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.lwjgl.BufferUtils;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;

@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms;
 
+import net.minecraft.client.Minecraft;
 import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.gui.option.LucernaVideoSettings;
-import net.minecraft.client.Minecraft;
 
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;
 

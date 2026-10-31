@@ -1,6 +1,5 @@
 package us.z1x.lucerna.mixin.celeritas;
 
-import us.z1x.lucerna.compat.celeritas.LucernaChunkProgramOverrides;
 import org.embeddedt.embeddium.impl.gl.device.CommandList;
 import org.embeddedt.embeddium.impl.gl.shader.GlProgram;
 import org.embeddedt.embeddium.impl.render.chunk.ShaderChunkRenderer;
@@ -12,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import us.z1x.lucerna.compat.celeritas.LucernaChunkProgramOverrides;
 
 @Mixin(value = ShaderChunkRenderer.class, remap = false)
 public class MixinShaderChunkRenderer {

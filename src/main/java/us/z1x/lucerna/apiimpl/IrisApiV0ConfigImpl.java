@@ -1,8 +1,8 @@
 package us.z1x.lucerna.apiimpl;
 
+import net.irisshaders.iris.api.v0.IrisApiConfig;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.config.LucernaConfig;
-import net.irisshaders.iris.api.v0.IrisApiConfig;
 
 import java.io.IOException;
 

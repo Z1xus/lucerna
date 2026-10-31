@@ -1,6 +1,13 @@
 package us.z1x.lucerna.gl.program;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.ARBShaderImageLoadStore;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL30C;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
@@ -10,13 +17,6 @@ import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.gl.uniform.UniformType;
 import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.uniforms.SystemTimeUniforms;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBShaderImageLoadStore;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL20C;
-import org.lwjgl.opengl.GL30C;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;

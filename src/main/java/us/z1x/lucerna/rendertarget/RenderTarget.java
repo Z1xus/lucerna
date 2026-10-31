@@ -1,14 +1,14 @@
 package us.z1x.lucerna.rendertarget;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.gl.texture.InternalTextureFormat;
-import us.z1x.lucerna.gl.texture.PixelFormat;
-import us.z1x.lucerna.gl.texture.PixelType;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.gl.texture.InternalTextureFormat;
+import us.z1x.lucerna.gl.texture.PixelFormat;
+import us.z1x.lucerna.gl.texture.PixelType;
 
 import java.nio.ByteBuffer;
 

@@ -1,7 +1,5 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.uniform.UniformHolder;
-import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -13,6 +11,8 @@ import org.joml.Math;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import us.z1x.lucerna.gl.uniform.UniformHolder;
+import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 
 public class LucernaExclusiveUniforms {
     private static final Vector4f ZERO = new Vector4f(0, 0, 0, 0);

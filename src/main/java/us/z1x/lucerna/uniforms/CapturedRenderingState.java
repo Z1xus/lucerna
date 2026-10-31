@@ -1,10 +1,10 @@
 package us.z1x.lucerna.uniforms;
 
-import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector4f;
+import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 
 public class CapturedRenderingState {
     public static final CapturedRenderingState INSTANCE = new CapturedRenderingState();

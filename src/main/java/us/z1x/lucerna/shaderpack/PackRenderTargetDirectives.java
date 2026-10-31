@@ -6,9 +6,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.joml.Vector4f;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.texture.InternalTextureFormat;
-import org.joml.Vector4f;
 
 import java.util.Collections;
 import java.util.Map;

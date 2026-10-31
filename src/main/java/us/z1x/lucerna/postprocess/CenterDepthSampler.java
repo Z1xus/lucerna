@@ -1,6 +1,11 @@
 package us.z1x.lucerna.postprocess;
 
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.platform.GlStateManager;
+import org.apache.commons.io.IOUtils;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL21C;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import us.z1x.lucerna.gl.program.Program;
@@ -12,11 +17,6 @@ import us.z1x.lucerna.gl.texture.InternalTextureFormat;
 import us.z1x.lucerna.gl.texture.PixelType;
 import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 import us.z1x.lucerna.uniforms.SystemTimeUniforms;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.platform.GlStateManager;
-import org.apache.commons.io.IOUtils;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL21C;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

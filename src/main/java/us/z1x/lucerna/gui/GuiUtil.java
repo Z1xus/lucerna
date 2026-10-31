@@ -1,6 +1,5 @@
 package us.z1x.lucerna.gui;
 
-import us.z1x.lucerna.Lucerna;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiElement;
 import net.minecraft.client.render.TextRenderer;
@@ -9,6 +8,7 @@ import net.minecraft.client.sound.instance.SimpleSoundInstance;
 import net.minecraft.locale.I18n;
 import net.minecraft.resource.Identifier;
 import org.lwjgl.opengl.GL11;
+import us.z1x.lucerna.Lucerna;
 
 import java.util.Locale;
 import java.util.Objects;

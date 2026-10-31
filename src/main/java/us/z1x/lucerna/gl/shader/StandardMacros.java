@@ -1,13 +1,13 @@
 package us.z1x.lucerna.gl.shader;
 
 import com.google.common.collect.ImmutableList;
-import us.z1x.lucerna.texture.pbr.PBRTextureManager;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20C;
 import us.z1x.lucerna.gui.option.LucernaVideoSettings;
 import us.z1x.lucerna.pipeline.HandRenderer;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
 import us.z1x.lucerna.shaderpack.StringPair;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20C;
+import us.z1x.lucerna.texture.pbr.PBRTextureManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;

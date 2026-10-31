@@ -1,13 +1,13 @@
 package us.z1x.lucerna.gui.element.widget;
 
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Formatting;
 import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.shaderpack.option.BooleanOption;
 import us.z1x.lucerna.shaderpack.option.menu.OptionMenuBooleanOptionElement;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Formatting;
 
 public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBooleanOptionElement> {
     private final BooleanOption option;

@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.image;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.lwjgl.opengl.GL42C;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.function.IntSupplier;
 

@@ -2,10 +2,10 @@ package us.z1x.lucerna.shaderpack;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
-import us.z1x.lucerna.Lucerna;
 import org.joml.Vector2f;
 import org.joml.Vector3i;
 import org.joml.Vector4f;
+import us.z1x.lucerna.Lucerna;
 
 import java.util.HashMap;
 import java.util.Map;

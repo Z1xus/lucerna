@@ -2,11 +2,11 @@ package us.z1x.lucerna.blockrendering;
 
 import it.unimi.dsi.fastutil.objects.Object2IntFunction;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.client.render.block.BlockLayer;
 import org.jetbrains.annotations.Nullable;
+import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
 
 import java.util.Map;
 

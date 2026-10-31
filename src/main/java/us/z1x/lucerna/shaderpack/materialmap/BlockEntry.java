@@ -1,7 +1,7 @@
 package us.z1x.lucerna.shaderpack.materialmap;
 
-import us.z1x.lucerna.Lucerna;
 import org.jetbrains.annotations.NotNull;
+import us.z1x.lucerna.Lucerna;
 
 import java.util.Collections;
 import java.util.HashMap;

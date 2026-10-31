@@ -1,21 +1,21 @@
 package us.z1x.lucerna.compat.argentum;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gl.blending.BlendModeOverride;
-import us.z1x.lucerna.gl.blending.BufferBlendOverride;
-import us.z1x.lucerna.gl.program.ProgramImages;
-import us.z1x.lucerna.gl.program.ProgramSamplers;
-import us.z1x.lucerna.gl.program.ProgramUniforms;
-import us.z1x.lucerna.pipeline.DeferredWorldRenderingPipeline;
-import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import org.embeddedt.embeddium.impl.gl.GlObject;
 import org.embeddedt.embeddium.impl.gl.shader.GlProgram;
 import org.embeddedt.embeddium.impl.gl.shader.GlShader;
 import org.embeddedt.embeddium.impl.gl.shader.ShaderType;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL30C;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.blending.BlendModeOverride;
+import us.z1x.lucerna.gl.blending.BufferBlendOverride;
+import us.z1x.lucerna.gl.program.ProgramImages;
+import us.z1x.lucerna.gl.program.ProgramSamplers;
+import us.z1x.lucerna.gl.program.ProgramUniforms;
+import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
+import us.z1x.lucerna.pipeline.DeferredWorldRenderingPipeline;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 
 import java.util.Map;
 import java.util.function.Supplier;

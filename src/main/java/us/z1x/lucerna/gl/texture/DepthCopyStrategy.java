@@ -1,12 +1,12 @@
 package us.z1x.lucerna.gl.texture;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
-import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL43C;
 import org.lwjgl.system.MemoryUtil;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 
 public interface DepthCopyStrategy {
     class Gl20CopyTexture implements DepthCopyStrategy {

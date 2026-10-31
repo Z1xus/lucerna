@@ -1,11 +1,6 @@
 package us.z1x.lucerna.mixin.entityrendercontext;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
-import us.z1x.lucerna.pipeline.WorldRenderingPhase;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.uniforms.CapturedRenderingState;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.BlockState;
@@ -15,6 +10,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
+import us.z1x.lucerna.pipeline.WorldRenderingPhase;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.uniforms.CapturedRenderingState;
 
 @Mixin(BlockEntityRenderDispatcher.class)
 public class MixinBlockEntityRenderDispatcher {

@@ -4,13 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.gl.program.Program;
-import us.z1x.lucerna.pipeline.HandRenderer;
-import us.z1x.lucerna.pipeline.WorldRenderingPhase;
-import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
-import us.z1x.lucerna.uniforms.CapturedRenderingState;
-import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleManager;
@@ -34,6 +27,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.program.Program;
+import us.z1x.lucerna.pipeline.HandRenderer;
+import us.z1x.lucerna.pipeline.WorldRenderingPhase;
+import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
+import us.z1x.lucerna.uniforms.CapturedRenderingState;
+import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 
 import java.nio.FloatBuffer;
 

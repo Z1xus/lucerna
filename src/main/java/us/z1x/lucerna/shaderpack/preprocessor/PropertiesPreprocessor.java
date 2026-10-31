@@ -1,13 +1,13 @@
 package us.z1x.lucerna.shaderpack.preprocessor;
 
-import us.z1x.lucerna.Lucerna;
-import us.z1x.lucerna.shaderpack.StringPair;
-import us.z1x.lucerna.shaderpack.option.ShaderPackOptions;
 import org.anarres.cpp.Feature;
 import org.anarres.cpp.LexerException;
 import org.anarres.cpp.Preprocessor;
 import org.anarres.cpp.StringLexerSource;
 import org.anarres.cpp.Token;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.shaderpack.StringPair;
+import us.z1x.lucerna.shaderpack.option.ShaderPackOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;

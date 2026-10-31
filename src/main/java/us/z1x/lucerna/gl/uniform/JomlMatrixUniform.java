@@ -1,8 +1,8 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.nio.FloatBuffer;
 import java.util.function.Supplier;
