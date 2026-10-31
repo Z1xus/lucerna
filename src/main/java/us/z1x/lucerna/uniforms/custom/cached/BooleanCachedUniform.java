@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import kroppeb.stareval.function.FunctionReturn;
-import kroppeb.stareval.function.Type;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.Type;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.function.BooleanSupplier;
 
@@ -25,7 +25,7 @@ public class BooleanCachedUniform extends CachedUniform {
 
     @Override
     public void push(int location) {
-        IrisRenderSystem.uniform1i(location, this.cached ? 1 : 0);
+        LucernaRenderSystem.uniform1i(location, this.cached ? 1 : 0);
     }
 
     @Override

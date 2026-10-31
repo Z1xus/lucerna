@@ -2,7 +2,7 @@ package us.z1x.lucerna.uniforms;
 
 import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.shaderpack.PackDirectives;
-import us.z1x.lucerna.shadow.ShadowMatrices;
+import us.z1x.lucerna.shadows.ShadowMatrices;
 import org.joml.Matrix4f;
 
 import java.util.function.Supplier;

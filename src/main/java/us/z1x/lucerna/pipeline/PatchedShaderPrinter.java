@@ -1,6 +1,6 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class PatchedShaderPrinter {
     private static boolean outputLocationCleared = false;
     private static int programCounter = 0;
     public static final boolean PRETTY_PRINT_SHADERS = FabricLoader.getInstance().isDevelopmentEnvironment()
-            || System.getProperty("iris.prettyPrintShaders", "false").equals("true");
+            || System.getProperty("lucerna.prettyPrintShaders", "false").equals("true");
 
     public static void resetPrintState() {
         outputLocationCleared = false;
@@ -39,7 +39,7 @@ public class PatchedShaderPrinter {
 
                     Files.createDirectories(debugOutDir);
                 } catch (IOException e) {
-                    Iris.logger.warn("Failed to initialize debug patched shader source location", e);
+                    Lucerna.logger.warn("Failed to initialize debug patched shader source location", e);
                 }
                 outputLocationCleared = true;
             }
@@ -57,7 +57,7 @@ public class PatchedShaderPrinter {
                     Files.write(debugOutDir.resolve(prefix + name + ".fsh"), fragment.getBytes(StandardCharsets.UTF_8));
                 }
             } catch (IOException e) {
-                Iris.logger.warn("Failed to write debug patched shader source", e);
+                Lucerna.logger.warn("Failed to write debug patched shader source", e);
             }
         }
     }

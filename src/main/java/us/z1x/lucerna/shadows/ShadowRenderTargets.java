@@ -3,7 +3,7 @@ package us.z1x.lucerna.shadows;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import us.z1x.lucerna.gl.texture.DepthBufferFormat;
 import us.z1x.lucerna.gl.texture.DepthCopyStrategy;
@@ -123,7 +123,7 @@ public class ShadowRenderTargets {
     public void copyPreTranslucentDepth() {
         if (translucentDepthDirty) {
             translucentDepthDirty = false;
-            IrisRenderSystem.blitFramebuffer(depthSourceFb.getId(), noTranslucentsDestFb.getId(), 0, 0, resolution, resolution,
+            LucernaRenderSystem.blitFramebuffer(depthSourceFb.getId(), noTranslucentsDestFb.getId(), 0, 0, resolution, resolution,
                 0, 0, resolution, resolution,
                 GL30C.GL_DEPTH_BUFFER_BIT,
                 GL30C.GL_NEAREST);

@@ -1,8 +1,8 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.gbuffer_overrides.matching.InputAvailability;
-import us.z1x.lucerna.gbuffer_overrides.matching.RenderCondition;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
+import us.z1x.lucerna.gbufferoverrides.matching.RenderCondition;
 import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import us.z1x.lucerna.pipeline.transform.TransformPatcher;
 import us.z1x.lucerna.shaderpack.ComputeSource;
@@ -54,7 +54,7 @@ public final class PipelineSources {
     // these link on first use or are compute programs, but parsing them still belongs on the worker
     private static void patchAhead(ProgramSet programs) {
         try {
-            SodiumTerrainPipeline.patchAhead(programs);
+            CeleritasTerrainPipeline.patchAhead(programs);
             patchComputes(programs.getShadowCompute(), programs.getPack().getCustomTexturePatching(TextureStage.SHADOWCOMP));
             patchComputes(programs.getShadowCompCompute(), programs.getPack().getCustomTexturePatching(TextureStage.SHADOWCOMP));
             patchComputes(programs.getSetupCompute(), Map.of());
@@ -64,7 +64,7 @@ public final class PipelineSources {
             patchComputes(programs.getCompositeCompute(), programs.getPack().getCustomTexturePatching(TextureStage.COMPOSITE_AND_FINAL));
             patchComputes(programs.getFinalCompute(), programs.getPack().getCustomTexturePatching(TextureStage.COMPOSITE_AND_FINAL));
         } catch (RuntimeException e) {
-            Iris.logger.warn("Failed to patch programs ahead of time", e);
+            Lucerna.logger.warn("Failed to patch programs ahead of time", e);
         }
     }
 
@@ -98,7 +98,7 @@ public final class PipelineSources {
         try {
             sources.add(patch.get());
         } catch (RuntimeException e) {
-            Iris.logger.warn("Failed to patch " + source.getName() + " ahead of time", e);
+            Lucerna.logger.warn("Failed to patch {} ahead of time", source.getName(), e);
         }
     }
 

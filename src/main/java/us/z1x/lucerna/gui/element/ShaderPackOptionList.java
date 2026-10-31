@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gui.element;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.element.widget.AbstractElementWidget;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOptionList.BaseEntry> {
+public class ShaderPackOptionList extends LucernaObjectSelectionList<ShaderPackOptionList.BaseEntry> {
     private final List<AbstractElementWidget<?>> elementWidgets = new ArrayList<>();
     private final ShaderPackScreen screen;
     private final NavigationController navigation;
@@ -78,7 +78,7 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
         }
     }
 
-    public abstract static class BaseEntry extends IrisObjectSelectionList.Entry {
+    public abstract static class BaseEntry extends LucernaObjectSelectionList.Entry {
         protected final NavigationController navigation;
 
         protected BaseEntry(NavigationController navigation) {
@@ -90,32 +90,32 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
         private static final int MIN_SIDE_BUTTON_WIDTH = 42;
         private static final int BUTTON_HEIGHT = 16;
 
-        private final String resetButtonTextInactive = Formatting.GRAY + I18n.translate("options.iris.reset");
-        private final String resetButtonTextActive = Formatting.YELLOW + I18n.translate("options.iris.reset");
-        private final String resetHoldShiftTooltip = Formatting.GOLD + I18n.translate("options.iris.reset.tooltip.holdShift");
-        private final String resetTooltip = Formatting.RED + I18n.translate("options.iris.reset.tooltip");
+        private final String resetButtonTextInactive = Formatting.GRAY + I18n.translate("options.lucerna.reset");
+        private final String resetButtonTextActive = Formatting.YELLOW + I18n.translate("options.lucerna.reset");
+        private final String resetHoldShiftTooltip = Formatting.GOLD + I18n.translate("options.lucerna.reset.tooltip.holdShift");
+        private final String resetTooltip = Formatting.RED + I18n.translate("options.lucerna.reset.tooltip");
 
         private final ShaderPackScreen screen;
-        private final @Nullable IrisElementRow backButton;
-        private final IrisElementRow utilityButtons = new IrisElementRow();
-        private final IrisElementRow.TextButtonElement resetButton;
+        private final @Nullable LucernaElementRow backButton;
+        private final LucernaElementRow utilityButtons = new LucernaElementRow();
+        private final LucernaElementRow.TextButtonElement resetButton;
         private final String text;
 
         public HeaderEntry(ShaderPackScreen screen, NavigationController navigation, String text, boolean hasBackButton) {
             super(navigation);
 
             if (hasBackButton) {
-                String backButtonText = "< " + Formatting.ITALIC + I18n.translate("options.iris.back");
+                String backButtonText = "< " + Formatting.ITALIC + I18n.translate("options.lucerna.back");
 
-                this.backButton = new IrisElementRow().add(
-                        new IrisElementRow.TextButtonElement(backButtonText, this::backButtonClicked),
+                this.backButton = new LucernaElementRow().add(
+                        new LucernaElementRow.TextButtonElement(backButtonText, this::backButtonClicked),
                         Math.max(MIN_SIDE_BUTTON_WIDTH, Minecraft.getInstance().textRenderer.getWidth(backButtonText) + 8)
                 );
             } else {
                 this.backButton = null;
             }
 
-            this.resetButton = new IrisElementRow.TextButtonElement(
+            this.resetButton = new LucernaElementRow.TextButtonElement(
                     resetButtonTextInactive, this::resetButtonClicked);
 
             this.utilityButtons
@@ -133,7 +133,7 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
 
             drawCenteredString(font, text, x + (int)(entryWidth * 0.5), y + 5, 0xFFFFFF);
 
-            GuiUtil.bindIrisWidgetsTexture();
+            GuiUtil.bindWidgetsTexture();
 
             if (this.backButton != null) {
                 backButton.render(x, y, BUTTON_HEIGHT, mouseX, mouseY, hovered);
@@ -167,16 +167,16 @@ public class ShaderPackOptionList extends IrisObjectSelectionList<ShaderPackOpti
             return backButtonResult || utilButtonResult;
         }
 
-        private boolean backButtonClicked(IrisElementRow.TextButtonElement button) {
+        private boolean backButtonClicked(LucernaElementRow.TextButtonElement button) {
             this.navigation.back();
             GuiUtil.playButtonClickSound();
 
             return true;
         }
 
-        private boolean resetButtonClicked(IrisElementRow.TextButtonElement button) {
+        private boolean resetButtonClicked(LucernaElementRow.TextButtonElement button) {
             if (Screen.isShiftDown()) {
-                Iris.resetShaderPackOptionsOnNextReload();
+                Lucerna.resetShaderPackOptionsOnNextReload();
                 this.screen.applyChanges();
                 GuiUtil.playButtonClickSound();
 

@@ -10,8 +10,8 @@ import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.blending.AlphaTest;
 import us.z1x.lucerna.gl.blending.AlphaTestFunction;
 import us.z1x.lucerna.gl.blending.AlphaTestOverride;
@@ -100,7 +100,7 @@ public class ShaderProperties {
             preprocessed.load(new StringReader(preprocessedContents));
             original.load(new StringReader(contents));
         } catch (IOException e) {
-            Iris.logger.error("Error loading shaders.properties!", e);
+            Lucerna.logger.error("Error loading shaders.properties!", e);
         }
 
         preprocessed.forEach((keyObject, valueObject) -> {
@@ -120,7 +120,7 @@ public class ShaderProperties {
                 } else if ("fancy".equals(value)) {
                     cloudSetting = CloudSetting.FANCY;
                 } else {
-                    Iris.logger.error("Unrecognized clouds setting: " + value);
+                    Lucerna.logger.error("Unrecognized clouds setting: {}", value);
                 }
             }
 
@@ -149,7 +149,7 @@ public class ShaderProperties {
                 try {
                     scale = Float.parseFloat(value);
                 } catch (NumberFormatException e) {
-                    Iris.logger.error("Unable to parse scale directive for " + pass + ": " + value, e);
+                    Lucerna.logger.error("Unable to parse scale directive for {}: {}", pass, value, e);
                     return;
                 }
 
@@ -160,7 +160,7 @@ public class ShaderProperties {
                 String[] parts = value.split(" ");
 
                 if (parts.length != 2) {
-                    Iris.logger.error("Unable to parse size.buffer directive for " + pass + ": " + value);
+                    Lucerna.logger.error("Unable to parse size.buffer directive for {}: {}", pass, value);
                     return;
                 }
 
@@ -176,16 +176,16 @@ public class ShaderProperties {
                 String[] parts = value.split(" ");
 
                 if (parts.length > 2) {
-                    Iris.logger.warn("Weird alpha test directive for " + pass + " contains more parts than we expected: " + value);
+                    Lucerna.logger.warn("Weird alpha test directive for {} contains more parts than we expected: {}", pass, value);
                 } else if (parts.length < 2) {
-                    Iris.logger.error("Invalid alpha test directive for " + pass + ": " + value);
+                    Lucerna.logger.error("Invalid alpha test directive for {}: {}", pass, value);
                     return;
                 }
 
                 Optional<AlphaTestFunction> function = AlphaTestFunction.fromString(parts[0]);
 
                 if (!function.isPresent()) {
-                    Iris.logger.error("Unable to parse alpha test directive for " + pass + ", unknown alpha test function " + parts[0] + ": " + value);
+                    Lucerna.logger.error("Unable to parse alpha test directive for {}, unknown alpha test function {}: {}", pass, parts[0], value);
                     return;
                 }
 
@@ -194,7 +194,7 @@ public class ShaderProperties {
                 try {
                     reference = Float.parseFloat(parts[1]);
                 } catch (NumberFormatException e) {
-                    Iris.logger.error("Unable to parse alpha test directive for " + pass + ": " + value, e);
+                    Lucerna.logger.error("Unable to parse alpha test directive for {}: {}", pass, value, e);
                     return;
                 }
 
@@ -204,7 +204,7 @@ public class ShaderProperties {
             handlePassDirective("blend.", key, value, pass -> {
                 if (pass.contains(".")) {
 
-                    if (!IrisRenderSystem.supportsBufferBlending()) {
+                    if (!LucernaRenderSystem.supportsBufferBlending()) {
                         throw new RuntimeException("Buffer blending is not supported on this platform, however it was attempted to be used!");
                     }
 
@@ -269,7 +269,7 @@ public class ShaderProperties {
                 Optional<TextureStage> optionalTextureStage = TextureStage.parse(stageName);
 
                 if (!optionalTextureStage.isPresent()) {
-                    Iris.logger.warn("Unknown texture stage " + "\"" + stageName + "\"," + " ignoring custom texture directive for " + key);
+                    Lucerna.logger.warn("Unknown texture stage \"{}\", ignoring custom texture directive for {}", stageName, key);
                     return;
                 }
 
@@ -301,7 +301,7 @@ public class ShaderProperties {
             handlePassDirective("variable.", key, value, pass -> {
                 String[] parts = pass.split("\\.");
                 if (parts.length != 2) {
-                    Iris.logger.warn("Custom variables should take the form of `variable.<type>.<name> = <expression>. Ignoring " + key);
+                    Lucerna.logger.warn("Custom variables should take the form of `variable.<type>.<name> = <expression>. Ignoring {}", key);
                     return;
                 }
 
@@ -311,15 +311,15 @@ public class ShaderProperties {
             handlePassDirective("uniform.", key, value, pass -> {
                 String[] parts = pass.split("\\.");
                 if (parts.length != 2) {
-                    Iris.logger.warn("Custom uniforms should take the form of `uniform.<type>.<name> = <expression>. Ignoring " + key);
+                    Lucerna.logger.warn("Custom uniforms should take the form of `uniform.<type>.<name> = <expression>. Ignoring {}", key);
                     return;
                 }
 
                 customUniforms.addVariable(parts[0], parts[1], value, true);
             });
 
-            handleWhitespacedListDirective(key, value, "iris.features.required", options -> requiredFeatureFlags = options);
-            handleWhitespacedListDirective(key, value, "iris.features.optional", options -> optionalFeatureFlags = options);
+            handleWhitespacedListDirective(key, value, "lucerna.features.required", options -> requiredFeatureFlags = options);
+            handleWhitespacedListDirective(key, value, "lucerna.features.optional", options -> optionalFeatureFlags = options);
 
             handlePassDirective("image.", key, value, name -> {
                 String[] parts = value.trim().split("\\s+");
@@ -328,7 +328,7 @@ public class ShaderProperties {
                 Optional<PixelType> type = parts.length > 3 ? PixelType.fromString(parts[3].toUpperCase(Locale.ROOT)) : Optional.empty();
 
                 if (parts.length < 7 || !format.isPresent() || !internalFormat.isPresent() || !type.isPresent()) {
-                    Iris.logger.error("Unable to parse image directive " + key + ": " + value);
+                    Lucerna.logger.error("Unable to parse image directive {}: {}", key, value);
                     return;
                 }
 
@@ -345,7 +345,7 @@ public class ShaderProperties {
                             parts.length > 7 ? Integer.parseInt(parts[7]) : 1, parts.length > 8 ? Integer.parseInt(parts[8]) : 1, clear, false, 0, 0));
                     }
                 } catch (RuntimeException e) {
-                    Iris.logger.error("Unable to parse image directive " + key + ": " + value);
+                    Lucerna.logger.error("Unable to parse image directive {}: {}", key, value);
                 }
             });
 
@@ -361,7 +361,7 @@ public class ShaderProperties {
                             : new ShaderStorageInfo(size, false, 0.0F, 0.0F));
                     }
                 } catch (NumberFormatException e) {
-                    Iris.logger.error("Unable to parse buffer object directive " + key + ": " + value);
+                    Lucerna.logger.error("Unable to parse buffer object directive {}: {}", key, value);
                 }
             });
 
@@ -395,7 +395,7 @@ public class ShaderProperties {
         } else if ("false".equals(value)) {
             handler.accept(false);
         } else {
-            Iris.logger.warn("Unexpected value for boolean key " + key + " in shaders.properties: got " + value + ", but expected either true or false");
+            Lucerna.logger.warn("Unexpected value for boolean key {} in shaders.properties: got {}, but expected either true or false", key, value);
         }
     }
 
@@ -409,7 +409,7 @@ public class ShaderProperties {
         } else if ("false".equals(value)) {
             handler.accept(OptionalBoolean.FALSE);
         } else {
-            Iris.logger.warn("Unexpected value for boolean key " + key + " in shaders.properties: got " + value + ", but expected either true or false");
+            Lucerna.logger.warn("Unexpected value for boolean key {} in shaders.properties: got {}, but expected either true or false", key, value);
         }
     }
 
@@ -423,7 +423,7 @@ public class ShaderProperties {
 
             handler.accept(result);
         } catch (NumberFormatException nex) {
-            Iris.logger.warn("Unexpected value for integer key " + key + " in shaders.properties: got " + value + ", but expected an integer");
+            Lucerna.logger.warn("Unexpected value for integer key {} in shaders.properties: got {}, but expected an integer", key, value);
         }
 
         return true;
@@ -445,7 +445,7 @@ public class ShaderProperties {
 
                 handler.accept(affixStrippedKey, result);
             } catch (NumberFormatException nex) {
-                Iris.logger.warn("Unexpected value for integer key " + key + " in shaders.properties: got " + value + ", but expected an integer");
+                Lucerna.logger.warn("Unexpected value for integer key {} in shaders.properties: got {}, but expected an integer", key, value);
             }
 
             return true;

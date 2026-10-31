@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import kroppeb.stareval.function.FunctionReturn;
-import kroppeb.stareval.function.Type;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.Type;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.uniform.FloatSupplier;
 
 public class FloatCachedUniform extends CachedUniform {
@@ -24,7 +24,7 @@ public class FloatCachedUniform extends CachedUniform {
 
     @Override
     public void push(int location) {
-        IrisRenderSystem.uniform1f(location, this.cached);
+        LucernaRenderSystem.uniform1f(location, this.cached);
     }
 
     @Override

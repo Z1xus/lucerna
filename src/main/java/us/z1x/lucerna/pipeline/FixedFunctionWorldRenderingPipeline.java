@@ -1,10 +1,10 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.block_rendering.BlockRenderingSettings;
-import us.z1x.lucerna.gbuffer_overrides.matching.InputAvailability;
-import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
-import us.z1x.lucerna.gbuffer_overrides.state.RenderTargetStateListener;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
+import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
+import us.z1x.lucerna.gbufferoverrides.matching.SpecialCondition;
+import us.z1x.lucerna.gbufferoverrides.state.RenderTargetStateListener;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.shaderpack.CloudSetting;
 import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
 import net.minecraft.client.Minecraft;
@@ -27,7 +27,7 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
     @Override
     public void beginLevelRendering() {
         Minecraft.getInstance().getRenderTarget().bindWrite(true);
-        IrisRenderSystem.useProgram(0);
+        LucernaRenderSystem.useProgram(0);
     }
 
     @Override
@@ -49,11 +49,11 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
     }
 
     @Override
-    public void beginSodiumTerrainRendering() {
+    public void beginTerrainRendering() {
     }
 
     @Override
-    public void endSodiumTerrainRendering() {
+    public void endTerrainRendering() {
     }
 
     @Override
@@ -117,7 +117,7 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
     }
 
     @Override
-    public SodiumTerrainPipeline getSodiumTerrainPipeline() {
+    public CeleritasTerrainPipeline getSodiumTerrainPipeline() {
         return null;
     }
 

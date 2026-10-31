@@ -2,7 +2,7 @@ package us.z1x.lucerna.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.pipeline.CloudRenderer;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
@@ -56,7 +56,7 @@ public class MixinWorldRenderer {
 
     @Unique
     private static void lucerna$setPhase(WorldRenderingPhase phase) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             pipeline.setPhase(phase);
@@ -65,20 +65,20 @@ public class MixinWorldRenderer {
 
     @Inject(method = "render(Lnet/minecraft/client/render/block/BlockLayer;DILnet/minecraft/entity/Entity;)I", at = @At("HEAD"))
     private void lucerna$beginTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             pipeline.setPhase(WorldRenderingPhase.fromTerrainRenderType(layer));
-            pipeline.beginSodiumTerrainRendering();
+            pipeline.beginTerrainRendering();
         }
     }
 
     @Inject(method = "render(Lnet/minecraft/client/render/block/BlockLayer;DILnet/minecraft/entity/Entity;)I", at = @At("RETURN"))
     private void lucerna$endTerrainLayer(BlockLayer layer, double tickDelta, int anaglyphRenderPass, Entity camera, CallbackInfoReturnable<Integer> cir) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
-            pipeline.endSodiumTerrainRendering();
+            pipeline.endTerrainRendering();
             pipeline.setPhase(WorldRenderingPhase.NONE);
         }
     }
@@ -95,7 +95,7 @@ public class MixinWorldRenderer {
 
     @Inject(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getTimeOfDay(F)F", ordinal = 1))
     private void lucerna$tiltSun(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             GlStateManager.rotatef(pipeline.getSunPathRotation(), 0.0F, 0.0F, 1.0F);
@@ -124,13 +124,13 @@ public class MixinWorldRenderer {
 
     @WrapOperation(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
     private void lucerna$renderSun(Tesselator tesselator, Operation<Void> original) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
         lucerna$endOrDiscard(tesselator, original, pipeline == null || pipeline.shouldRenderSun());
     }
 
     @WrapOperation(method = LUCERNA_RENDER_SKY, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
     private void lucerna$renderMoon(Tesselator tesselator, Operation<Void> original) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
         lucerna$endOrDiscard(tesselator, original, pipeline == null || pipeline.shouldRenderMoon());
     }
 

@@ -5,7 +5,7 @@
 
 package us.z1x.lucerna.gl;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import org.lwjgl.opengl.AMDDebugOutput;
 import org.lwjgl.opengl.ARBDebugOutput;
 import org.lwjgl.opengl.GL;
@@ -69,7 +69,7 @@ public final class GLDebug {
     public static int setupDebugMessageCallback(PrintStream stream) {
         GLCapabilities caps = GL.getCapabilities();
         if (caps.OpenGL43) {
-            Iris.logger.info("[GL] Using OpenGL 4.3 for error logging.");
+            Lucerna.logger.info("[GL] Using OpenGL 4.3 for error logging.");
             GLDebugMessageCallback proc = GLDebugMessageCallback.create((source, type, id, severity, length, message, userParam) -> {
                 stream.println("[LWJGL] OpenGL debug message");
                 printDetail(stream, "ID", String.format("0x%X", id));
@@ -85,13 +85,13 @@ public final class GLDebug {
             GL43C.glDebugMessageControl(4352, 4352, GL43C.GL_DEBUG_SEVERITY_NOTIFICATION, (int[])null, false);
             GL43C.glDebugMessageCallback(proc, 0L);
             if ((GL43C.glGetInteger(33310) & 2) == 0) {
-                Iris.logger.warn("[GL] Warning: A non-debug context may not produce any debug output.");
+                Lucerna.logger.warn("[GL] Warning: A non-debug context may not produce any debug output.");
                 GL43C.glEnable(37600);
                 return 2;
             }
             return 1;
         } else if (caps.GL_KHR_debug) {
-            Iris.logger.info("[GL] Using KHR_debug for error logging.");
+            Lucerna.logger.info("[GL] Using KHR_debug for error logging.");
             GLDebugMessageCallback proc = GLDebugMessageCallback.create((source, type, id, severity, length, message, userParam) -> {
                 stream.println("[LWJGL] OpenGL debug message");
                 printDetail(stream, "ID", String.format("0x%X", id));
@@ -107,13 +107,13 @@ public final class GLDebug {
             KHRDebug.glDebugMessageControl(4352, 4352, GL43C.GL_DEBUG_SEVERITY_NOTIFICATION, (int[])null, false);
             KHRDebug.glDebugMessageCallback(proc, 0L);
             if (caps.OpenGL30 && (GL43C.glGetInteger(33310) & 2) == 0) {
-                Iris.logger.warn("[GL] Warning: A non-debug context may not produce any debug output.");
+                Lucerna.logger.warn("[GL] Warning: A non-debug context may not produce any debug output.");
                 GL43C.glEnable(37600);
                 return 2;
             }
             return 1;
         } else if (caps.GL_ARB_debug_output) {
-            Iris.logger.info("[GL] Using ARB_debug_output for error logging.");
+            Lucerna.logger.info("[GL] Using ARB_debug_output for error logging.");
             GLDebugMessageARBCallback proc = GLDebugMessageARBCallback.create((source, type, id, severity, length, message, userParam) -> {
                 stream.println("[LWJGL] ARB_debug_output message");
                 printDetail(stream, "ID", String.format("0x%X", id));
@@ -130,7 +130,7 @@ public final class GLDebug {
             ARBDebugOutput.glDebugMessageCallbackARB(proc, 0L);
             return 1;
         } else if (caps.GL_AMD_debug_output) {
-            Iris.logger.info("[GL] Using AMD_debug_output for error logging.");
+            Lucerna.logger.info("[GL] Using AMD_debug_output for error logging.");
             GLDebugMessageAMDCallback proc = GLDebugMessageAMDCallback.create((id, category, severity, length, message, userParam) -> {
                 stream.println("[LWJGL] AMD_debug_output message");
                 printDetail(stream, "ID", String.format("0x%X", id));
@@ -146,7 +146,7 @@ public final class GLDebug {
             AMDDebugOutput.glDebugMessageCallbackAMD(proc, 0L);
             return 1;
         } else {
-            Iris.logger.info("[GL] No debug output implementation is available, cannot return debug info.");
+            Lucerna.logger.info("[GL] No debug output implementation is available, cannot return debug info.");
             return 0;
         }
     }

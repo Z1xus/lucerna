@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.program;
 
 import us.z1x.lucerna.gl.GlResource;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.lwjgl.opengl.GL20;
 
 public final class Program extends GlResource {
@@ -18,7 +18,7 @@ public final class Program extends GlResource {
     }
 
     public void use() {
-        IrisRenderSystem.useProgram(getGlId());
+        LucernaRenderSystem.useProgram(getGlId());
 
         uniforms.update();
         samplers.update();
@@ -28,7 +28,7 @@ public final class Program extends GlResource {
     public static void unbind() {
         ProgramUniforms.clearActiveUniforms();
         ProgramSamplers.clearActiveSamplers();
-        IrisRenderSystem.useProgram(0);
+        LucernaRenderSystem.useProgram(0);
     }
 
     public void destroyInternal() {

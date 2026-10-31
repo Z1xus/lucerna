@@ -152,15 +152,15 @@ public class HardcodedCustomUniforms {
     }
 
     private static float getTimeBrightness() {
-        return (float) java.lang.Math.max(java.lang.Math.sin(getTimeAngle() * java.lang.Math.PI * 2.0),0.0);
+        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * 2.0),0.0);
     }
 
     private static float getMoonBrightness() {
-        return (float) java.lang.Math.max(java.lang.Math.sin(getTimeAngle() * java.lang.Math.PI * (-2.0)),0.0);
+        return (float) Math.max(Math.sin(getTimeAngle() * Math.PI * (-2.0)),0.0);
     }
 
     private static float getShadowFade() {
-        return (float) Math.clamp(0.0, 1.0, 1.0 - (java.lang.Math.abs(java.lang.Math.abs(CelestialUniforms.getSunAngle() - 0.5) - 0.25) - 0.23) * 100.0);
+        return (float) Math.clamp(0.0, 1.0, 1.0 - (Math.abs(Math.abs(CelestialUniforms.getSunAngle() - 0.5) - 0.25) - 0.23) * 100.0);
     }
 
     private static SmoothedFloat rainStrengthS(FrameUpdateNotifier updateNotifier, float halfLifeUp, float halfLifeDown) {

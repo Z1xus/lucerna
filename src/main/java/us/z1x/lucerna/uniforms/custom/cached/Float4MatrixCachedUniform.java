@@ -1,6 +1,6 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.parsing.MatrixType;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
@@ -23,7 +23,7 @@ public class Float4MatrixCachedUniform extends VectorCachedUniform<Matrix4f> {
     @Override
     public void push(int location) {
         this.cached.get(buffer);
-        IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
+        LucernaRenderSystem.uniformMatrix4fv(location, false, buffer);
     }
 
     @Override

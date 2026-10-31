@@ -63,7 +63,7 @@ public abstract class BaseOptionElementWidget<T extends OptionMenuElement> exten
     }
 
     protected final void renderOptionWithValue(int x, int y, int width, int height, boolean hovered, float sliderPosition, int sliderWidth) {
-        GuiUtil.bindIrisWidgetsTexture();
+        GuiUtil.bindWidgetsTexture();
 
         GuiUtil.drawButton(x, y, width, height, hovered, false);
 
@@ -89,7 +89,7 @@ public abstract class BaseOptionElementWidget<T extends OptionMenuElement> exten
 
     protected final void tryRenderTooltip(int mouseX, int mouseY, boolean hovered) {
         if (Screen.isShiftDown()) {
-            renderTooltip(Formatting.GREEN + I18n.translate("options.iris.setToDefault"), mouseX, mouseY, hovered);
+            renderTooltip(Formatting.GREEN + I18n.translate("options.lucerna.setToDefault"), mouseX, mouseY, hovered);
         } else if (this.isLabelTrimmed && !this.screen.isDisplayingComment()) {
             renderTooltip(this.unmodifiedLabel, mouseX, mouseY, hovered);
         }

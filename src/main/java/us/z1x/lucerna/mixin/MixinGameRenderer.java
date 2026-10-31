@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.program.Program;
 import us.z1x.lucerna.pipeline.HandRenderer;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
@@ -94,7 +94,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "render(FJ)V", at = @At("HEAD"))
     private void lucerna$tickBackgroundReload(float tickDelta, long renderTimeLimit, CallbackInfo ci) {
-        Iris.tickBackgroundReload();
+        Lucerna.tickBackgroundReload();
     }
 
     @Inject(method = "setupClearColor", at = @At("RETURN"))
@@ -115,7 +115,7 @@ public abstract class MixinGameRenderer {
 
         Program.unbind();
 
-        lucerna$pipeline = Iris.getPipelineManager().preparePipeline(Iris.getCurrentDimension());
+        lucerna$pipeline = Lucerna.getPipelineManager().preparePipeline(Lucerna.getCurrentDimension());
         lucerna$deferParticlesAndWeather = IrisApi.getInstance().isShaderPackInUse() && !lucerna$pipeline.shouldRenderParticlesBeforeDeferred();
 
         lucerna$pipeline.beginLevelRendering();

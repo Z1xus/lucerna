@@ -1,6 +1,6 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import net.minecraft.client.gui.screen.menu.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,7 +17,7 @@ public class MixinTitleScreen {
     private void lucerna$firstInit(CallbackInfo ci) {
         if (!lucerna$hasFirstInit) {
             lucerna$hasFirstInit = true;
-            Iris.onLoadingComplete();
+            Lucerna.onLoadingComplete();
         }
     }
 }

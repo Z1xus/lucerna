@@ -2,8 +2,8 @@ package us.z1x.lucerna.uniforms.custom;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import kroppeb.stareval.function.Type;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.stareval.function.Type;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.uniform.FloatSupplier;
 import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.gl.uniform.UniformType;
@@ -63,7 +63,7 @@ public class CustomUniformFixedInputUniformsHolder {
 
         private Builder put(String name, CachedUniform uniform) {
             if (inputVariables.containsKey(name)) {
-                Iris.logger.warn("Duplicated fixed uniform supplied as inputs to the Custom uniform holder: " + name);
+                Lucerna.logger.warn("Duplicated fixed uniform supplied as inputs to the Custom uniform holder: {}", name);
                 return this;
             }
             inputVariables.put(name, uniform);

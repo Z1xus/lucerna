@@ -1,6 +1,6 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
+import us.z1x.lucerna.gbufferoverrides.matching.SpecialCondition;
 import us.z1x.lucerna.layer.GbufferPrograms;
 import net.minecraft.client.render.block.entity.BeaconRenderer;
 import net.minecraft.client.render.entity.layer.EnderDragonEyesLayer;

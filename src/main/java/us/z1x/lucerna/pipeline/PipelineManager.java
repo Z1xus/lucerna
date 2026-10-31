@@ -1,7 +1,7 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.block_rendering.BlockRenderingSettings;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
 import us.z1x.lucerna.shaderpack.DimensionId;
 import us.z1x.lucerna.uniforms.SystemTimeUniforms;
 import net.minecraft.client.Minecraft;
@@ -30,7 +30,7 @@ public class PipelineManager {
             SystemTimeUniforms.COUNTER.reset();
             SystemTimeUniforms.TIMER.reset();
 
-            Iris.logger.info("Creating pipeline for dimension {}", currentDimension);
+            Lucerna.logger.info("Creating pipeline for dimension {}", currentDimension);
             pipeline = pipelineFactory.apply(currentDimension);
             pipelinesPerDimension.put(currentDimension, pipeline);
 
@@ -66,7 +66,7 @@ public class PipelineManager {
     // see https://github.com/IrisShaders/Iris/issues/1330
     public void destroyPipeline() {
         pipelinesPerDimension.forEach((dimensionId, pipeline) -> {
-            Iris.logger.info("Destroying pipeline {}", dimensionId);
+            Lucerna.logger.info("Destroying pipeline {}", dimensionId);
             resetTextureState();
             pipeline.destroy();
         });

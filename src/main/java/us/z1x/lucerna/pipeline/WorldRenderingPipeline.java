@@ -1,8 +1,8 @@
 package us.z1x.lucerna.pipeline;
 
-import us.z1x.lucerna.gbuffer_overrides.matching.InputAvailability;
-import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
-import us.z1x.lucerna.gbuffer_overrides.state.RenderTargetStateListener;
+import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
+import us.z1x.lucerna.gbufferoverrides.matching.SpecialCondition;
+import us.z1x.lucerna.gbufferoverrides.state.RenderTargetStateListener;
 import us.z1x.lucerna.shaderpack.CloudSetting;
 import us.z1x.lucerna.uniforms.FrameUpdateNotifier;
 import net.minecraft.client.render.Culler;
@@ -20,8 +20,8 @@ public interface WorldRenderingPipeline {
 
     WorldRenderingPhase getPhase();
 
-    void beginSodiumTerrainRendering();
-    void endSodiumTerrainRendering();
+    void beginTerrainRendering();
+    void endTerrainRendering();
     void setOverridePhase(WorldRenderingPhase phase);
     void setPhase(WorldRenderingPhase phase);
     void setInputs(InputAvailability availability);
@@ -42,7 +42,7 @@ public interface WorldRenderingPipeline {
     void finalizeLevelRendering();
     void destroy();
 
-    SodiumTerrainPipeline getSodiumTerrainPipeline();
+    CeleritasTerrainPipeline getSodiumTerrainPipeline();
     FrameUpdateNotifier getFrameUpdateNotifier();
 
     boolean shouldDisableVanillaEntityShadows();

@@ -1,6 +1,6 @@
 package us.z1x.lucerna.mixin;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.uniforms.CapturedRenderingState;
 import us.z1x.lucerna.vertices.VanillaVertexAttributes;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinBufferUploader {
     @Inject(method = "end", at = @At("HEAD"))
     private void lucerna$beforeDraw(BufferBuilder builder, CallbackInfo ci) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline == null) {
             return;

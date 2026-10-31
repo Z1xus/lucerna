@@ -1,7 +1,7 @@
 package us.z1x.lucerna.shaderpack.option;
 
 import com.google.common.collect.ImmutableMap;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class OptionSet {
                 merged = existing.merge(proposed);
 
                 if (merged == null) {
-                    Iris.logger.warn("Ignoring ambiguous boolean option " + option.getName());
+                    Lucerna.logger.warn("Ignoring ambiguous boolean option {}", option.getName());
                     booleanOptions.remove(option.getName());
                     return;
                 }
@@ -93,7 +93,7 @@ public class OptionSet {
                 merged = existing.merge(proposed);
 
                 if (merged == null) {
-                    Iris.logger.warn("Ignoring ambiguous string option " + option.getName());
+                    Lucerna.logger.warn("Ignoring ambiguous string option {}", option.getName());
                     stringOptions.remove(option.getName());
                     return;
                 }

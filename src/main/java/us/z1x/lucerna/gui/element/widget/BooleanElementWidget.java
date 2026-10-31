@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gui.element.widget;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
@@ -46,7 +46,7 @@ public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBool
 
     @Override
     protected String createValueLabel() {
-        String text = I18n.translate(this.value ? "label.iris.true" : "label.iris.false");
+        String text = I18n.translate(this.value ? "label.lucerna.true" : "label.lucerna.false");
 
         // default values get no color, red off and green on made people switch options on for no reason
         if (this.value == this.defaultValue) {
@@ -66,7 +66,7 @@ public class BooleanElementWidget extends BaseOptionElementWidget<OptionMenuBool
     }
 
     private void queue() {
-        Iris.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
+        Lucerna.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
     }
 
     @Override

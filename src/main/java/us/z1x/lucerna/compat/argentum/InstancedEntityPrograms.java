@@ -1,13 +1,13 @@
 package us.z1x.lucerna.compat.argentum;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.blending.BlendModeOverride;
 import us.z1x.lucerna.gl.blending.BufferBlendOverride;
 import us.z1x.lucerna.gl.program.ProgramImages;
 import us.z1x.lucerna.gl.program.ProgramSamplers;
 import us.z1x.lucerna.gl.program.ProgramUniforms;
 import us.z1x.lucerna.pipeline.DeferredWorldRenderingPipeline;
-import us.z1x.lucerna.pipeline.SodiumTerrainPipeline;
+import us.z1x.lucerna.pipeline.CeleritasTerrainPipeline;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.transform.PatchShaderType;
 import org.embeddedt.embeddium.impl.gl.GlObject;
@@ -37,12 +37,12 @@ public final class InstancedEntityPrograms {
     private InstancedEntityPrograms() {
     }
 
-    private record Entry(GlProgram<?> program, SodiumTerrainPipeline.PassInfo info, ProgramUniforms uniforms, ProgramSamplers samplers, ProgramImages images) {
+    private record Entry(GlProgram<?> program, CeleritasTerrainPipeline.PassInfo info, ProgramUniforms uniforms, ProgramSamplers samplers, ProgramImages images) {
     }
 
     @Nullable
-    private static SodiumTerrainPipeline getTerrainPipeline() {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+    private static CeleritasTerrainPipeline getTerrainPipeline() {
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
         return pipeline instanceof DeferredWorldRenderingPipeline ? pipeline.getSodiumTerrainPipeline() : null;
     }
 
@@ -53,10 +53,10 @@ public final class InstancedEntityPrograms {
     // returns null when argentum should keep its own program
     @Nullable
     public static GlProgram<?> get(boolean shadow, Supplier<GlProgram<?>> link) {
-        SodiumTerrainPipeline pipeline = getTerrainPipeline();
+        CeleritasTerrainPipeline pipeline = getTerrainPipeline();
 
-        if (version != Iris.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
-            version = Iris.getPipelineManager().getVersionCounterForSodiumShaderReload();
+        if (version != Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
+            version = Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload();
             delete();
         }
 
@@ -67,7 +67,7 @@ public final class InstancedEntityPrograms {
         int index = shadow ? 1 : 0;
 
         if (ENTRIES[index] == null) {
-            SodiumTerrainPipeline.PassInfo info = pipeline.getEntityPassInfo(shadow);
+            CeleritasTerrainPipeline.PassInfo info = pipeline.getEntityPassInfo(shadow);
 
             if (info.sources().isEmpty()) {
                 // no usable entity program in this pack, so entities fall back to display lists
@@ -135,7 +135,7 @@ public final class InstancedEntityPrograms {
         BlendModeOverride.restore();
 
         // argentum unbinds the program, so the next vanilla draw has to set up its gbuffer pass again
-        if (Iris.getPipelineManager().getPipelineNullable() instanceof DeferredWorldRenderingPipeline pipeline) {
+        if (Lucerna.getPipelineManager().getPipelineNullable() instanceof DeferredWorldRenderingPipeline pipeline) {
             pipeline.beginPass(null);
         }
     }

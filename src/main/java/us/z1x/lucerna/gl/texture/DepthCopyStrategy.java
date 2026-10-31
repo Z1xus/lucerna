@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gl.texture;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20C;
@@ -17,7 +17,7 @@ public interface DepthCopyStrategy {
         public void copy(GlFramebuffer sourceFb, int sourceTexture, GlFramebuffer destFb, int destTexture, int width, int height) {
             sourceFb.bindAsReadBuffer();
 
-            IrisRenderSystem.copyTexSubImage2D(
+            LucernaRenderSystem.copyTexSubImage2D(
                 destTexture,
                 GL20C.GL_TEXTURE_2D,
                 0,
@@ -34,7 +34,7 @@ public interface DepthCopyStrategy {
 
         @Override
         public void copy(GlFramebuffer sourceFb, int sourceTexture, GlFramebuffer destFb, int destTexture, int width, int height) {
-            IrisRenderSystem.blitFramebuffer(sourceFb.getId(), destFb.getId(), 0, 0, width, height,
+            LucernaRenderSystem.blitFramebuffer(sourceFb.getId(), destFb.getId(), 0, 0, width, height,
                 0, 0, width, height,
                 GL30C.GL_DEPTH_BUFFER_BIT | GL30C.GL_STENCIL_BUFFER_BIT,
                 GL30C.GL_NEAREST);

@@ -1,6 +1,6 @@
 package us.z1x.lucerna.postprocess;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.platform.GlStateManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -83,6 +83,6 @@ public class FullScreenQuadRenderer {
             0.0F, 0.0F
         };
 
-        return IrisRenderSystem.bufferStorage(GL20C.GL_ARRAY_BUFFER, vertices, GL20C.GL_STATIC_DRAW);
+        return LucernaRenderSystem.bufferStorage(GL20C.GL_ARRAY_BUFFER, vertices, GL20C.GL_STATIC_DRAW);
     }
 }

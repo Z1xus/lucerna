@@ -33,7 +33,7 @@ public class LinkElementWidget extends CommentedElementWidget<OptionMenuLinkElem
 
     @Override
     public void render(int x, int y, int width, int height, int mouseX, int mouseY, boolean hovered) {
-        GuiUtil.bindIrisWidgetsTexture();
+        GuiUtil.bindWidgetsTexture();
         GuiUtil.drawButton(x, y, width, height, hovered, false);
 
         TextRenderer font = Minecraft.getInstance().textRenderer;

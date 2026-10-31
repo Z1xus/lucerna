@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.rdh.argentum.impl.render.terrain.compile.ArgentumChunkBuildContext;
 import dev.rdh.argentum.impl.world.cloned.ChunkRenderContext;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.compat.celeritas.TerrainBlockContext;
 import us.z1x.lucerna.compat.celeritas.TerrainContextRanges;
 import net.minecraft.block.state.BlockState;
@@ -48,7 +48,7 @@ public abstract class MixinArgentumChunkBuildContext implements TerrainContextRa
 
     @Inject(method = "renderFluid", remap = false, at = @At("HEAD"))
     private void lucerna$beginFluid(BlockState state, BlockPos pos, ChunkRenderContext world, BlockLayer layer, CallbackInfo ci) {
-        if (Iris.isShaderPackActive()) {
+        if (Lucerna.isShaderPackActive()) {
             lucerna$recordBlock(layer, TerrainBlockContext.packId(state), pos);
         }
     }

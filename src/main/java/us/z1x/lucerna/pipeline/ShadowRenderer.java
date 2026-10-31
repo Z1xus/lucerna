@@ -4,15 +4,15 @@ import com.google.common.collect.ImmutableList;
 import dev.rdh.argentum.impl.ext.WorldRendererExtension;
 import dev.rdh.argentum.impl.render.entity.instancing.EntityInstancing;
 import dev.rdh.argentum.impl.render.terrain.ArgentumWorldRenderer;
-import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.gl.IrisRenderSystem;
-import us.z1x.lucerna.gui.option.IrisVideoSettings;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
+import us.z1x.lucerna.gui.option.LucernaVideoSettings;
 import us.z1x.lucerna.mixin.argentum.ArgentumWorldRendererAccessor;
 import us.z1x.lucerna.shaderpack.OptionalBoolean;
 import us.z1x.lucerna.shaderpack.PackDirectives;
 import us.z1x.lucerna.shaderpack.PackShadowDirectives;
 import us.z1x.lucerna.shaderpack.ProgramSource;
-import us.z1x.lucerna.shadow.ShadowMatrices;
+import us.z1x.lucerna.shadows.ShadowMatrices;
 import us.z1x.lucerna.shadows.ShadowRenderTargets;
 import us.z1x.lucerna.shadows.frustum.BoxCuller;
 import us.z1x.lucerna.shadows.frustum.CullEverythingFrustum;
@@ -151,11 +151,11 @@ public class ShadowRenderer {
     private void configureDepthSampler(int glTextureId, PackShadowDirectives.DepthSamplingSettings settings) {
         if (settings.getHardwareFiltering()) {
             // shadow hardware filtering breaks without the compare mode
-            IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_COMPARE_MODE, GL30C.GL_COMPARE_REF_TO_TEXTURE);
+            LucernaRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_COMPARE_MODE, GL30C.GL_COMPARE_REF_TO_TEXTURE);
         }
 
         // old packs like chocapic v4 read depth from z, but drivers only put it in r, so swizzle it
-        IrisRenderSystem.texParameteriv(glTextureId, GL20C.GL_TEXTURE_2D, ARBTextureSwizzle.GL_TEXTURE_SWIZZLE_RGBA,
+        LucernaRenderSystem.texParameteriv(glTextureId, GL20C.GL_TEXTURE_2D, ARBTextureSwizzle.GL_TEXTURE_SWIZZLE_RGBA,
             new int[] { GL30C.GL_RED, GL30C.GL_RED, GL30C.GL_RED, GL30C.GL_ONE });
 
         configureSampler(glTextureId, settings);
@@ -168,11 +168,11 @@ public class ShadowRenderer {
         }
 
         if (!settings.getNearest()) {
-            IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, GL20C.GL_LINEAR);
-            IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MAG_FILTER, GL20C.GL_LINEAR);
+            LucernaRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, GL20C.GL_LINEAR);
+            LucernaRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MAG_FILTER, GL20C.GL_LINEAR);
         } else {
-            IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, GL20C.GL_NEAREST);
-            IrisRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MAG_FILTER, GL20C.GL_NEAREST);
+            LucernaRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, GL20C.GL_NEAREST);
+            LucernaRenderSystem.texParameteri(glTextureId, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MAG_FILTER, GL20C.GL_NEAREST);
         }
     }
 
@@ -187,8 +187,8 @@ public class ShadowRenderer {
     }
 
     private void setupMipmappingForTexture(int texture, int filteringMode) {
-        IrisRenderSystem.generateMipmaps(texture, GL20C.GL_TEXTURE_2D);
-        IrisRenderSystem.texParameteri(texture, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, filteringMode);
+        LucernaRenderSystem.generateMipmaps(texture, GL20C.GL_TEXTURE_2D);
+        LucernaRenderSystem.texParameteri(texture, GL20C.GL_TEXTURE_2D, GL20C.GL_TEXTURE_MIN_FILTER, filteringMode);
     }
 
     private FrustumHolder createShadowFrustum(float renderMultiplier, FrustumHolder holder) {
@@ -223,7 +223,7 @@ public class ShadowRenderer {
             String setter = "(set by shader pack)";
 
             if (renderMultiplier < 0) {
-                distance = IrisVideoSettings.shadowDistance * 16;
+                distance = LucernaVideoSettings.shadowDistance * 16;
                 setter = "(set by user)";
             }
 
@@ -290,7 +290,7 @@ public class ShadowRenderer {
     }
 
     public void renderShadows(WorldRenderer worldRenderer, Entity camera, Culler playerCuller) {
-        if (IrisVideoSettings.getOverriddenShadowDistance(IrisVideoSettings.shadowDistance) == 0) {
+        if (LucernaVideoSettings.getOverriddenShadowDistance(LucernaVideoSettings.shadowDistance) == 0) {
             return;
         }
 
@@ -445,7 +445,7 @@ public class ShadowRenderer {
         restoreMatrix(GL11.GL_PROJECTION);
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
 
-        GlStateManager.viewport(0, 0, IrisVideoSettings.scaleRenderSize(client.getRenderTarget().width), IrisVideoSettings.scaleRenderSize(client.getRenderTarget().height));
+        GlStateManager.viewport(0, 0, LucernaVideoSettings.scaleRenderSize(client.getRenderTarget().width), LucernaVideoSettings.scaleRenderSize(client.getRenderTarget().height));
 
         ACTIVE = false;
         profiler.pop();
@@ -499,13 +499,13 @@ public class ShadowRenderer {
     }
 
     public void addDebugText(List<String> messages) {
-        messages.add("[" + Iris.MODNAME + "] Shadow Maps: " + debugStringOverall);
-        messages.add("[" + Iris.MODNAME + "] Shadow Distance Terrain: " + terrainFrustumHolder.getDistanceInfo() + " Entity: " + entityFrustumHolder.getDistanceInfo());
-        messages.add("[" + Iris.MODNAME + "] Shadow Culling Terrain: " + terrainFrustumHolder.getCullingInfo() + " Entity: " + entityFrustumHolder.getCullingInfo());
-        messages.add("[" + Iris.MODNAME + "] Shadow Terrain: " + debugStringTerrain
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Maps: " + debugStringOverall);
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Distance Terrain: " + terrainFrustumHolder.getDistanceInfo() + " Entity: " + entityFrustumHolder.getDistanceInfo());
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Culling Terrain: " + terrainFrustumHolder.getCullingInfo() + " Entity: " + entityFrustumHolder.getCullingInfo());
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Terrain: " + debugStringTerrain
             + (shouldRenderTerrain ? "" : " (no terrain) ") + (shouldRenderTranslucent ? "" : "(no translucent)"));
-        messages.add("[" + Iris.MODNAME + "] Shadow Entities: " + getEntitiesDebugString());
-        messages.add("[" + Iris.MODNAME + "] Shadow Block Entities: " + getBlockEntitiesDebugString());
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Entities: " + getEntitiesDebugString());
+        messages.add("[" + Lucerna.MODNAME + "] Shadow Block Entities: " + getBlockEntitiesDebugString());
     }
 
     private String getEntitiesDebugString() {

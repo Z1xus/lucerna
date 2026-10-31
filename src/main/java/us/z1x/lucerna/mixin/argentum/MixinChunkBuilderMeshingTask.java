@@ -2,7 +2,7 @@ package us.z1x.lucerna.mixin.argentum;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.rdh.argentum.impl.render.terrain.compile.task.ChunkBuilderMeshingTask;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.compat.celeritas.TerrainBlockContext;
 import us.z1x.lucerna.compat.celeritas.TerrainContextRanges;
 import net.minecraft.block.state.BlockState;
@@ -20,7 +20,7 @@ public class MixinChunkBuilderMeshingTask {
     @Inject(method = "execute", remap = false, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;hasBlockEntity()Z", remap = true))
     private void lucerna$beginBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
                                  @Local(name = "blockState") BlockState blockState, @Local(name = "blockPos") BlockPos.Mutable blockPos) {
-        if (Iris.isShaderPackActive()) {
+        if (Lucerna.isShaderPackActive()) {
             TerrainBlockContext.get().set(TerrainBlockContext.packId(blockState), blockPos.getX(), blockPos.getY(), blockPos.getZ());
         }
     }
@@ -29,7 +29,7 @@ public class MixinChunkBuilderMeshingTask {
     private void lucerna$beginVanillaBlock(ChunkBuildContext context, CancellationToken cancellationToken, CallbackInfoReturnable<?> cir,
                                         @Local(name = "blockState") BlockState blockState, @Local(name = "blockPos") BlockPos.Mutable blockPos,
                                         @Local(name = "pass") BlockLayer pass) {
-        if (Iris.isShaderPackActive()) {
+        if (Lucerna.isShaderPackActive()) {
             ((TerrainContextRanges) context).lucerna$recordBlock(pass, TerrainBlockContext.packId(blockState), blockPos);
         }
     }

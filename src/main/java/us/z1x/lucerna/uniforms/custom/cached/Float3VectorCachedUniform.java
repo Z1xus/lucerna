@@ -1,6 +1,6 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.parsing.VectorType;
 import org.joml.Vector3f;
 
@@ -19,7 +19,7 @@ public class Float3VectorCachedUniform extends VectorCachedUniform<Vector3f> {
 
     @Override
     public void push(int location) {
-        IrisRenderSystem.uniform3f(location, this.cached.x, this.cached.y, this.cached.z);
+        LucernaRenderSystem.uniform3f(location, this.cached.x, this.cached.y, this.cached.z);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.program;
 
 import com.google.common.collect.ImmutableList;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.image.ImageBinding;
 import us.z1x.lucerna.gl.image.ImageHolder;
 import us.z1x.lucerna.gl.image.ImageLimits;
@@ -24,7 +24,7 @@ public class ProgramImages {
     public void update() {
         if (initializer != null) {
             for (GlUniform1iCall call : initializer) {
-                IrisRenderSystem.uniform1i(call.getLocation(), call.getValue());
+                LucernaRenderSystem.uniform1i(call.getLocation(), call.getValue());
             }
 
             initializer = null;

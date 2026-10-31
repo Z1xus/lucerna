@@ -3,7 +3,7 @@ package us.z1x.lucerna.gl.program;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.sampler.SamplerBinding;
 import us.z1x.lucerna.gl.sampler.SamplerHolder;
 import us.z1x.lucerna.gl.sampler.SamplerLimits;
@@ -38,7 +38,7 @@ public class ProgramSamplers {
 
         if (initializer != null) {
             for (GlUniform1iCall call : initializer) {
-                IrisRenderSystem.uniform1i(call.getLocation(), call.getValue());
+                LucernaRenderSystem.uniform1i(call.getLocation(), call.getValue());
             }
 
             initializer = null;
@@ -122,7 +122,7 @@ public class ProgramSamplers {
             }
 
             for (String name : names) {
-                int location = IrisRenderSystem.getUniformLocation(program, name);
+                int location = LucernaRenderSystem.getUniformLocation(program, name);
 
                 if (location == -1) {
                     continue;
@@ -134,7 +134,7 @@ public class ProgramSamplers {
 
         @Override
         public boolean hasSampler(String name) {
-            return IrisRenderSystem.getUniformLocation(program, name) != -1;
+            return LucernaRenderSystem.getUniformLocation(program, name) != -1;
         }
 
         @Override
@@ -159,7 +159,7 @@ public class ProgramSamplers {
 
         private boolean addDynamicSampler(IntSupplier sampler, boolean used, ValueUpdateNotifier notifier, String... names) {
             for (String name : names) {
-                int location = IrisRenderSystem.getUniformLocation(program, name);
+                int location = LucernaRenderSystem.getUniformLocation(program, name);
 
                 if (location == -1) {
                     continue;

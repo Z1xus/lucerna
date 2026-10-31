@@ -21,7 +21,7 @@ public class JcppProcessor {
     public static String glslPreprocessSource(String source, Iterable<StringPair> environmentDefines) {
         if (source.contains(GlslCollectingListener.VERSION_MARKER)
                 || source.contains(GlslCollectingListener.EXTENSION_MARKER)) {
-            throw new RuntimeException("Some shader author is trying to exploit internal Iris implementation details, stop!");
+            throw new RuntimeException("Some shader author is trying to exploit internal Lucerna implementation details, stop!");
         }
 
         // hack: markers let us hoist #extension only when used, for packs from lenient drivers on strict ones like mesa

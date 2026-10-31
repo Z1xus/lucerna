@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gui.element.widget;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.element.ShaderPackOptionList;
@@ -65,7 +65,7 @@ public final class OptionMenuConstructor {
 
     static {
         registerScreen(OptionMenuMainElementScreen.class, screen ->
-                new ElementWidgetScreenData(Formatting.BOLD + Iris.getCurrentPackName() + (Iris.isFallback() ? " (fallback)" : ""), false));
+                new ElementWidgetScreenData(Formatting.BOLD + Lucerna.getCurrentPackName() + (Lucerna.isFallback() ? " (fallback)" : ""), false));
 
         registerScreen(OptionMenuSubElementScreen.class, screen ->
                 new ElementWidgetScreenData(GuiUtil.translateOrDefault(screen.screenId, "screen." + screen.screenId), true));

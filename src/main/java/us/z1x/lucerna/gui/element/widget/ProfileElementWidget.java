@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gui.element.widget;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
@@ -27,7 +27,7 @@ public class ProfileElementWidget extends BaseOptionElementWidget<OptionMenuProf
     @Override
     public void init(ShaderPackScreen screen, NavigationController navigation) {
         super.init(screen, navigation);
-        this.setLabel(I18n.translate("options.iris.profile"));
+        this.setLabel(I18n.translate("options.lucerna.profile"));
 
         ProfileSet profiles = this.element.profiles;
         OptionSet options = this.element.options;
@@ -40,7 +40,7 @@ public class ProfileElementWidget extends BaseOptionElementWidget<OptionMenuProf
         Optional<String> profileName = result.current.map(p -> p.name);
 
         this.profileLabel = profileName.map(name -> GuiUtil.translateOrDefault(name, "profile." + name))
-                .orElse(Formatting.YELLOW + I18n.translate("options.iris.profile.custom"));
+                .orElse(Formatting.YELLOW + I18n.translate("options.lucerna.profile.custom"));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ProfileElementWidget extends BaseOptionElementWidget<OptionMenuProf
             return false;
         }
 
-        Iris.queueShaderPackOptionsFromProfile(this.next);
+        Lucerna.queueShaderPackOptionsFromProfile(this.next);
 
         return true;
     }
@@ -77,7 +77,7 @@ public class ProfileElementWidget extends BaseOptionElementWidget<OptionMenuProf
             return false;
         }
 
-        Iris.queueShaderPackOptionsFromProfile(this.previous);
+        Lucerna.queueShaderPackOptionsFromProfile(this.previous);
 
         return true;
     }

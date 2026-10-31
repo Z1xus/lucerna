@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.mixin.GameRendererAccessor;
 import us.z1x.lucerna.rendertarget.NativeImageBackedCustomTexture;
 import us.z1x.lucerna.rendertarget.NativeImageBackedNoiseTexture;
@@ -49,8 +49,7 @@ public class CustomTextureManager {
                 try {
                     customTextureIds.put(samplerName, createCustomTexture(textureData));
                 } catch (IOException e) {
-                    Iris.logger.error("Unable to parse the image data for the custom texture on stage "
-                            + textureStage + ", sampler " + samplerName, e);
+                    Lucerna.logger.error("Unable to parse the image data for the custom texture on stage {}, sampler {}", textureStage, samplerName, e);
                 }
             });
 
@@ -61,7 +60,7 @@ public class CustomTextureManager {
             try {
                 return Optional.of(createCustomTexture(textureData));
             } catch (IOException e) {
-                Iris.logger.error("Unable to parse the image data for the custom noise texture", e);
+                Lucerna.logger.error("Unable to parse the image data for the custom noise texture", e);
 
                 return Optional.empty();
             }

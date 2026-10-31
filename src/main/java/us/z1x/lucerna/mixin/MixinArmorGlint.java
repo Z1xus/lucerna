@@ -2,7 +2,7 @@ package us.z1x.lucerna.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
+import us.z1x.lucerna.gbufferoverrides.matching.SpecialCondition;
 import us.z1x.lucerna.layer.GbufferPrograms;
 import net.minecraft.client.render.entity.layer.AbstractArmorLayer;
 import net.minecraft.client.render.model.Model;

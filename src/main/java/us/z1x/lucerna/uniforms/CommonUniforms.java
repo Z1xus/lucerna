@@ -108,7 +108,7 @@ public final class CommonUniforms {
         BiomeUniforms.addBiomeUniforms(uniforms);
         new CelestialUniforms(directives.getSunPathRotation()).addCelestialUniforms(uniforms);
         IdMapUniforms.addIdMapUniforms(updateNotifier, uniforms, idMap, directives.isOldHandLight());
-        IrisExclusiveUniforms.addIrisExclusiveUniforms(uniforms);
+        LucernaExclusiveUniforms.addLucernaExclusiveUniforms(uniforms);
         MatrixUniforms.addMatrixUniforms(uniforms, directives);
         CommonUniforms.generalCommonUniforms(uniforms, updateNotifier, directives);
     }

@@ -1,9 +1,9 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import kroppeb.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
 import us.z1x.lucerna.parsing.VectorType;
 import org.joml.Vector3i;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 
 import java.util.function.Supplier;
 
@@ -20,7 +20,7 @@ public class Int3VectorCachedUniform extends VectorCachedUniform<Vector3i> {
 
     @Override
     public void push(int location) {
-        IrisRenderSystem.uniform3i(location, this.cached.x, this.cached.y, this.cached.z);
+        LucernaRenderSystem.uniform3i(location, this.cached.x, this.cached.y, this.cached.z);
     }
 
     @Override

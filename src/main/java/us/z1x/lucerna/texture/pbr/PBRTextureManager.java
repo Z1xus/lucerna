@@ -2,7 +2,7 @@ package us.z1x.lucerna.texture.pbr;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
 import us.z1x.lucerna.texture.TextureInfoCache;
 import us.z1x.lucerna.texture.TextureTracker;
@@ -67,9 +67,9 @@ public final class PBRTextureManager {
 
         if (!Objects.equals(previous, format)) {
             try {
-                Iris.reload();
+                Lucerna.reload();
             } catch (IOException e) {
-                Iris.logger.error("Failed to reload the shader pack for the new texture format", e);
+                Lucerna.logger.error("Failed to reload the shader pack for the new texture format", e);
             }
         }
     }
@@ -85,7 +85,7 @@ public final class PBRTextureManager {
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException e) {
-            Iris.logger.error("Failed to read the texture format", e);
+            Lucerna.logger.error("Failed to read the texture format", e);
             return null;
         }
     }
@@ -171,7 +171,7 @@ public final class PBRTextureManager {
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException e) {
-            Iris.logger.error("Failed to read " + location, e);
+            Lucerna.logger.error("Failed to read {}", location, e);
             return null;
         }
     }

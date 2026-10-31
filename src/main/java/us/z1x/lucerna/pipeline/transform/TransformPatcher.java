@@ -14,7 +14,7 @@ import io.github.douira.glsl_transformer.cst.token_filter.ChannelFilter;
 import io.github.douira.glsl_transformer.cst.token_filter.TokenChannel;
 import io.github.douira.glsl_transformer.cst.token_filter.TokenFilter;
 import io.github.douira.glsl_transformer.util.LRUCache;
-import us.z1x.lucerna.gbuffer_overrides.matching.InputAvailability;
+import us.z1x.lucerna.gbufferoverrides.matching.InputAvailability;
 import us.z1x.lucerna.pipeline.PatchedShaderPrinter;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
@@ -133,7 +133,7 @@ public class TransformPatcher {
                 }
                 violation.ifPresent(id -> {
                     throw new SemanticException(
-                            "Detected a potential reference to unstable and internal Iris shader interfaces (iris_ and irisMain). This isn't currently supported. Violation: "
+                            "Detected a potential reference to unstable and internal Lucerna shader interfaces (iris_ and irisMain). This isn't currently supported. Violation: "
                                     + id.getName() + ". See debugging.md for more information.");
                 });
 
@@ -145,7 +145,7 @@ public class TransformPatcher {
                             AttributeTransformer.transform(transformer, tree, root, (AttributeParameters) parameters);
                             break;
                         case SODIUM_TERRAIN:
-                            SodiumTerrainTransformer.transform(transformer, tree, root, parameters);
+                            CeleritasTerrainTransformer.transform(transformer, tree, root, parameters);
                             break;
                         case INSTANCED_ENTITY:
                             InstancedEntityTransformer.transform(transformer, tree, root, parameters);

@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import org.joml.Vector2i;
 
@@ -35,7 +35,7 @@ public class Vector2IntegerJomlUniform extends Uniform {
 
         if (cachedValue == null || !newValue.equals(cachedValue)) {
             cachedValue = newValue;
-            IrisRenderSystem.uniform2i(this.location, newValue.x, newValue.y);
+            LucernaRenderSystem.uniform2i(this.location, newValue.x, newValue.y);
         }
     }
 }

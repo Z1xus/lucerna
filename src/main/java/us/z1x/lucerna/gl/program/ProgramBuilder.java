@@ -1,7 +1,7 @@
 package us.z1x.lucerna.gl.program;
 
 import com.google.common.collect.ImmutableSet;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.image.ImageHolder;
 import us.z1x.lucerna.gl.sampler.SamplerHolder;
 import us.z1x.lucerna.gl.shader.GlShader;
@@ -27,7 +27,7 @@ public class ProgramBuilder extends ProgramUniforms.Builder implements SamplerHo
     }
 
     public void bindAttributeLocation(int index, String name) {
-        IrisRenderSystem.bindAttributeLocation(program, index, name);
+        LucernaRenderSystem.bindAttributeLocation(program, index, name);
     }
 
     public static ProgramBuilder begin(String name, @Nullable String vertexSource, @Nullable String geometrySource,
@@ -73,7 +73,7 @@ public class ProgramBuilder extends ProgramUniforms.Builder implements SamplerHo
 
     public static ProgramBuilder beginCompute(String name, @Nullable String source, ImmutableSet<Integer> reservedTextureUnits) {
 
-        if (!IrisRenderSystem.supportsCompute()) {
+        if (!LucernaRenderSystem.supportsCompute()) {
             throw new IllegalStateException("This PC does not support compute shaders, but it's attempting to be used???");
         }
 

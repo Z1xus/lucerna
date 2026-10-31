@@ -157,7 +157,7 @@ class InstancedEntityTransformer {
         tree.prependMain(t, "float lucerna_alpha = (" + sample + "(uTexture, lucerna_texCoord) * lucerna_color).a;");
 
         // glint and charged layers blend onto the shaded entity, the other draw buffers are masked while they draw
-        String output = SodiumTerrainTransformer.findFragmentOutput(root);
+        String output = CeleritasTerrainTransformer.findFragmentOutput(root);
         String effect = output != null ? output + " = lucerna_effect();" : "discard;";
         tree.appendMain(t, "if (uGlintPass >= 0 || uItemGlintPass >= 0 || uChargePass != 0) " + effect);
         tree.appendMain(t, "if (" + NEVER + " && " + sample + "(uLightmap, vec2(0.0)).r + u_FogColor.x + u_FogDensity + u_FogStart + u_FogEnd + float(u_FogShape) + float(uLit) + float(uLightmapped) > 0.0) discard;");

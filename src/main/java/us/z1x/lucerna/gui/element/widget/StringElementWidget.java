@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gui.element.widget;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.GuiUtil;
 import us.z1x.lucerna.gui.NavigationController;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
@@ -71,7 +71,7 @@ public class StringElementWidget extends BaseOptionElementWidget<OptionMenuStrin
     }
 
     protected void queue() {
-        Iris.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
+        Lucerna.getShaderPackOptionQueue().put(this.option.getName(), this.getValue());
     }
 
     @Override

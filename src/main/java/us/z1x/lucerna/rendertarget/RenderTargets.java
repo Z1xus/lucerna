@@ -3,7 +3,7 @@ package us.z1x.lucerna.rendertarget;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.gl.framebuffer.GlFramebuffer;
 import us.z1x.lucerna.gl.image.CustomImage;
 import us.z1x.lucerna.gl.texture.DepthBufferFormat;
@@ -230,7 +230,7 @@ public class RenderTargets {
             translucentDepthDirty = false;
             GlStateManager.bindTexture(noTranslucents.getTextureId());
             depthSourceFb.bindAsReadBuffer();
-            IrisRenderSystem.copyTexImage2D(GL20C.GL_TEXTURE_2D, 0, currentDepthFormat.getGlInternalFormat(), 0, 0, cachedWidth, cachedHeight, 0);
+            LucernaRenderSystem.copyTexImage2D(GL20C.GL_TEXTURE_2D, 0, currentDepthFormat.getGlInternalFormat(), 0, 0, cachedWidth, cachedHeight, 0);
         } else {
             copyStrategy.copy(depthSourceFb, getDepthTexture(), noTranslucentsDestFb, noTranslucents.getTextureId(),
                 getCurrentWidth(), getCurrentHeight());
@@ -242,7 +242,7 @@ public class RenderTargets {
             handDepthDirty = false;
             GlStateManager.bindTexture(noHand.getTextureId());
             depthSourceFb.bindAsReadBuffer();
-            IrisRenderSystem.copyTexImage2D(GL20C.GL_TEXTURE_2D, 0, currentDepthFormat.getGlInternalFormat(), 0, 0, cachedWidth, cachedHeight, 0);
+            LucernaRenderSystem.copyTexImage2D(GL20C.GL_TEXTURE_2D, 0, currentDepthFormat.getGlInternalFormat(), 0, 0, cachedWidth, cachedHeight, 0);
         } else {
             copyStrategy.copy(depthSourceFb, getDepthTexture(), noHandDestFb, noHand.getTextureId(),
                 getCurrentWidth(), getCurrentHeight());

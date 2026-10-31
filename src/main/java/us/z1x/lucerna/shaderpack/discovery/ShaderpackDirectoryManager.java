@@ -1,6 +1,6 @@
 package us.z1x.lucerna.shaderpack.discovery;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +30,7 @@ public class ShaderpackDirectoryManager {
         };
 
         try (Stream<Path> list = Files.list(root)) {
-            return list.filter(Iris::isValidShaderpack)
+            return list.filter(Lucerna::isValidShaderpack)
                 .map(path -> path.getFileName().toString())
                 .sorted(comparator).collect(Collectors.toList());
         }

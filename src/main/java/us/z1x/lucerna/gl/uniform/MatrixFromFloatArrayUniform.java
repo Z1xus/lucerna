@@ -1,6 +1,6 @@
 package us.z1x.lucerna.gl.uniform;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -29,7 +29,7 @@ public class MatrixFromFloatArrayUniform extends Uniform {
             buffer.put(cachedValue);
             buffer.rewind();
 
-            IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
+            LucernaRenderSystem.uniformMatrix4fv(location, false, buffer);
         }
     }
 }

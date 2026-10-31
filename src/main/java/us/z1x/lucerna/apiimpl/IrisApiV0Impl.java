@@ -1,6 +1,6 @@
 package us.z1x.lucerna.apiimpl;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.gui.screen.ShaderPackScreen;
 import us.z1x.lucerna.pipeline.FixedFunctionWorldRenderingPipeline;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
@@ -20,7 +20,7 @@ public class IrisApiV0Impl implements IrisApi {
 
     @Override
     public boolean isShaderPackInUse() {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline == null) {
             return false;
@@ -41,7 +41,7 @@ public class IrisApiV0Impl implements IrisApi {
 
     @Override
     public String getMainScreenLanguageKey() {
-        return "options.iris.shaderPackSelection";
+        return "options.lucerna.shaderPackSelection";
     }
 
     @Override

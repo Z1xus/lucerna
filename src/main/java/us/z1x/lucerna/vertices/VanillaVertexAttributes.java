@@ -1,6 +1,6 @@
 package us.z1x.lucerna.vertices;
 
-import us.z1x.lucerna.gl.IrisRenderSystem;
+import us.z1x.lucerna.gl.LucernaRenderSystem;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.VertexFormat;
 import org.joml.Vector3f;
@@ -76,7 +76,7 @@ public final class VanillaVertexAttributes {
         GL20C.glDisableVertexAttribArray(MID_TEX_COORD_LOCATION);
         GL20C.glDisableVertexAttribArray(TANGENT_LOCATION);
         // the current value of an attribute is undefined after an array draw
-        IrisRenderSystem.vertexAttrib4f(MID_TEX_COORD_LOCATION, 0.0F, 0.0F, 0.0F, 1.0F);
-        IrisRenderSystem.vertexAttrib4f(TANGENT_LOCATION, 1.0F, 0.0F, 0.0F, 1.0F);
+        LucernaRenderSystem.vertexAttrib4f(MID_TEX_COORD_LOCATION, 0.0F, 0.0F, 0.0F, 1.0F);
+        LucernaRenderSystem.vertexAttrib4f(TANGENT_LOCATION, 1.0F, 0.0F, 0.0F, 1.0F);
     }
 }

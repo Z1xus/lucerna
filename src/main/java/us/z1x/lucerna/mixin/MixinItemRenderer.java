@@ -1,7 +1,7 @@
 package us.z1x.lucerna.mixin;
 
 import it.unimi.dsi.fastutil.objects.Object2IntFunction;
-import us.z1x.lucerna.block_rendering.BlockRenderingSettings;
+import us.z1x.lucerna.blockrendering.BlockRenderingSettings;
 import us.z1x.lucerna.shaderpack.materialmap.NamespacedId;
 import us.z1x.lucerna.uniforms.CapturedRenderingState;
 import net.minecraft.client.render.entity.ItemRenderer;

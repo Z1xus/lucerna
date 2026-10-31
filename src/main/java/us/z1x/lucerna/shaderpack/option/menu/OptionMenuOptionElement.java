@@ -1,6 +1,6 @@
 package us.z1x.lucerna.shaderpack.option.menu;
 
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.Lucerna;
 import us.z1x.lucerna.shaderpack.ShaderProperties;
 import us.z1x.lucerna.shaderpack.option.values.MutableOptionValues;
 import us.z1x.lucerna.shaderpack.option.values.OptionValues;
@@ -23,7 +23,7 @@ public abstract class OptionMenuOptionElement extends OptionMenuElement {
 
     public OptionValues getPendingOptionValues() {
         MutableOptionValues values = getAppliedOptionValues().mutableCopy();
-        values.addAll(Iris.getShaderPackOptionQueue());
+        values.addAll(Lucerna.getShaderPackOptionQueue());
 
         return values;
     }

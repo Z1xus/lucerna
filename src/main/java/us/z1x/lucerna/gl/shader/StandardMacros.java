@@ -2,7 +2,7 @@ package us.z1x.lucerna.gl.shader;
 
 import com.google.common.collect.ImmutableList;
 import us.z1x.lucerna.texture.pbr.PBRTextureManager;
-import us.z1x.lucerna.gui.option.IrisVideoSettings;
+import us.z1x.lucerna.gui.option.LucernaVideoSettings;
 import us.z1x.lucerna.pipeline.HandRenderer;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
 import us.z1x.lucerna.shaderpack.StringPair;
@@ -62,14 +62,14 @@ public class StandardMacros {
             }
         }
 
-        define(standardDefines, "MC_RENDER_QUALITY", Float.toString(IrisVideoSettings.renderQuality));
-        define(standardDefines, "MC_SHADOW_QUALITY", Float.toString(IrisVideoSettings.shadowQuality));
+        define(standardDefines, "MC_RENDER_QUALITY", Float.toString(LucernaVideoSettings.renderQuality));
+        define(standardDefines, "MC_SHADOW_QUALITY", Float.toString(LucernaVideoSettings.shadowQuality));
         define(standardDefines, "MC_HAND_DEPTH", Float.toString(HandRenderer.DEPTH));
 
         getRenderStages().forEach((stage, index) -> define(standardDefines, stage, index));
 
-        for (String irisDefine : getIrisDefines()) {
-            define(standardDefines, irisDefine);
+        for (String lucernaDefine : getLucernaDefines()) {
+            define(standardDefines, lucernaDefine);
         }
 
         return ImmutableList.copyOf(standardDefines);
@@ -209,7 +209,7 @@ public class StandardMacros {
         return stages;
     }
 
-    public static List<String> getIrisDefines() {
+    public static List<String> getLucernaDefines() {
         List<String> defines = new ArrayList<>();
 
         return defines;

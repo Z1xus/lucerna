@@ -1,7 +1,7 @@
 package us.z1x.lucerna.parsing;
 
-import kroppeb.stareval.function.FunctionReturn;
-import kroppeb.stareval.function.Type;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.Type;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;

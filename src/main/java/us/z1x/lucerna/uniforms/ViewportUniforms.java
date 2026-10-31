@@ -1,7 +1,7 @@
 package us.z1x.lucerna.uniforms;
 
 import us.z1x.lucerna.gl.uniform.UniformHolder;
-import us.z1x.lucerna.gui.option.IrisVideoSettings;
+import us.z1x.lucerna.gui.option.LucernaVideoSettings;
 import net.minecraft.client.Minecraft;
 
 import static us.z1x.lucerna.gl.uniform.UniformUpdateFrequency.PER_FRAME;
@@ -12,8 +12,8 @@ public final class ViewportUniforms {
 
     public static void addViewportUniforms(UniformHolder uniforms) {
         uniforms
-            .uniform1f(PER_FRAME, "viewHeight", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().height))
-            .uniform1f(PER_FRAME, "viewWidth", () -> IrisVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().width))
+            .uniform1f(PER_FRAME, "viewHeight", () -> LucernaVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().height))
+            .uniform1f(PER_FRAME, "viewWidth", () -> LucernaVideoSettings.scaleRenderSize(Minecraft.getInstance().getRenderTarget().width))
             .uniform1f(PER_FRAME, "aspectRatio", ViewportUniforms::getAspectRatio);
     }
 

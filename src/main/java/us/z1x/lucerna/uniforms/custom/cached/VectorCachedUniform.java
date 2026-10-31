@@ -1,8 +1,8 @@
 package us.z1x.lucerna.uniforms.custom.cached;
 
-import kroppeb.stareval.function.FunctionReturn;
-import kroppeb.stareval.function.Type;
-import us.z1x.lucerna.Iris;
+import us.z1x.lucerna.stareval.function.FunctionReturn;
+import us.z1x.lucerna.stareval.function.Type;
+import us.z1x.lucerna.Lucerna;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -24,7 +24,7 @@ public abstract class VectorCachedUniform<T> extends CachedUniform {
     protected boolean doUpdate() {
         T other = this.supplier.get();
         if (other == null) {
-            Iris.logger.warn("Cached Uniform supplier gave null back");
+            Lucerna.logger.warn("Cached Uniform supplier gave null back");
             return false;
         }
         if (!this.cached.equals(other)) {

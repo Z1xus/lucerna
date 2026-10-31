@@ -44,8 +44,8 @@
     "celeritas.MixinShadowBatchCache",
     "celeritas.MixinShadowFaceMask",
     "celeritas.MixinSimpleWorldRenderer",
-    "entity_render_context.MixinBlockEntityRenderDispatcher",
-    "entity_render_context.MixinEntityRenderDispatcher",
+    "entityrendercontext.MixinBlockEntityRenderDispatcher",
+    "entityrendercontext.MixinEntityRenderDispatcher",
     "gui.MixinCeleritasVideoOptionsController",
     "gui.MixinDebugOverlay",
     "gui.MixinGameGui"

@@ -1,7 +1,7 @@
 package us.z1x.lucerna.layer;
 
-import us.z1x.lucerna.Iris;
-import us.z1x.lucerna.gbuffer_overrides.matching.SpecialCondition;
+import us.z1x.lucerna.Lucerna;
+import us.z1x.lucerna.gbufferoverrides.matching.SpecialCondition;
 import us.z1x.lucerna.gl.state.StateUpdateNotifiers;
 import us.z1x.lucerna.pipeline.WorldRenderingPhase;
 import us.z1x.lucerna.pipeline.WorldRenderingPipeline;
@@ -13,7 +13,7 @@ public class GbufferPrograms {
     private static Runnable phaseChangeListener;
 
     public static WorldRenderingPhase getCurrentPhase() {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             return pipeline.getPhase();
@@ -23,7 +23,7 @@ public class GbufferPrograms {
     }
 
     private static void setPhase(WorldRenderingPhase phase) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             pipeline.setPhase(phase);
@@ -31,7 +31,7 @@ public class GbufferPrograms {
     }
 
     public static void setOverridePhase(WorldRenderingPhase phase) {
-        WorldRenderingPipeline pipeline = Iris.getPipelineManager().getPipelineNullable();
+        WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
         if (pipeline != null) {
             pipeline.setOverridePhase(phase);
@@ -45,11 +45,11 @@ public class GbufferPrograms {
     }
 
     public static void setupSpecialRenderCondition(SpecialCondition override) {
-        Iris.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(override));
+        Lucerna.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(override));
     }
 
     public static void teardownSpecialRenderCondition(SpecialCondition override) {
-        Iris.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(null));
+        Lucerna.getPipelineManager().getPipeline().ifPresent(p -> p.setSpecialCondition(null));
     }
 
     static {
