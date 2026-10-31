@@ -34,6 +34,10 @@ public final class CloudRenderer {
     private CloudRenderer() {
     }
 
+    public void invalidate() {
+        texture = 0;
+    }
+
     public void render(double x, double z, float height, float red, float green, float blue, int anaglyphRenderPass) {
         int cellX = MathHelper.floor(x);
         int cellZ = MathHelper.floor(z);

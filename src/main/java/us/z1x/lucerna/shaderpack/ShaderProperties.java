@@ -322,8 +322,8 @@ public class ShaderProperties {
                 customUniforms.addVariable(parts[0], parts[1], value, true);
             });
 
-            handleWhitespacedListDirective(key, value, "lucerna.features.required", options -> requiredFeatureFlags = options);
-            handleWhitespacedListDirective(key, value, "lucerna.features.optional", options -> optionalFeatureFlags = options);
+            handleWhitespacedListDirective(key, value, "iris.features.required", options -> requiredFeatureFlags = options);
+            handleWhitespacedListDirective(key, value, "iris.features.optional", options -> optionalFeatureFlags = options);
 
             handlePassDirective("image.", key, value, name -> {
                 String[] parts = value.trim().split("\\s+");

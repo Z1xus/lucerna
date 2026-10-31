@@ -39,7 +39,7 @@ public final class HandRenderer {
 
         pipeline.setPhase(WorldRenderingPhase.HAND_SOLID);
 
-        minecraft.profiler.push("iris_hand");
+        minecraft.profiler.push("lucerna_hand");
 
         // scale the projection depth so the hand does not clip through blocks
         GlStateManager.matrixMode(GL11.GL_PROJECTION);
