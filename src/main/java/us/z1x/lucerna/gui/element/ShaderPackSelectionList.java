@@ -258,7 +258,7 @@ public class ShaderPackSelectionList extends LucernaObjectSelectionList<ShaderPa
         }
 
         private String getEnableDisableLabel() {
-            return this.allowEnableShadersButton ? this.shadersEnabled ? shadersEnabledLabel : shadersDisabledLabel : nonePresentLabel;
+            return this.allowEnableShadersButton ? (this.shadersEnabled ? shadersEnabledLabel : shadersDisabledLabel) : nonePresentLabel;
         }
 
         @Override

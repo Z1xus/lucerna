@@ -115,7 +115,7 @@ public class MixinGlStateManager {
         TextureInfoCache.INSTANCE.onDeleteTexture(id);
     }
 
-    @Inject(method = { "enableFog", "disableFog" }, at = @At("RETURN"))
+    @Inject(method = {"enableFog", "disableFog"}, at = @At("RETURN"))
     private static void lucerna$onFogToggle(CallbackInfo ci) {
         if (lucerna$fogToggleListener != null) {
             lucerna$fogToggleListener.run();
@@ -182,7 +182,7 @@ public class MixinGlStateManager {
         }
     }
 
-    @Inject(method = { "blendFunc", "blendFuncSeparate" }, at = @At("RETURN"))
+    @Inject(method = {"blendFunc", "blendFuncSeparate"}, at = @At("RETURN"))
     private static void lucerna$onBlendFunc(CallbackInfo ci) {
         if (lucerna$blendFuncListener != null) {
             lucerna$blendFuncListener.run();

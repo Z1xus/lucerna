@@ -35,7 +35,7 @@ public final class GuiUtil {
         int halfHeight = height / 2;
 
         // disabled, hovered and normal texture rows
-        int vOffset = disabled ? 46 : hovered ? 86 : 66;
+        int vOffset = disabled ? 46 : (hovered ? 86 : 66);
 
         GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager.enableBlend();

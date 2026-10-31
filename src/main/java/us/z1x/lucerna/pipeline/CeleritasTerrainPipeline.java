@@ -81,13 +81,13 @@ public class CeleritasTerrainPipeline {
     private final IntFunction<ProgramImages> createShadowImages;
 
     public CeleritasTerrainPipeline(WorldRenderingPipeline parent,
-                                 ProgramSet programSet, IntFunction<ProgramSamplers> createTerrainSamplers,
-                                 IntFunction<ProgramSamplers> createShadowSamplers,
-                                 IntFunction<ProgramImages> createTerrainImages,
-                                 IntFunction<ProgramImages> createShadowImages,
-                                 RenderTargets targets, ImmutableSet<Integer> flippedAfterPrepare,
-                                 ImmutableSet<Integer> flippedAfterTranslucent, Supplier<GlFramebuffer> shadowFramebuffer,
-                                 CustomUniforms customUniforms) {
+                                    ProgramSet programSet, IntFunction<ProgramSamplers> createTerrainSamplers,
+                                    IntFunction<ProgramSamplers> createShadowSamplers,
+                                    IntFunction<ProgramImages> createTerrainImages,
+                                    IntFunction<ProgramImages> createShadowImages,
+                                    RenderTargets targets, ImmutableSet<Integer> flippedAfterPrepare,
+                                    ImmutableSet<Integer> flippedAfterTranslucent, Supplier<GlFramebuffer> shadowFramebuffer,
+                                    CustomUniforms customUniforms) {
         this.parent = Objects.requireNonNull(parent);
         this.customUniforms = customUniforms;
         this.programSet = programSet;

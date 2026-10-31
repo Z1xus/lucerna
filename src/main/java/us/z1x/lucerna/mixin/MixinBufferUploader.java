@@ -1,6 +1,5 @@
 package us.z1x.lucerna.mixin;
 
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.BufferUploader;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +23,7 @@ public class MixinBufferUploader {
 
         if (CapturedRenderingState.INSTANCE.isCompilingDisplayList()) {
             // glUseProgram would be recorded into the display list, and the list can be replayed in any pass
-            if (IrisApi.getInstance().isShaderPackInUse()) {
+            if (Lucerna.isShaderPipelineActive()) {
                 VanillaVertexAttributes.bind(builder);
             }
         } else {

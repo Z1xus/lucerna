@@ -281,8 +281,12 @@ public class ShaderProperties {
 
                 // like iris, a raw texture gets its own sampler that replaces only declarations of its type, see TransformPatcher
                 if (parts.length > 1) {
-                    String type = parts[1].equals("TEXTURE_1D") ? "SAMPLER1D" : parts[1].equals("TEXTURE_3D") ? "SAMPLER3D"
-                        : parts[1].equals("TEXTURE_RECTANGLE") ? "SAMPLER2DRECT" : "SAMPLER2D";
+                    String type = switch (parts[1]) {
+                        case "TEXTURE_1D" -> "SAMPLER1D";
+                        case "TEXTURE_3D" -> "SAMPLER3D";
+                        case "TEXTURE_RECTANGLE" -> "SAMPLER2DRECT";
+                        default -> "SAMPLER2D";
+                    };
                     String customName = "customtex" + customTextureCount++;
                     customTexturePatching.computeIfAbsent(stage, _stage -> new Object2ObjectOpenHashMap<>()).put(type + " " + name, customName);
                     name = customName;
@@ -340,7 +344,7 @@ public class ShaderProperties {
                         images.add(new ImageInformation(name, samplerName, GL11C.GL_TEXTURE_2D, format.get(), internalFormat.get(), type.get(), 0, 0, 0, clear,
                             true, Float.parseFloat(parts[6]), Float.parseFloat(parts[7])));
                     } else {
-                        int target = parts.length == 7 ? GL11C.GL_TEXTURE_1D : parts.length == 8 ? GL11C.GL_TEXTURE_2D : GL12C.GL_TEXTURE_3D;
+                        int target = parts.length == 7 ? GL11C.GL_TEXTURE_1D : (parts.length == 8 ? GL11C.GL_TEXTURE_2D : GL12C.GL_TEXTURE_3D);
                         images.add(new ImageInformation(name, samplerName, target, format.get(), internalFormat.get(), type.get(), Integer.parseInt(parts[6]),
                             parts.length > 7 ? Integer.parseInt(parts[7]) : 1, parts.length > 8 ? Integer.parseInt(parts[8]) : 1, clear, false, 0, 0));
                     }

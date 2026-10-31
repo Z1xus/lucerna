@@ -58,7 +58,7 @@ public class BiomeUniforms {
                     return 0;
                 }
 
-                return biome.isSnowy() ? 2 : biome.isRainy() ? 1 : 0;
+                return biome.isSnowy() ? 2 : (biome.isRainy() ? 1 : 0);
             })
             .uniform1f(PER_TICK, "rainfall", () -> {
                 Biome biome = getBiome();

@@ -60,7 +60,7 @@ public class LucernaChunkShaderInterface implements ChunkShaderInterface {
     private final Matrix3f normal = new Matrix3f();
 
     public LucernaChunkShaderInterface(int handle, ShaderBindingContext contextExt, CeleritasTerrainPipeline pipeline, LucernaTerrainPass pass,
-                                    BlendModeOverride blendModeOverride, List<BufferBlendOverride> bufferOverrides, float alpha) {
+                                       BlendModeOverride blendModeOverride, List<BufferBlendOverride> bufferOverrides, float alpha) {
         this.uniformModelViewMatrix = contextExt.bindUniformIfPresent("iris_ModelViewMatrix", GlUniformMatrix4f::new);
         this.uniformModelViewMatrixInverse = contextExt.bindUniformIfPresent("iris_ModelViewMatrixInverse", GlUniformMatrix4f::new);
         this.uniformProjectionMatrix = contextExt.bindUniformIfPresent("iris_ProjectionMatrix", GlUniformMatrix4f::new);

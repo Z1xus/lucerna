@@ -670,6 +670,11 @@ public class Lucerna {
         return lucernaConfig;
     }
 
+    public static boolean isShaderPipelineActive() {
+        WorldRenderingPipeline pipeline = pipelineManager.getPipelineNullable();
+        return pipeline != null && !(pipeline instanceof FixedFunctionWorldRenderingPipeline);
+    }
+
     public static boolean isShaderPackActive() {
         return currentPack != null && !fallback;
     }

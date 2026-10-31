@@ -32,17 +32,11 @@ public class MixinGameOptions {
         }
 
         switch (pipeline.getCloudSetting()) {
-            case OFF:
-                cir.setReturnValue(0);
-                break;
-            case FAST:
-                cir.setReturnValue(1);
-                break;
-            case FANCY:
-                cir.setReturnValue(2);
-                break;
-            default:
-                break;
+            case OFF -> cir.setReturnValue(0);
+            case FAST -> cir.setReturnValue(1);
+            case FANCY -> cir.setReturnValue(2);
+            default -> {
+            }
         }
     }
 }

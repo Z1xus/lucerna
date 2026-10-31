@@ -601,7 +601,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     }
 
     public static ProgramId programIdFor(RenderCondition condition, InputAvailability availability) {
-        int index = availability.texture ? availability.lightmap ? 2 : 1 : 0;
+        int index = availability.texture ? (availability.lightmap ? 2 : 1) : 0;
         ProgramId id = PROGRAM_IDS[condition.ordinal() * 3 + index];
 
         return id != null ? id : PROGRAM_IDS[index];

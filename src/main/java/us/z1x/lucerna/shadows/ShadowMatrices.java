@@ -84,7 +84,7 @@ public class ShadowMatrices {
     }
 
     public static Matrix4f createModelViewMatrix(Matrix4f target, float shadowAngle, float shadowIntervalSize,
-                                             float sunPathRotation, double cameraX, double cameraY, double cameraZ) {
+                                                 float sunPathRotation, double cameraX, double cameraY, double cameraZ) {
         createBaselineModelViewMatrix(target, shadowAngle, sunPathRotation);
         snapModelViewToGrid(target, shadowIntervalSize, cameraX, cameraY, cameraZ);
 

@@ -2,7 +2,6 @@ package us.z1x.lucerna.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Culler;
 import net.minecraft.client.render.block.BlockLayer;
@@ -18,6 +17,7 @@ import net.minecraft.resource.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.HitResult;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -152,7 +152,7 @@ public class MixinWorldRenderer {
 
     @Inject(method = "renderFancyClouds", at = @At("HEAD"), cancellable = true)
     private void lucerna$renderCachedClouds(float tickDelta, int anaglyphRenderPass, CallbackInfo ci) {
-        if (!IrisApi.getInstance().isShaderPackInUse()) {
+        if (!Lucerna.isShaderPipelineActive()) {
             return;
         }
 
@@ -178,7 +178,7 @@ public class MixinWorldRenderer {
         GlStateManager.disableCull();
         textureManager.bind(CLOUDS_LOCATION);
         GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
         CloudRenderer.INSTANCE.render(x - MathHelper.floor(x / 2048.0) * 2048, z - MathHelper.floor(z / 2048.0) * 2048, height, red, green, blue, anaglyphRenderPass);
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();

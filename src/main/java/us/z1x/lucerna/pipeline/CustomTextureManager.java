@@ -114,7 +114,7 @@ public class CustomTextureManager {
     }
 
     private static int createRawTexture(CustomTextureData.RawData raw) {
-        int target = raw instanceof CustomTextureData.RawData1D ? GL11C.GL_TEXTURE_1D : raw instanceof CustomTextureData.RawData3D ? GL12C.GL_TEXTURE_3D : GL11C.GL_TEXTURE_2D;
+        int target = raw instanceof CustomTextureData.RawData1D ? GL11C.GL_TEXTURE_1D : (raw instanceof CustomTextureData.RawData3D ? GL12C.GL_TEXTURE_3D : GL11C.GL_TEXTURE_2D);
         int texture = GL11C.glGenTextures();
         int filter = raw.getFilteringData().shouldBlur() ? GL11C.GL_LINEAR : GL11C.GL_NEAREST;
         int wrap = raw.getFilteringData().shouldClamp() ? GL12C.GL_CLAMP_TO_EDGE : GL11C.GL_REPEAT;

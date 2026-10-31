@@ -58,7 +58,7 @@ final class PBRMipmaps {
         int k1 = kind.applyAsInt(v1);
         int k2 = kind.applyAsInt(v2);
         int k3 = kind.applyAsInt(v3);
-        int target = k0 == k1 || k0 == k2 || k0 == k3 ? k0 : k1 == k2 || k1 == k3 ? k1 : k2 == k3 ? k2 : k0;
+        int target = k0 == k1 || k0 == k2 || k0 == k3 ? k0 : (k1 == k2 || k1 == k3 ? k1 : (k2 == k3 ? k2 : k0));
         int sum = 0;
         int count = 0;
 
