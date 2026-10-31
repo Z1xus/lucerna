@@ -68,44 +68,11 @@ public class StandardMacros {
 
         getRenderStages().forEach((stage, index) -> define(standardDefines, stage, index));
 
-        for (String lucernaDefine : getLucernaDefines()) {
-            define(standardDefines, lucernaDefine);
-        }
-
         return ImmutableList.copyOf(standardDefines);
     }
 
     public static String getMcVersion() {
-        String version = "1.8.9";
-
-        if (version == null) {
-            throw new IllegalStateException("Could not get the current minecraft version!");
-        }
-
-        String[] splitVersion = version.split("\\.");
-
-        if (splitVersion.length < 2) {
-            throw new IllegalStateException("Could not parse game version \"" + version +  "\"");
-        }
-
-        String major = splitVersion[0];
-        String minor = splitVersion[1];
-        String bugfix;
-
-        if (splitVersion.length < 3) {
-            bugfix = "00";
-        } else {
-            bugfix = splitVersion[2];
-        }
-
-        if (minor.length() == 1) {
-            minor = 0 + minor;
-        }
-        if (bugfix.length() == 1) {
-            bugfix = 0 + bugfix;
-        }
-
-        return major + minor + bugfix;
+        return "10809";
     }
 
     public static String getGlVersion(int name) {
@@ -121,7 +88,7 @@ public class StandardMacros {
         String minor = group(matcher, "minor");
         String bugfix = group(matcher, "bugfix");
 
-        if (bugfix == null) {
+        if (bugfix == null || bugfix.isEmpty()) {
             bugfix = "0";
         }
 
@@ -207,11 +174,5 @@ public class StandardMacros {
             stages.put("MC_RENDER_STAGE_" + phase.name(), String.valueOf(phase.ordinal()));
         }
         return stages;
-    }
-
-    public static List<String> getLucernaDefines() {
-        List<String> defines = new ArrayList<>();
-
-        return defines;
     }
 }

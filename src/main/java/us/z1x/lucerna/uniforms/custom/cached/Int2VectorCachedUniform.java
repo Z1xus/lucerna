@@ -3,7 +3,6 @@ package us.z1x.lucerna.uniforms.custom.cached;
 import org.joml.Vector2i;
 import us.z1x.lucerna.gl.LucernaRenderSystem;
 import us.z1x.lucerna.parsing.VectorType;
-import us.z1x.lucerna.stareval.function.FunctionReturn;
 
 import java.util.function.Supplier;
 
@@ -21,11 +20,6 @@ public class Int2VectorCachedUniform extends VectorCachedUniform<Vector2i> {
     @Override
     public void push(int location) {
         LucernaRenderSystem.uniform2i(location, this.cached.x, this.cached.y);
-    }
-
-    @Override
-    public void writeTo(FunctionReturn functionReturn) {
-        functionReturn.objectReturn = this.cached;
     }
 
     @Override

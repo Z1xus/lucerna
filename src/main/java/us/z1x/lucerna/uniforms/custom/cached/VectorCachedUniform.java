@@ -35,7 +35,6 @@ public abstract class VectorCachedUniform<T> extends CachedUniform {
 
     @Override
     public void writeTo(FunctionReturn functionReturn) {
-
         functionReturn.objectReturn = this.cached;
     }
 
