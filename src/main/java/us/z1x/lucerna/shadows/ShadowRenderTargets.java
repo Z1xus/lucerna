@@ -94,6 +94,7 @@ public class ShadowRenderTargets {
         }
 
         noTranslucents.destroy();
+        mainDepth.destroy();
     }
 
     public int getRenderTargetCount() {

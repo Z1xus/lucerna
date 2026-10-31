@@ -26,7 +26,6 @@ import us.z1x.lucerna.samplers.LucernaImages;
 import us.z1x.lucerna.samplers.LucernaSamplers;
 import us.z1x.lucerna.shaderpack.ComputeSource;
 import us.z1x.lucerna.shaderpack.PackDirectives;
-import us.z1x.lucerna.shaderpack.PackRenderTargetDirectives;
 import us.z1x.lucerna.shaderpack.ProgramDirectives;
 import us.z1x.lucerna.shaderpack.ProgramSource;
 import us.z1x.lucerna.shadows.ShadowRenderTargets;
@@ -65,10 +64,6 @@ public class CompositeRenderer {
         this.renderTargets = renderTargets;
         this.customTextureIds = customTextureIds;
         this.textureRenames = textureRenames;
-
-        final PackRenderTargetDirectives renderTargetDirectives = packDirectives.getRenderTargetDirectives();
-        final Map<Integer, PackRenderTargetDirectives.RenderTargetSettings> renderTargetSettings =
-                renderTargetDirectives.getRenderTargetSettings();
 
         final ImmutableList.Builder<Pass> passes = ImmutableList.builder();
         final ImmutableSet.Builder<Integer> flippedAtLeastOnce = new ImmutableSet.Builder<>();
@@ -279,7 +274,7 @@ public class CompositeRenderer {
     }
 
     private Program createProgram(ProgramSource source, ImmutableSet<Integer> flipped, ImmutableSet<Integer> flippedAtLeastOnceSnapshot,
-                                                           Supplier<ShadowRenderTargets> shadowTargetsSupplier) {
+                                  Supplier<ShadowRenderTargets> shadowTargetsSupplier) {
         Map<PatchShaderType, String> transformed = TransformPatcher.patchComposite(
             source.getVertexSource().orElseThrow(NullPointerException::new),
             source.getGeometrySource().orElse(null),

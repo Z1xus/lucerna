@@ -6,6 +6,7 @@ import us.z1x.lucerna.uniforms.CameraUniforms;
 import us.z1x.lucerna.uniforms.CelestialUniforms;
 
 public class ShadowMatrices {
+    private static final Vector3d CAMERA_POSITION = new Vector3d();
     private static final float NEAR = 0.05f;
     private static final float FAR = 256.0f;
 
@@ -26,12 +27,12 @@ public class ShadowMatrices {
                 yScale, 0f, 0f, 0f,
                 0f, yScale, 0f, 0f,
                 0f, 0f, (FAR + NEAR) / (NEAR - FAR), -1.0F,
-                0f, 0f, 2.0F * FAR * NEAR / (NEAR - FAR), 1f
+                0f, 0f, 2.0F * FAR * NEAR / (NEAR - FAR), 0f
         };
     }
 
     public static Matrix4f createShadowModelView(float sunPathRotation, float intervalSize) {
-        Vector3d cameraPos = CameraUniforms.getUnshiftedCameraPosition();
+        Vector3d cameraPos = CameraUniforms.getUnshiftedCameraPosition(CAMERA_POSITION);
 
         return createModelViewMatrix(new Matrix4f(), getShadowAngle(), intervalSize, sunPathRotation, cameraPos.x, cameraPos.y, cameraPos.z);
     }

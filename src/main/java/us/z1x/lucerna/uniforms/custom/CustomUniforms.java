@@ -246,7 +246,7 @@ public class CustomUniforms implements FunctionContext {
         Set<CachedUniform> unused = new ObjectOpenHashSet<>();
         for (int i = this.orderedUniforms.size() - 1; i >= 0; i--) {
             CachedUniform uniform = this.orderedUniforms.get(i);
-            if (!dependedByCount.containsKey(uniform)) {
+            if (dependedByCount.getInt(uniform) == 0) {
                 unused.add(uniform);
                 List<CachedUniform> dependencies = this.dependsOn.get(uniform);
                 if (dependencies != null) {

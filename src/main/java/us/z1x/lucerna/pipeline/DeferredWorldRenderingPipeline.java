@@ -1199,7 +1199,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         // vanilla leaves the scene depth in the main target, mods and upscalers that run after the world read it there
         RenderTarget main = Minecraft.getInstance().getRenderTarget();
-        LucernaRenderSystem.blitFramebuffer(renderTargets.getDepthSourceFb().getId(), main.frameBufferId, 0, 0, main.width, main.height,
+        LucernaRenderSystem.blitFramebuffer(renderTargets.getDepthSourceFb().getId(), main.frameBufferId, 0, 0, renderTargets.getCurrentWidth(), renderTargets.getCurrentHeight(),
             0, 0, main.width, main.height, GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
 
         isRenderingFullScreenPass = false;

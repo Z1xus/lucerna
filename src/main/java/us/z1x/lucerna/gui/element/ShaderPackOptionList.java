@@ -22,23 +22,24 @@ import java.util.List;
 public class ShaderPackOptionList extends LucernaObjectSelectionList<ShaderPackOptionList.BaseEntry> {
     private final List<AbstractElementWidget<?>> elementWidgets = new ArrayList<>();
     private final ShaderPackScreen screen;
-    private final NavigationController navigation;
+    private NavigationController navigation;
     private OptionMenuContainer container;
 
     public ShaderPackOptionList(ShaderPackScreen screen, NavigationController navigation, ShaderPack pack, Minecraft client, int width, int height, int top, int bottom, int left, int right) {
         super(client, width, height, top, bottom, left, right, 24);
-        this.navigation = navigation;
         this.screen = screen;
 
-        applyShaderPack(pack);
+        applyShaderPack(pack, navigation);
     }
 
-    public void applyShaderPack(ShaderPack pack) {
+    public void applyShaderPack(ShaderPack pack, NavigationController navigation) {
         this.container = pack.getMenuContainer();
+        this.navigation = navigation;
     }
 
     public void rebuild() {
         this.clearEntries();
+        this.elementWidgets.clear();
         this.setScrollAmount(0);
         OptionMenuConstructor.constructAndApplyToScreen(this.container, this.screen, this, navigation);
     }
@@ -65,7 +66,7 @@ public class ShaderPackOptionList extends LucernaObjectSelectionList<ShaderPackO
 
             if (row.size() >= columns) {
                 this.addEntry(new ElementRowEntry(screen, this.navigation, row));
-                row = new ArrayList<>(); // Clearing the list would affect the row entry created above
+                row = new ArrayList<>(); // clearing the list would affect the row entry created above
             }
         }
 
@@ -208,7 +209,7 @@ public class ShaderPackOptionList extends LucernaObjectSelectionList<ShaderPackO
 
             int totalWidthWithoutMargins = entryWidth - (2 * (widgets.size() - 1));
 
-            totalWidthWithoutMargins -= 3; // Centers it for some reason
+            totalWidthWithoutMargins -= 3;
 
             float singleWidgetWidth = (float) totalWidthWithoutMargins / widgets.size();
 

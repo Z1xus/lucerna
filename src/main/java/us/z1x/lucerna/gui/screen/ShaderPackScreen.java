@@ -281,10 +281,11 @@ public class ShaderPackScreen extends Screen implements HudHideable {
         if (Lucerna.getCurrentPack().isPresent()) {
             ShaderPack currentPack = Lucerna.getCurrentPack().get();
 
-            this.navigation = new NavigationController(currentPack.getMenuContainer());
+            this.navigation = new NavigationController();
 
             if (this.shaderOptionList != null) {
-                this.shaderOptionList.applyShaderPack(currentPack);
+                this.shaderOptionList.applyShaderPack(currentPack, this.navigation);
+                this.navigation.setActiveOptionList(this.shaderOptionList);
                 this.shaderOptionList.rebuild();
             }
         } else {

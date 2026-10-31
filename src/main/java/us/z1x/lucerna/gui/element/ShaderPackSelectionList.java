@@ -64,6 +64,7 @@ public class ShaderPackSelectionList extends LucernaObjectSelectionList<ShaderPa
         this.addEntry(topButtonRow);
 
         topButtonRow.allowEnableShadersButton = names.size() > 0;
+        topButtonRow.enableDisableButton.text = topButtonRow.getEnableDisableLabel();
 
         int index = 0;
 

@@ -43,6 +43,13 @@ public final class CommonUniforms {
     private static final Vector2i ZERO_VECTOR_2i = new Vector2i();
     private static final Vector4i ZERO_VECTOR_4i = new Vector4i(0, 0, 0, 0);
     private static final Vector3d ZERO_VECTOR_3D = new Vector3d();
+    private static final Vector2i ATLAS_SIZE = new Vector2i();
+    private static final Vector2i TEXTURE_SIZE = new Vector2i();
+    private static final Vector4i BLEND_FUNC = new Vector4i();
+    private static final Vector2i EYE_BRIGHTNESS = new Vector2i();
+    private static final Vector2i EYE_BRIGHTNESS_SMOOTH = new Vector2i();
+    private static final Vector3d SKY_COLOR = new Vector3d();
+    private static final BlockPos.Mutable EYE_BLOCK_POS = new BlockPos.Mutable();
 
     private CommonUniforms() {
     }
@@ -70,7 +77,7 @@ public final class CommonUniforms {
             AbstractTexture texture = TextureTracker.INSTANCE.getTexture(glId);
             if (texture instanceof TextureAtlas) {
                 TextureInfo info = TextureInfoCache.INSTANCE.getInfo(glId);
-                return new Vector2i(info.getWidth(), info.getHeight());
+                return ATLAS_SIZE.set(info.getWidth(), info.getHeight());
             }
 
             return ZERO_VECTOR_2i;
@@ -80,15 +87,14 @@ public final class CommonUniforms {
             int glId = GlStateManager.TEXTURES[0].texture;
 
             TextureInfo info = TextureInfoCache.INSTANCE.getInfo(glId);
-            return new Vector2i(info.getWidth(), info.getHeight());
-
+            return TEXTURE_SIZE.set(info.getWidth(), info.getHeight());
         }, StateUpdateNotifiers.bindTextureNotifier);
 
         uniforms.uniform4i("blendFunc", () -> {
             GlStateManager.Blend blend = GlStateManager.BLEND;
 
             if (blend.state.enabled) {
-                return new Vector4i(blend.sfactorRGB, blend.dfactorRGB, blend.sfactorAlpha, blend.dfactorAlpha);
+                return BLEND_FUNC.set(blend.sfactorRGB, blend.dfactorRGB, blend.sfactorAlpha, blend.dfactorAlpha);
             } else {
                 return ZERO_VECTOR_4i;
             }
@@ -144,7 +150,7 @@ public final class CommonUniforms {
             .uniform2i(PER_FRAME, "eyeBrightness", CommonUniforms::getEyeBrightness)
             .uniform2i(PER_FRAME, "eyeBrightnessSmooth", () -> {
                 Vector2f smoothed = eyeBrightnessSmooth.get();
-                return new Vector2i((int) smoothed.x(), (int) smoothed.y());
+                return EYE_BRIGHTNESS_SMOOTH.set((int) smoothed.x(), (int) smoothed.y());
             })
             .uniform1f(PER_TICK, "rainStrength", CommonUniforms::getRainStrength)
             .uniform1f(PER_TICK, "wetness", new SmoothedFloat(directives.getWetnessHalfLife(), directives.getDrynessHalfLife(), CommonUniforms::getRainStrength, updateNotifier))
@@ -164,7 +170,7 @@ public final class CommonUniforms {
         }
 
         Vec3d color = client.world.getSkyColor(client.getCamera(), CapturedRenderingState.INSTANCE.getTickDelta());
-        return new Vector3d(color.x, color.y, color.z);
+        return SKY_COLOR.set(color.x, color.y, color.z);
     }
 
     static float getBlindness() {
@@ -200,12 +206,12 @@ public final class CommonUniforms {
             return ZERO_VECTOR_2i;
         }
 
-        BlockPos eyeBlockPos = new BlockPos(camera.x, camera.y + camera.getEyeHeight(), camera.z);
+        BlockPos eyeBlockPos = EYE_BLOCK_POS.set(MathHelper.floor(camera.x), MathHelper.floor(camera.y + camera.getEyeHeight()), MathHelper.floor(camera.z));
 
         int blockLight = client.world.getBrightness(LightType.BLOCK, eyeBlockPos);
         int skyLight = client.world.getBrightness(LightType.SKY, eyeBlockPos);
 
-        return new Vector2i(blockLight * 16, skyLight * 16);
+        return EYE_BRIGHTNESS.set(blockLight * 16, skyLight * 16);
     }
 
     private static float getNightVision() {

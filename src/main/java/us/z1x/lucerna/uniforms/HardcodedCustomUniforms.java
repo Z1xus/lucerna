@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.living.player.LocalClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.SwampBiome;
@@ -14,6 +15,7 @@ import us.z1x.lucerna.uniforms.transforms.SmoothedFloat;
 
 // expressions copied from bsl and complementary
 public class HardcodedCustomUniforms {
+    private static final BlockPos.Mutable EYE_BLOCK_POS = new BlockPos.Mutable();
     private static final Minecraft client = Minecraft.getInstance();
     private static Biome storedBiome;
 
@@ -121,7 +123,7 @@ public class HardcodedCustomUniforms {
             return 0;
         }
 
-        BlockPos eyeBlockPos = new BlockPos(camera.x, camera.y + camera.getEyeHeight(), camera.z);
+        BlockPos eyeBlockPos = EYE_BLOCK_POS.set(MathHelper.floor(camera.x), MathHelper.floor(camera.y + camera.getEyeHeight()), MathHelper.floor(camera.z));
 
         int skyLight = client.world.getBrightness(LightType.SKY, eyeBlockPos);
 

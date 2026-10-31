@@ -84,7 +84,7 @@ public class ProfileElementWidget extends BaseOptionElementWidget<OptionMenuProf
 
     @Override
     public boolean applyOriginalValue() {
-        return false; // Resetting options is the way to return to the "default profile"
+        return false; // resetting options is the way to return to the "default profile"
     }
 
     @Override

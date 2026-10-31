@@ -29,7 +29,6 @@ import us.z1x.lucerna.rendertarget.RenderTargets;
 import us.z1x.lucerna.samplers.LucernaImages;
 import us.z1x.lucerna.samplers.LucernaSamplers;
 import us.z1x.lucerna.shaderpack.ComputeSource;
-import us.z1x.lucerna.shaderpack.PackRenderTargetDirectives;
 import us.z1x.lucerna.shaderpack.ProgramDirectives;
 import us.z1x.lucerna.shaderpack.ProgramSet;
 import us.z1x.lucerna.shaderpack.ProgramSource;
@@ -72,10 +71,6 @@ public class FinalPassRenderer {
         this.centerDepthSampler = centerDepthSampler;
         this.customTextureIds = customTextureIds;
         this.textureRenames = pack.getPack().getCustomTexturePatching(TextureStage.COMPOSITE_AND_FINAL);
-
-        final PackRenderTargetDirectives renderTargetDirectives = pack.getPackDirectives().getRenderTargetDirectives();
-        final Map<Integer, PackRenderTargetDirectives.RenderTargetSettings> renderTargetSettings =
-                renderTargetDirectives.getRenderTargetSettings();
 
         this.noiseTexture = noiseTexture;
         this.renderTargets = renderTargets;
@@ -133,6 +128,12 @@ public class FinalPassRenderer {
 
         private void destroy() {
             this.program.destroy();
+
+            for (ComputeProgram compute : this.computes) {
+                if (compute != null) {
+                    compute.destroy();
+                }
+            }
         }
     }
 
@@ -345,5 +346,7 @@ public class FinalPassRenderer {
         if (finalPass != null) {
             finalPass.destroy();
         }
+
+        colorHolder.destroy();
     }
 }

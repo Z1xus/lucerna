@@ -7,7 +7,8 @@ import us.z1x.lucerna.gl.state.ValueUpdateNotifier;
 import java.util.function.Supplier;
 
 public class Vector4IntegerJomlUniform extends Uniform {
-    private Vector4i cachedValue;
+    private final Vector4i cachedValue = new Vector4i();
+    private boolean initialized;
     private final Supplier<Vector4i> value;
 
     Vector4IntegerJomlUniform(int location, Supplier<Vector4i> value) {
@@ -17,7 +18,6 @@ public class Vector4IntegerJomlUniform extends Uniform {
     Vector4IntegerJomlUniform(int location, Supplier<Vector4i> value, ValueUpdateNotifier notifier) {
         super(location, notifier);
 
-        this.cachedValue = null;
         this.value = value;
     }
 
@@ -33,8 +33,9 @@ public class Vector4IntegerJomlUniform extends Uniform {
     private void updateValue() {
         Vector4i newValue = value.get();
 
-        if (cachedValue == null || !newValue.equals(cachedValue)) {
-            cachedValue = newValue;
+        if (!initialized || !newValue.equals(cachedValue)) {
+            initialized = true;
+            cachedValue.set(newValue);
             LucernaRenderSystem.uniform4i(this.location, newValue.x, newValue.y, newValue.z, newValue.w);
         }
     }

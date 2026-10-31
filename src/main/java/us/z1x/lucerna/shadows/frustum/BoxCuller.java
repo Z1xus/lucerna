@@ -26,8 +26,7 @@ public class BoxCuller {
     }
 
     public boolean isCulled(Box aabb) {
-        return isCulled((float) aabb.minX, (float) aabb.minY, (float) aabb.minZ,
-            (float) aabb.maxX, (float) aabb.maxY, (float) aabb.maxZ);
+        return isCulled(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
     public boolean isCulled(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {

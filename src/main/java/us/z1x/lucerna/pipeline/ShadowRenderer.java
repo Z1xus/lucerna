@@ -73,6 +73,7 @@ public class ShadowRenderer {
     private final boolean shouldRenderBlockEntities;
     private final float sunPathRotation;
     private final CelestialUniforms celestial;
+    private final Vector3d cameraPosition = new Vector3d();
     private final List<MipmapPass> mipmapPasses = new ArrayList<>();
     private final String debugStringOverall;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
@@ -312,7 +313,7 @@ public class ShadowRenderer {
 
         terrainFrustumHolder = createShadowFrustum(renderDistanceMultiplier, terrainFrustumHolder);
 
-        Vector3d cameraPos = CameraUniforms.getUnshiftedCameraPosition();
+        Vector3d cameraPos = CameraUniforms.getUnshiftedCameraPosition(cameraPosition);
 
         double cameraX = cameraPos.x;
         double cameraY = cameraPos.y;
@@ -364,12 +365,9 @@ public class ShadowRenderer {
         profiler.swap("entities");
 
         // entities get a tighter frustum when the pack asks for one, otherwise the terrain frustum is used
-        boolean hasEntityFrustum = false;
-
         if (entityShadowDistanceMultiplier == 1.0F || entityShadowDistanceMultiplier < 0.0F) {
             entityFrustumHolder.setInfo(terrainFrustumHolder.getFrustum(), terrainFrustumHolder.getDistanceInfo(), terrainFrustumHolder.getCullingInfo());
         } else {
-            hasEntityFrustum = true;
             entityFrustumHolder = createShadowFrustum(renderDistanceMultiplier * entityShadowDistanceMultiplier, entityFrustumHolder);
         }
 

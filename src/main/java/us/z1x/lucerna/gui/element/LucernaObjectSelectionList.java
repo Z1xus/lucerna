@@ -120,7 +120,7 @@ public class LucernaObjectSelectionList<E extends LucernaObjectSelectionList.Ent
         this.setScrolling(true);
     }
 
-    // Mirrors ListWidget#render, but allows skipping the list background so that the world stays visible
+    // mirrors ListWidget#render, but allows skipping the list background so that the world stays visible
     @Override
     public void render(int mouseX, int mouseY, float tickDelta) {
         this.mouseX = mouseX;

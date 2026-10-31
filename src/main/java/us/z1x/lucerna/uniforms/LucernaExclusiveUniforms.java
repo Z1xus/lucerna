@@ -15,6 +15,9 @@ import us.z1x.lucerna.gl.uniform.UniformHolder;
 import us.z1x.lucerna.gl.uniform.UniformUpdateFrequency;
 
 public class LucernaExclusiveUniforms {
+    private static final Vector3d CAMERA_POSITION = new Vector3d();
+    private static final Vector3d EYE_POSITION = new Vector3d();
+    private static final Vector3d RELATIVE_EYE_POSITION = new Vector3d();
     private static final Vector4f ZERO = new Vector4f(0, 0, 0, 0);
     private static final Vector3f DIRECTION = new Vector3f();
 
@@ -31,7 +34,7 @@ public class LucernaExclusiveUniforms {
         uniforms.uniform1b(UniformUpdateFrequency.PER_FRAME, "firstPersonCamera", () -> Minecraft.getInstance().options.perspective == 0);
         uniforms.uniform1b(UniformUpdateFrequency.PER_TICK, "isSpectator", LucernaExclusiveUniforms::isSpectator);
         uniforms.uniform3d(UniformUpdateFrequency.PER_FRAME, "eyePosition", LucernaExclusiveUniforms::getEyePosition);
-        uniforms.uniform3d(UniformUpdateFrequency.PER_FRAME, "relativeEyePosition", () -> CameraUniforms.getUnshiftedCameraPosition().sub(getEyePosition()));
+        uniforms.uniform3d(UniformUpdateFrequency.PER_FRAME, "relativeEyePosition", () -> CameraUniforms.getUnshiftedCameraPosition(RELATIVE_EYE_POSITION).sub(getEyePosition()));
         uniforms.uniform3f(UniformUpdateFrequency.PER_FRAME, "playerLookVector", LucernaExclusiveUniforms::getPlayerLookVector);
         uniforms.uniform3f(UniformUpdateFrequency.PER_FRAME, "playerBodyVector", LucernaExclusiveUniforms::getPlayerBodyVector);
         // 1.8.9 has no left handed option
@@ -49,7 +52,7 @@ public class LucernaExclusiveUniforms {
 
         for (Entity entity : world.globalEntities) {
             if (entity instanceof LightningBoltEntity) {
-                Vector3d camera = CameraUniforms.getUnshiftedCameraPosition();
+                Vector3d camera = CameraUniforms.getUnshiftedCameraPosition(CAMERA_POSITION);
                 return new Vector4f((float) (entity.x - camera.x), (float) (entity.y - camera.y), (float) (entity.z - camera.z), 1);
             }
         }
@@ -102,7 +105,7 @@ public class LucernaExclusiveUniforms {
     }
 
     private static Vector3d getEyePosition() {
-        return CameraUniforms.getUnshiftedCameraPosition().add(0.0, Minecraft.getInstance().getCamera().getEyeHeight(), 0.0);
+        return CameraUniforms.getUnshiftedCameraPosition(EYE_POSITION).add(0.0, Minecraft.getInstance().getCamera().getEyeHeight(), 0.0);
     }
 
     private static Vector3f getPlayerLookVector() {
