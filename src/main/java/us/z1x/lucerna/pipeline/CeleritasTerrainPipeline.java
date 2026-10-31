@@ -140,7 +140,7 @@ public class CeleritasTerrainPipeline {
         Optional<ProgramSource> terrain = terrainSource(programSet);
 
         for (Optional<ProgramSource> source : List.of(terrain, first(programSet.getGbuffersWater(), terrain), programSet.getShadow())) {
-            source.ifPresent(sources -> TransformPatcher.patchSodiumTerrain(sources.getVertexSource().orElse(null), sources.getGeometrySource().orElse(null), sources.getFragmentSource().orElse(null), textureRenames));
+            source.ifPresent(sources -> TransformPatcher.patchCeleritasTerrain(sources.getVertexSource().orElse(null), sources.getGeometrySource().orElse(null), sources.getFragmentSource().orElse(null), textureRenames));
         }
 
         for (Optional<ProgramSource> source : List.of(entitySource(programSet), programSet.getShadow())) {
@@ -179,7 +179,7 @@ public class CeleritasTerrainPipeline {
                 AlphaTest alphaTest = sources.getDirectives().getAlphaTestOverride().map(AlphaTestOverride::getAlphaTest).orElse(null);
                 info.alphaReference = cutout ? (alphaTest != null ? alphaTest.getReference() : CUTOUT_ALPHA_REFERENCE) : 0.0F;
 
-                Map<PatchShaderType, String> result = TransformPatcher.patchSodiumTerrain(
+                Map<PatchShaderType, String> result = TransformPatcher.patchCeleritasTerrain(
                     sources.getVertexSource().orElse(null),
                     sources.getGeometrySource().orElse(null),
                     sources.getFragmentSource().orElse(null),

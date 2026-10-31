@@ -235,7 +235,7 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
 
     @Override
     public boolean testAab(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        return (boxCuller == null || !boxCuller.isCulledSodium(minX, minY, minZ, maxX, maxY, maxZ)) && this.checkCornerVisibility(minX, minY, minZ, maxX, maxY, maxZ) > 0;
+        return (boxCuller == null || !boxCuller.isCulledCeleritas(minX, minY, minZ, maxX, maxY, maxZ)) && this.checkCornerVisibility(minX, minY, minZ, maxX, maxY, maxZ) > 0;
     }
 
     // tri-state checkCornerVisibility from joml's FrustumIntersection#intersectAab, also tests the near corner to report fully inside boxes
@@ -265,7 +265,7 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
 
     @Override
     public int intersectAab(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        if (boxCuller != null && boxCuller.isCulledSodium(minX, minY, minZ, maxX, maxY, maxZ)) {
+        if (boxCuller != null && boxCuller.isCulledCeleritas(minX, minY, minZ, maxX, maxY, maxZ)) {
             return OUTSIDE;
         }
 
@@ -273,7 +273,7 @@ public class AdvancedShadowCullingFrustum implements Culler, ViewportProvider, F
 
         // a box is only fully inside if it is also inside the box culler bounds, otherwise a sub-box could be culled
         if (result == FULLY_INSIDE && boxCuller != null
-                && !boxCuller.isFullyInsideSodium(minX, minY, minZ, maxX, maxY, maxZ)) {
+                && !boxCuller.isFullyInsideCeleritas(minX, minY, minZ, maxX, maxY, maxZ)) {
             return PARTIALLY_INSIDE;
         }
 

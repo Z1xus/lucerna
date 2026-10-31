@@ -19,7 +19,7 @@ public class PipelineManager {
     private final Function<DimensionId, WorldRenderingPipeline> pipelineFactory;
     private final Map<DimensionId, WorldRenderingPipeline> pipelinesPerDimension = new HashMap<>();
     private WorldRenderingPipeline pipeline = new FixedFunctionWorldRenderingPipeline();
-    private int versionCounterForSodiumShaderReload = 0;
+    private int versionCounterForCeleritasShaderReload = 0;
 
     public PipelineManager(Function<DimensionId, WorldRenderingPipeline> pipelineFactory) {
         this.pipelineFactory = pipelineFactory;
@@ -58,8 +58,8 @@ public class PipelineManager {
     }
 
     // bumped on each destroy so cached chunk and entity programs know to reload
-    public int getVersionCounterForSodiumShaderReload() {
-        return versionCounterForSodiumShaderReload;
+    public int getVersionCounterForCeleritasShaderReload() {
+        return versionCounterForCeleritasShaderReload;
     }
 
     // re-prepare the pipeline right after this or the program state becomes inconsistent
@@ -73,7 +73,7 @@ public class PipelineManager {
 
         pipelinesPerDimension.clear();
         pipeline = null;
-        versionCounterForSodiumShaderReload++;
+        versionCounterForCeleritasShaderReload++;
     }
 
     private void resetTextureState() {

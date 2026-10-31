@@ -72,6 +72,7 @@ public class ShadowRenderer {
     private final boolean shouldRenderPlayer;
     private final boolean shouldRenderBlockEntities;
     private final float sunPathRotation;
+    private final CelestialUniforms celestial;
     private final List<MipmapPass> mipmapPasses = new ArrayList<>();
     private final String debugStringOverall;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
@@ -118,6 +119,7 @@ public class ShadowRenderer {
         }
 
         this.sunPathRotation = directives.getSunPathRotation();
+        this.celestial = new CelestialUniforms(sunPathRotation);
 
         configureSamplingSettings(shadowDirectives);
     }
@@ -244,7 +246,7 @@ public class ShadowRenderer {
 
             cullingInfo = "Advanced Frustum Culling enabled";
 
-            Vector4f shadowLightPosition = new CelestialUniforms(sunPathRotation).getShadowLightPositionInWorldSpace();
+            Vector4f shadowLightPosition = celestial.getShadowLightPositionInWorldSpace();
 
             Vector3f shadowLightVectorFromOrigin =
                 new Vector3f(shadowLightPosition.x(), shadowLightPosition.y(), shadowLightPosition.z());

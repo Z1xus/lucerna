@@ -75,6 +75,7 @@ public class ProgramUniforms {
             updateStage(perTick);
             updateStage(perFrame);
             lastTick = getCurrentTick();
+            lastFrame = SystemTimeUniforms.COUNTER.getAsInt();
 
             once = null;
             return;

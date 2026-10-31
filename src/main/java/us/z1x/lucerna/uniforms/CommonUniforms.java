@@ -42,7 +42,7 @@ public final class CommonUniforms {
     private static final Minecraft client = Minecraft.getInstance();
     private static final Vector2i ZERO_VECTOR_2i = new Vector2i();
     private static final Vector4i ZERO_VECTOR_4i = new Vector4i(0, 0, 0, 0);
-    private static final Vector3d ZERO_VECTOR_3d = new Vector3d();
+    private static final Vector3d ZERO_VECTOR_3D = new Vector3d();
 
     private CommonUniforms() {
     }
@@ -160,7 +160,7 @@ public final class CommonUniforms {
 
     private static Vector3d getSkyColor() {
         if (client.world == null || client.getCamera() == null) {
-            return ZERO_VECTOR_3d;
+            return ZERO_VECTOR_3D;
         }
 
         Vec3d color = client.world.getSkyColor(client.getCamera(), CapturedRenderingState.INSTANCE.getTickDelta());

@@ -82,7 +82,7 @@ public class LucernaChunkShaderInterface implements ChunkShaderInterface {
 
     @Override
     public void setupState(TerrainRenderPass terrainPass) {
-        CeleritasTerrainPipeline pipeline = getSodiumTerrainPipeline();
+        CeleritasTerrainPipeline pipeline = getCeleritasTerrainPipeline();
 
         if (pipeline != null) {
             GlFramebuffer framebuffer = pipeline.getPassInfo(pass).framebuffer();
@@ -181,9 +181,9 @@ public class LucernaChunkShaderInterface implements ChunkShaderInterface {
         // unused, the pack samplers bind the albedo and lightmap units themselves
     }
 
-    private static CeleritasTerrainPipeline getSodiumTerrainPipeline() {
+    private static CeleritasTerrainPipeline getCeleritasTerrainPipeline() {
         WorldRenderingPipeline worldRenderingPipeline = Lucerna.getPipelineManager().getPipelineNullable();
 
-        return worldRenderingPipeline != null ? worldRenderingPipeline.getSodiumTerrainPipeline() : null;
+        return worldRenderingPipeline != null ? worldRenderingPipeline.getCeleritasTerrainPipeline() : null;
     }
 }

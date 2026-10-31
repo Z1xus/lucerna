@@ -42,7 +42,7 @@ public interface WorldRenderingPipeline {
     void finalizeLevelRendering();
     void destroy();
 
-    CeleritasTerrainPipeline getSodiumTerrainPipeline();
+    CeleritasTerrainPipeline getCeleritasTerrainPipeline();
     FrameUpdateNotifier getFrameUpdateNotifier();
 
     boolean shouldDisableVanillaEntityShadows();

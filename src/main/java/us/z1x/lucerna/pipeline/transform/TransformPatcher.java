@@ -144,7 +144,7 @@ public class TransformPatcher {
                         case ATTRIBUTES:
                             AttributeTransformer.transform(transformer, tree, root, (AttributeParameters) parameters);
                             break;
-                        case SODIUM_TERRAIN:
+                        case CELERITAS_TERRAIN:
                             CeleritasTerrainTransformer.transform(transformer, tree, root, parameters);
                             break;
                         case INSTANCED_ENTITY:
@@ -204,8 +204,8 @@ public class TransformPatcher {
         return transform(vertex, geometry, fragment, withRenames(new AttributeParameters(Patch.ATTRIBUTES, geometry != null, inputs), textureRenames));
     }
 
-    public static Map<PatchShaderType, String> patchSodiumTerrain(String vertex, String geometry, String fragment, Map<String, String> textureRenames) {
-        return transform(vertex, geometry, fragment, withRenames(new Parameters(Patch.SODIUM_TERRAIN), textureRenames));
+    public static Map<PatchShaderType, String> patchCeleritasTerrain(String vertex, String geometry, String fragment, Map<String, String> textureRenames) {
+        return transform(vertex, geometry, fragment, withRenames(new Parameters(Patch.CELERITAS_TERRAIN), textureRenames));
     }
 
     public static Map<PatchShaderType, String> patchInstancedEntity(String vertex, String fragment, Map<String, String> textureRenames) {

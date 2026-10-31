@@ -87,6 +87,8 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, RenderTargetStateListener  {
+    private static final Vector4f EMPTY_CLEAR_COLOR = new Vector4f(1.0F);
+
     private final RenderTargets renderTargets;
     private final DepthTexture mainDepth;
 
@@ -148,7 +150,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     private final ImmutableSet<Integer> flippedAfterPrepare;
     private final ImmutableSet<Integer> flippedAfterTranslucent;
 
-    private final CeleritasTerrainPipeline sodiumTerrainPipeline;
+    private final CeleritasTerrainPipeline celeritasTerrainPipeline;
 
     private final HorizonRenderer horizonRenderer = new HorizonRenderer();
 
@@ -419,7 +421,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             return builder.build();
         };
 
-        this.sodiumTerrainPipeline = new CeleritasTerrainPipeline(this, programs, createTerrainSamplers,
+        this.celeritasTerrainPipeline = new CeleritasTerrainPipeline(this, programs, createTerrainSamplers,
             shadowRenderer == null ? null : createShadowTerrainSamplers, createTerrainImages,
             shadowRenderer == null ? null : createShadowTerrainImages, renderTargets, flippedAfterPrepare, flippedAfterTranslucent,
             () -> shadowRenderTargets.createShadowFramebuffer(shadowRenderTargets.snapshot(), new int[] {0, 1}), customUniforms);
@@ -561,7 +563,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
             return;
         }
 
-        if (sodiumTerrainRendering) {
+        if (celeritasTerrainRendering) {
             beginPass(table.match(getCondition(getPhase()), new InputAvailability(true, true, false)));
             return;
         }
@@ -773,7 +775,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 GlStateManager.viewport(0, 0, renderTargets.getCurrentWidth(), renderTargets.getCurrentHeight());
             }
 
-            if (program != null && !sodiumTerrainRendering) {
+            if (program != null && !celeritasTerrainRendering) {
                 program.use();
 
                 // vanilla geometry has no extended attributes, so give the pack the values OptiFine uses for it
@@ -844,10 +846,17 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
         setupRenderer.destroy();
         beginRenderer.destroy();
+        prepareRenderer.destroy();
         compositeRenderer.destroy();
         deferredRenderer.destroy();
         finalPassRenderer.destroy();
         centerDepthSampler.destroy();
+
+        for (ComputeProgram computeProgram : shadowComputes) {
+            if (computeProgram != null) {
+                computeProgram.destroy();
+            }
+        }
 
         horizonRenderer.destroy();
 
@@ -888,19 +897,19 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         });
     }
 
+    private final Vector4f clearFogColor = new Vector4f();
     private int mainDepthWidth = -1;
     private int mainDepthHeight = -1;
 
     private void prepareRenderTargets() {
         GlStateManager.activeTexture(GL15C.GL_TEXTURE0);
-        Vector4f emptyClearColor = new Vector4f(1.0F);
 
         if (shadowRenderTargets != null) {
             if (packDirectives.getShadowDirectives().isShadowEnabled() == OptionalBoolean.FALSE) {
                 if (shadowRenderTargets.isFullClearRequired()) {
                     shadowRenderTargets.onFullClear();
                     for (ClearPass clearPass : shadowClearPassesFull) {
-                        clearPass.execute(emptyClearColor);
+                        clearPass.execute(EMPTY_CLEAR_COLOR);
                     }
                 }
             } else {
@@ -924,7 +933,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
                 }
 
                 for (ClearPass clearPass : passes) {
-                    clearPass.execute(emptyClearColor);
+                    clearPass.execute(EMPTY_CLEAR_COLOR);
                 }
             }
         }
@@ -976,10 +985,10 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         Vector3d fogColor3 = CapturedRenderingState.INSTANCE.getFogColor();
 
         // alpha must be 1.0, sildur's vibrant shaders get pink reflections otherwise
-        Vector4f fogColor = new Vector4f((float) fogColor3.x, (float) fogColor3.y, (float) fogColor3.z, 1.0F);
+        clearFogColor.set((float) fogColor3.x, (float) fogColor3.y, (float) fogColor3.z, 1.0F);
 
         for (ClearPass clearPass : passes) {
-            clearPass.execute(fogColor);
+            clearPass.execute(clearFogColor);
         }
 
         // vanilla only clears the depth of its own framebuffer, the gbuffers have a depth texture of their own
@@ -1197,8 +1206,8 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
     }
 
     @Override
-    public CeleritasTerrainPipeline getSodiumTerrainPipeline() {
-        return sodiumTerrainPipeline;
+    public CeleritasTerrainPipeline getCeleritasTerrainPipeline() {
+        return celeritasTerrainPipeline;
     }
 
     @Override
@@ -1215,7 +1224,7 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
         return phase;
     }
 
-    boolean sodiumTerrainRendering = false;
+    boolean celeritasTerrainRendering = false;
 
     @Override
     public void syncProgram() {
@@ -1229,14 +1238,14 @@ public class DeferredWorldRenderingPipeline implements WorldRenderingPipeline, R
 
     @Override
     public void beginTerrainRendering() {
-        sodiumTerrainRendering = true;
+        celeritasTerrainRendering = true;
         syncProgram();
 
     }
 
     @Override
     public void endTerrainRendering() {
-        sodiumTerrainRendering = false;
+        celeritasTerrainRendering = false;
         current = null;
         syncProgram();
     }

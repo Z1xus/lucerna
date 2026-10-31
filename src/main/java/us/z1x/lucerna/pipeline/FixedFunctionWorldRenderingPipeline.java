@@ -117,7 +117,7 @@ public class FixedFunctionWorldRenderingPipeline implements WorldRenderingPipeli
     }
 
     @Override
-    public CeleritasTerrainPipeline getSodiumTerrainPipeline() {
+    public CeleritasTerrainPipeline getCeleritasTerrainPipeline() {
         return null;
     }
 

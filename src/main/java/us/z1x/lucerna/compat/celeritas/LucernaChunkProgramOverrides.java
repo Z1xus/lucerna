@@ -27,7 +27,7 @@ public class LucernaChunkProgramOverrides {
 
     private final EnumMap<LucernaTerrainPass, GlProgram<LucernaChunkShaderInterface>> programs = new EnumMap<>(LucernaTerrainPass.class);
     private boolean shadersCreated;
-    private int versionCounterForSodiumShaderReload = -1;
+    private int versionCounterForCeleritasShaderReload = -1;
 
     @Nullable
     private GlProgram<LucernaChunkShaderInterface> createProgram(LucernaTerrainPass pass, CeleritasTerrainPipeline pipeline) {
@@ -77,20 +77,20 @@ public class LucernaChunkProgramOverrides {
 
     @Nullable
     public GlProgram<LucernaChunkShaderInterface> getProgramOverride(TerrainRenderPass pass) {
-        if (versionCounterForSodiumShaderReload != Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
-            versionCounterForSodiumShaderReload = Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload();
+        if (versionCounterForCeleritasShaderReload != Lucerna.getPipelineManager().getVersionCounterForCeleritasShaderReload()) {
+            versionCounterForCeleritasShaderReload = Lucerna.getPipelineManager().getVersionCounterForCeleritasShaderReload();
             deleteShaders();
         }
 
         WorldRenderingPipeline worldRenderingPipeline = Lucerna.getPipelineManager().getPipelineNullable();
-        CeleritasTerrainPipeline sodiumTerrainPipeline = worldRenderingPipeline != null ? worldRenderingPipeline.getSodiumTerrainPipeline() : null;
+        CeleritasTerrainPipeline celeritasTerrainPipeline = worldRenderingPipeline != null ? worldRenderingPipeline.getCeleritasTerrainPipeline() : null;
 
-        if (sodiumTerrainPipeline == null) {
+        if (celeritasTerrainPipeline == null) {
             return null;
         }
 
         if (!shadersCreated) {
-            createShaders(sodiumTerrainPipeline);
+            createShaders(celeritasTerrainPipeline);
         }
 
         if (ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {

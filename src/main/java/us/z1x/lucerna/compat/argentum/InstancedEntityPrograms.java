@@ -43,7 +43,7 @@ public final class InstancedEntityPrograms {
     @Nullable
     private static CeleritasTerrainPipeline getTerrainPipeline() {
         WorldRenderingPipeline pipeline = Lucerna.getPipelineManager().getPipelineNullable();
-        return pipeline instanceof DeferredWorldRenderingPipeline ? pipeline.getSodiumTerrainPipeline() : null;
+        return pipeline instanceof DeferredWorldRenderingPipeline ? pipeline.getCeleritasTerrainPipeline() : null;
     }
 
     public static boolean isActive() {
@@ -55,8 +55,8 @@ public final class InstancedEntityPrograms {
     public static GlProgram<?> get(boolean shadow, Supplier<GlProgram<?>> link) {
         CeleritasTerrainPipeline pipeline = getTerrainPipeline();
 
-        if (version != Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload()) {
-            version = Lucerna.getPipelineManager().getVersionCounterForSodiumShaderReload();
+        if (version != Lucerna.getPipelineManager().getVersionCounterForCeleritasShaderReload()) {
+            version = Lucerna.getPipelineManager().getVersionCounterForCeleritasShaderReload();
             delete();
         }
 
